@@ -1,55 +1,14 @@
 "use client";
 
-import {
-  AnimatePresence,
-  motion,
-  useMotionTemplate,
-  useMotionValue,
-  useReducedMotion,
-  useSpring,
-  useTransform,
-} from "framer-motion";
-import { ArrowUpRight, Copy, Mail, Phone, type LucideIcon } from "lucide-react";
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
+import { Fragment, useState, useSyncExternalStore, type ReactNode } from "react";
 
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
 
-// Magnetic feel: how far a card leans toward the cursor.
-const MAX_SHIFT = 6; // px
-const MAX_TILT = 4; // deg
-const COPIED_MS = 1800;
-
-const CHANNELS = [
-  {
-    id: "email",
-    title: "Email",
-    caption: "Project inquiries & consulting",
-    value: "amiralborz2002@gmail.com",
-    copy: "amiralborz2002@gmail.com",
-    href: "mailto:amiralborz2002@gmail.com",
-    openLabel: "Open Mail",
-    icon: Mail,
-  },
-  {
-    id: "phone",
-    title: "Phone",
-    caption: "Quick calls & virtual coffee",
-    value: "+98 938 816 3359",
-    copy: "+989388163359",
-    href: "tel:+989388163359",
-    openLabel: "Call Now",
-    icon: Phone,
-  },
-] as const satisfies readonly {
-  id: string;
-  title: string;
-  caption: string;
-  value: string;
-  copy: string;
-  href: string;
-  openLabel: string;
-  icon: LucideIcon;
-}[];
+const EMAIL = "amiralborz2002@gmail.com";
+const PHONE_DISPLAY = "+98 938 816 3359";
+const PHONE_HREF = "tel:+989388163359";
 
 /** Shared entrance: fade + rise, or fade only when motion is reduced. */
 function rise(delay: number, reduceMotion: boolean) {
@@ -58,6 +17,22 @@ function rise(delay: number, reduceMotion: boolean) {
     animate: { opacity: 1, y: 0 },
     transition: { duration: 0.8, delay, ease },
   };
+}
+
+// True on devices with a real hover (mouse / trackpad). Server snapshot assumes
+// hover so the preview starts hidden and never flashes on desktop.
+const HOVER_QUERY = "(hover: hover) and (pointer: fine)";
+function subscribeHover(onChange: () => void) {
+  const mql = window.matchMedia(HOVER_QUERY);
+  mql.addEventListener("change", onChange);
+  return () => mql.removeEventListener("change", onChange);
+}
+function useCanHover() {
+  return useSyncExternalStore(
+    subscribeHover,
+    () => window.matchMedia(HOVER_QUERY).matches,
+    () => true,
+  );
 }
 
 export function ContactHero() {
@@ -77,7 +52,7 @@ export function ContactHero() {
             {...rise(0, reduceMotion)}
             className="mb-4 text-4xl font-bold tracking-tight text-balance text-white sm:mb-6 sm:text-5xl md:text-6xl"
           >
-            Let&apos;s build systems that work.
+            Let&apos;s build <span className="text-accent">systems</span> that work.
           </motion.h1>
           <motion.p
             {...rise(0.1, reduceMotion)}
@@ -88,236 +63,224 @@ export function ContactHero() {
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-7">
-          {CHANNELS.map((channel, i) => (
-            <motion.div key={channel.id} {...rise(0.2 + i * 0.08, reduceMotion)} className="flex">
-              <ContactCard {...channel} reduceMotion={reduceMotion} />
-            </motion.div>
-          ))}
+        <div className="flex min-w-0 flex-col gap-4 sm:gap-6 lg:col-span-7">
+          <motion.div {...rise(0.2, reduceMotion)}>
+            <EditorCard reduceMotion={reduceMotion} />
+          </motion.div>
+          <motion.div {...rise(0.3, reduceMotion)}>
+            <TerminalCard reduceMotion={reduceMotion} />
+          </motion.div>
         </div>
       </div>
     </section>
   );
 }
 
-async function copyToClipboard(text: string) {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    // Older browsers / insecure contexts: fall back to a hidden textarea.
-    const area = document.createElement("textarea");
-    area.value = text;
-    area.setAttribute("readonly", "");
-    area.style.cssText = "position:fixed;opacity:0;pointer-events:none";
-    document.body.appendChild(area);
-    area.select();
-    const ok = document.execCommand("copy");
-    area.remove();
-    return ok;
-  }
-}
+/* ───────────────────────────── Window chrome ───────────────────────────── */
 
-function ContactCard({
-  title,
-  caption,
-  value,
-  copy,
-  href,
-  openLabel,
-  icon: Icon,
-  reduceMotion,
-}: (typeof CHANNELS)[number] & { reduceMotion: boolean }) {
-  // Pointer position inside the card, -0.5 … 0.5 on each axis.
-  const px = useMotionValue(0);
-  const py = useMotionValue(0);
-  const spring = { stiffness: 200, damping: 20, mass: 0.6 };
-  const x = useSpring(useTransform(px, [-0.5, 0.5], [-MAX_SHIFT, MAX_SHIFT]), spring);
-  const y = useSpring(useTransform(py, [-0.5, 0.5], [-MAX_SHIFT, MAX_SHIFT]), spring);
-  const rotateX = useSpring(useTransform(py, [-0.5, 0.5], [MAX_TILT, -MAX_TILT]), spring);
-  const rotateY = useSpring(useTransform(px, [-0.5, 0.5], [-MAX_TILT, MAX_TILT]), spring);
+const windowFrame =
+  "relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/80 shadow-ambient-lg backdrop-blur-xl transition-[border-color,box-shadow] duration-500 ease-apple";
 
-  // Soft accent light that follows the pointer across the glass.
-  const lightX = useTransform(px, [-0.5, 0.5], [0, 100]);
-  const lightY = useTransform(py, [-0.5, 0.5], [0, 100]);
-  const light = useMotionTemplate`radial-gradient(420px circle at ${lightX}% ${lightY}%, color-mix(in oklab, var(--color-accent) 12%, transparent), transparent 70%)`;
-
-  const onPointerMove = (event: PointerEvent<HTMLElement>) => {
-    if (event.pointerType !== "mouse") return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    px.set((event.clientX - rect.left) / rect.width - 0.5);
-    py.set((event.clientY - rect.top) / rect.height - 0.5);
-  };
-
-  const onPointerLeave = () => {
-    px.set(0);
-    py.set(0);
-  };
-
+/** macOS-style title bar. Dots stay muted until the window is hovered. */
+function TitleBar({ title, meta }: { title: ReactNode; meta?: ReactNode }) {
+  const dots = ["group-hover:bg-[#ff5f57]", "group-hover:bg-[#febc2e]", "group-hover:bg-[#28c840]"];
   return (
-    <motion.article
-      onPointerMove={onPointerMove}
-      onPointerLeave={onPointerLeave}
-      style={reduceMotion ? undefined : { x, y, rotateX, rotateY, transformPerspective: 1000 }}
-      whileHover={reduceMotion ? undefined : { scale: 1.015 }}
-      transition={{ type: "spring", stiffness: 300, damping: 26 }}
-      className="group @container relative isolate flex w-full min-w-0 flex-col justify-between gap-3 overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-5 shadow-ambient backdrop-blur-xl transition-[border-color,background-color,box-shadow] duration-500 ease-apple hover:border-white/20 hover:bg-white/[0.07] hover:shadow-ambient-lg has-[:focus-visible]:border-white/20 sm:min-h-[280px] sm:gap-6 sm:p-8"
-    >
-      {/* Lit top edge of the glass */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
-      />
-      <motion.span
-        aria-hidden
-        style={{ background: light }}
-        className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 ease-apple group-hover:opacity-100"
-      />
-
-      {/* Top: icon + title */}
-      <header className="flex items-center gap-3">
-        <span className="inline-flex size-10 items-center justify-center rounded-2xl sm:size-11 border border-white/10 bg-white/5 text-zinc-300 transition-colors duration-500 ease-apple group-hover:border-accent/40 group-hover:text-accent">
-          <Icon className="size-5" strokeWidth={1.75} aria-hidden />
-        </span>
-        <div>
-          <h2 className="text-sm font-medium text-white">{title}</h2>
-          <p className="hidden text-xs text-zinc-500 sm:block">{caption}</p>
-        </div>
-      </header>
-
-      {/* Middle: the value — sized to the card's own width so it never wraps */}
-      <p className="truncate text-[clamp(0.875rem,6.2cqi,1.75rem)] font-semibold tracking-tight text-white">
-        {value}
-      </p>
-
-      {/* Bottom: dual action */}
-      <div className="flex items-center gap-2 transition-[opacity,transform] duration-500 ease-apple pointer-fine:translate-y-1 pointer-fine:opacity-70 pointer-fine:group-hover:translate-y-0 pointer-fine:group-hover:opacity-100 pointer-fine:group-has-[:focus-visible]:translate-y-0 pointer-fine:group-has-[:focus-visible]:opacity-100">
-        <CopyButton text={copy} label={title} reduceMotion={reduceMotion} />
-        <a
-          href={href}
-          className="group/open inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-sm font-medium whitespace-nowrap text-zinc-300 transition-colors duration-300 hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {openLabel}
-          <span aria-hidden className="relative inline-flex size-4 overflow-hidden">
-            {/* The arrow fires off top-right while a fresh one slides in. */}
-            <ArrowUpRight className="size-4 transition-transform duration-500 ease-apple group-hover/open:-translate-y-4 group-hover/open:translate-x-4" />
-            <ArrowUpRight className="absolute inset-0 size-4 -translate-x-4 translate-y-4 text-accent transition-transform duration-500 ease-apple group-hover/open:translate-x-0 group-hover/open:translate-y-0" />
-          </span>
-        </a>
+    <div className="relative flex h-9 items-center border-b border-white/10 bg-white/[0.03] px-4 sm:h-10">
+      <div aria-hidden className="flex gap-1.5">
+        {dots.map((hover) => (
+          <span
+            key={hover}
+            className={`size-3 rounded-full bg-white/20 transition-colors duration-300 ${hover}`}
+          />
+        ))}
       </div>
-    </motion.article>
+      <div className="absolute inset-x-0 flex justify-center font-mono text-xs text-zinc-400 pointer-events-none">
+        {title}
+      </div>
+      {meta && <div className="ml-auto font-mono text-[10px] text-zinc-600">{meta}</div>}
+    </div>
   );
 }
 
-/** Copy pill: fills orange from the left, pops, and swaps to a drawn-in check. */
-function CopyButton({
-  text,
-  label,
-  reduceMotion,
-}: {
-  text: string;
-  label: string;
-  reduceMotion: boolean;
-}) {
-  const [copied, setCopied] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+/* ───────────────────────────── Card 1: IDE ───────────────────────────── */
 
-  useEffect(() => () => clearTimeout(timer.current), []);
+// One token per span: [text, colour class].
+type Token = readonly [string, string];
+const P = "text-zinc-500"; // punctuation
+const TAG = "text-blue-400";
+const ATTR = "text-purple-400";
+const STR = "text-orange-400";
+const TEXT = "text-zinc-200";
 
-  const onClick = async () => {
-    if (!(await copyToClipboard(text))) return;
-    setCopied(true);
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => setCopied(false), COPIED_MS);
-  };
+const CODE: readonly (readonly Token[])[] = [
+  [
+    ["<", P],
+    ["Button", TAG],
+  ],
+  [
+    ["  variant", ATTR],
+    ["=", P],
+    ['"primary"', STR],
+  ],
+  [
+    ["  action", ATTR],
+    ["=", P],
+    [`"mailto:${EMAIL}"`, STR],
+  ],
+  [[">", P]],
+  [["  Say Hello", TEXT]],
+  [
+    ["</", P],
+    ["Button", TAG],
+    [">", P],
+  ],
+];
+
+function EditorCard({ reduceMotion }: { reduceMotion: boolean }) {
+  const canHover = useCanHover();
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  // Touch devices can't hover, so the preview simply stays open there.
+  const showPreview = !canHover || hovered || focused;
 
   return (
-    <>
-      <motion.button
-        type="button"
-        onClick={onClick}
-        whileTap={reduceMotion ? undefined : { scale: 0.94 }}
-        animate={copied && !reduceMotion ? { scale: [1, 1.06, 1] } : { scale: 1 }}
-        transition={{ duration: 0.35, ease }}
-        aria-label={copied ? `${label} copied` : `Copy ${label.toLowerCase()} to clipboard`}
-        className={`relative isolate inline-flex h-10 items-center gap-2 overflow-hidden rounded-full border px-4 text-sm font-medium whitespace-nowrap transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-          copied
-            ? "border-accent text-accent-foreground"
-            : "border-white/10 bg-white/5 text-white hover:border-white/20 hover:bg-white/10"
-        }`}
-      >
-        {/* Orange fill that sweeps in from the left on copy. */}
-        <motion.span
-          aria-hidden
-          initial={false}
-          animate={{ clipPath: copied ? "inset(0 0% 0 0)" : "inset(0 100% 0 0)" }}
-          transition={{ duration: reduceMotion ? 0 : 0.45, ease }}
-          className="absolute inset-0 -z-10 bg-accent"
-        />
-
-        <span className="relative inline-flex size-4 items-center justify-center">
-          <AnimatePresence mode="popLayout" initial={false}>
-            {copied ? (
-              <motion.svg
-                key="check"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={3}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-4"
-                aria-hidden
-                initial={{ scale: 0.6, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.6, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 500, damping: 24 }}
-              >
-                <motion.path
-                  d="M20 6 9 17l-5-5"
-                  initial={{ pathLength: reduceMotion ? 1 : 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 0.35, delay: 0.1, ease }}
-                />
-              </motion.svg>
-            ) : (
-              <motion.span
-                key="copy"
-                className="inline-flex"
-                initial={{ scale: 0.6, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.6, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 500, damping: 24 }}
-              >
-                <Copy className="size-4" aria-hidden />
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </span>
-
-        {/* Fixed-width label slot so the pill doesn't jump between states. */}
-        <span className="relative grid">
-          <span aria-hidden className="invisible col-start-1 row-start-1">
-            Copied!
+    <div
+      onPointerEnter={(e) => e.pointerType === "mouse" && setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setFocused(false)}
+      className={`group ${windowFrame} hover:border-white/20 focus-within:border-white/20`}
+    >
+      <TitleBar
+        title={
+          <span className="inline-flex items-center gap-2">
+            <span className="size-1.5 rounded-full bg-accent" aria-hidden />
+            EmailClient.tsx
           </span>
-          <AnimatePresence mode="popLayout" initial={false}>
-            <motion.span
-              key={copied ? "copied" : "copy"}
-              aria-hidden
-              className="col-start-1 row-start-1"
-              initial={{ y: 12, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -12, opacity: 0 }}
-              transition={{ duration: 0.25, ease }}
+        }
+        meta="TSX"
+      />
+
+      <div className="relative">
+        <pre
+          aria-label={`React snippet: a primary button that opens mailto:${EMAIL}`}
+          className="overflow-x-auto px-4 py-3 font-mono text-[11px] leading-[1.7] sm:px-5 sm:py-4 sm:text-sm"
+        >
+          <code>
+            {CODE.map((line, i) => (
+              <div key={i} className="flex">
+                <span
+                  aria-hidden
+                  className="mr-4 hidden w-4 shrink-0 text-right text-zinc-600 select-none sm:inline-block sm:mr-5"
+                >
+                  {i + 1}
+                </span>
+                <span className="whitespace-pre">
+                  {line.map(([text, color], j) => (
+                    <span key={j} className={color}>
+                      {text}
+                    </span>
+                  ))}
+                </span>
+              </div>
+            ))}
+          </code>
+        </pre>
+
+        {/* Live preview of the snippet, floating over the editor. */}
+        <AnimatePresence>
+          {showPreview && (
+            <motion.div
+              initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
+              transition={{ duration: 0.35, ease }}
+              className="absolute right-3 bottom-2 flex items-center gap-2.5 rounded-full border border-white/15 bg-zinc-900/70 py-1 pr-1 pl-3.5 shadow-ambient-lg backdrop-blur-md sm:right-4 sm:bottom-3 sm:gap-3 sm:pl-4"
             >
-              {copied ? "Copied!" : "Copy"}
-            </motion.span>
-          </AnimatePresence>
-        </span>
-      </motion.button>
-      <span role="status" aria-live="polite" className="sr-only">
-        {copied ? `${label} copied to clipboard` : ""}
-      </span>
-    </>
+              <p className="font-mono text-[9px] tracking-[0.18em] text-zinc-500 sm:text-[10px]">
+                PREVIEW
+              </p>
+              <a
+                href={`mailto:${EMAIL}`}
+                className="group/btn inline-flex h-8 items-center gap-1.5 rounded-full bg-accent px-3.5 text-xs font-medium whitespace-nowrap text-accent-foreground shadow-glow transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 sm:h-9 sm:px-4 sm:text-sm"
+              >
+                Say Hello
+                <ArrowUpRight
+                  aria-hidden
+                  className="size-4 transition-transform duration-300 ease-apple group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
+                />
+              </a>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+/* ───────────────────────────── Card 2: Terminal ───────────────────────────── */
+
+const GREEN_GLOW =
+  "transition-[text-shadow] duration-300 group-hover:[text-shadow:0_0_10px_rgb(74_222_128/0.75),0_0_24px_rgb(74_222_128/0.35)]";
+
+function TerminalCard({ reduceMotion }: { reduceMotion: boolean }) {
+  const lines: ReactNode[] = [
+    <Fragment key="cmd">
+      <span className="text-zinc-500">&gt; </span>
+      <span className="text-blue-400">initiate_call</span>{" "}
+      <span className="text-purple-400">--target</span>{" "}
+      <span className="text-orange-400">&quot;{PHONE_DISPLAY}&quot;</span>
+    </Fragment>,
+    <Fragment key="wait">
+      <span className="text-zinc-500">&gt; </span>
+      <span className="text-zinc-400">establishing secure line...</span>
+    </Fragment>,
+    <span key="ok" className={`text-green-400 ${GREEN_GLOW}`}>
+      ✓ Status: Ready to connect
+    </span>,
+  ];
+
+  return (
+    <motion.a
+      href={PHONE_HREF}
+      aria-label={`Call ${PHONE_DISPLAY}`}
+      whileHover={reduceMotion ? undefined : { scale: 1.015 }}
+      whileTap={reduceMotion ? undefined : { scale: 0.99 }}
+      transition={{ duration: 0.3, ease }}
+      className={`group block ${windowFrame} hover:border-green-400/30 hover:shadow-[0_0_0_1px_rgb(74_222_128/0.08),0_24px_60px_-24px_rgb(74_222_128/0.25)] focus-visible:border-green-400/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40`}
+    >
+      <TitleBar title="zsh — connection" meta="80×24" />
+
+      <div className="overflow-x-auto px-4 py-3 font-mono text-[11px] leading-[1.7] sm:px-5 sm:py-4 sm:text-sm">
+        {lines.map((line, i) => (
+          <motion.div
+            key={i}
+            className="whitespace-pre"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.01, delay: reduceMotion ? 0 : 0.7 + i * 0.35 }}
+          >
+            {line}
+          </motion.div>
+        ))}
+        <motion.div
+          aria-hidden
+          className="flex items-center gap-2 whitespace-pre text-zinc-500"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.01, delay: reduceMotion ? 0 : 0.7 + lines.length * 0.35 }}
+        >
+          <span>&gt;</span>
+          <span
+            className={`inline-block h-[1.1em] w-[0.6em] bg-zinc-400 group-hover:bg-green-400 ${
+              reduceMotion ? "" : "animate-caret-blink"
+            }`}
+          />
+          <span className="text-zinc-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+            ↵ press to dial
+          </span>
+        </motion.div>
+      </div>
+    </motion.a>
   );
 }
