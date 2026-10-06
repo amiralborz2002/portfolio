@@ -1,149 +1,108 @@
 "use client";
 
-import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { MapPin, Workflow } from "lucide-react";
-import type { ReactNode } from "react";
-
-import { BentoCard } from "../ui/BentoCard";
-import { Button } from "../ui/Button";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
+
+const greetings = [
+  { text: "Hello.", lang: "en", dir: "ltr" },
+  { text: "Hallo.", lang: "nl", dir: "ltr" },
+  { text: "سلام.", lang: "fa", dir: "rtl" },
+] as const;
+
+const GREETING_INTERVAL_MS = 2600;
 
 export function Hero() {
   const reduceMotion = useReducedMotion();
 
-  const grid: Variants = {
-    hidden: {},
-    show: {
-      transition: { staggerChildren: 0.12, delayChildren: 0.1 },
-    },
-  };
-
-  const card: Variants = {
-    hidden: reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.96 },
-    show: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: { duration: 0.7, ease },
-    },
-  };
-
   return (
-    <section aria-labelledby="hero-title" className="mx-auto w-full max-w-6xl px-6 pt-10 pb-section sm:pt-16">
+    <section
+      aria-labelledby="hero-title"
+      className="relative mx-auto flex min-h-[85vh] w-full max-w-6xl flex-col justify-center px-6 pt-16 pb-28"
+    >
       <motion.div
-        variants={grid}
-        initial="hidden"
-        animate="show"
-        className="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:grid-rows-3 lg:gap-5"
+        initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, ease }}
+        className="flex flex-col items-start"
       >
-        {/* 1. Main introductory card */}
-        <BentoCard
-          variants={card}
-          padding="lg"
-          className="lg:col-span-2 lg:row-span-3"
-          contentClassName="flex flex-col justify-between gap-12 lg:p-14"
+        <RotatingGreeting reduceMotion={!!reduceMotion} />
+
+        <h1
+          id="hero-title"
+          className="mt-4 max-w-5xl text-6xl font-bold tracking-tight text-white md:text-8xl"
         >
-          <div className="flex flex-col gap-6">
-            <span className="eyebrow">Senior UX Designer</span>
+          I design complex systems and digital products.
+        </h1>
 
-            <h1 id="hero-title" className="text-display-lg max-w-2xl">
-              Designing systems, not just screens.
-            </h1>
-
-            <p className="max-w-xl text-base leading-relaxed text-muted sm:text-lg">
-              With ~5 years of product design experience, I translate complex business logic into
-              seamless user experiences. Bridging system thinking, technical constraints, and
-              product strategy.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Button href="/contact" variant="primary" size="lg">
-              Let&apos;s Talk
-            </Button>
-            <Button href="/work" variant="outline" size="lg">
-              View Works
-            </Button>
-          </div>
-        </BentoCard>
-
-        {/* 2. Location card */}
-        <BentoCard
-          variants={card}
-          padding="md"
-          radius="2xl"
-          interactive
-          className="lg:col-start-3"
-          contentClassName="flex flex-col justify-between gap-6"
-        >
-          <IconBadge>
-            <MapPin className="size-5" strokeWidth={1.5} aria-hidden />
-          </IconBadge>
-          <p className="text-base font-medium text-foreground">
-            Based in Haarlem, Netherlands
-          </p>
-        </BentoCard>
-
-        {/* 3. Availability card */}
-        <BentoCard
-          variants={card}
-          padding="md"
-          radius="2xl"
-          interactive
-          className="lg:col-start-3"
-          contentClassName="flex flex-col justify-between gap-6"
-        >
-          <div className="flex size-10 items-center justify-center">
-            <PulseDot animate={!reduceMotion} />
-          </div>
-          <p className="text-base font-medium text-foreground">Available for new projects</p>
-        </BentoCard>
-
-        {/* 4. Mindset card */}
-        <BentoCard
-          variants={card}
-          padding="md"
-          radius="2xl"
-          interactive
-          className="lg:col-start-3"
-          contentClassName="flex flex-col justify-between gap-6"
-        >
-          <IconBadge>
-            <Workflow className="size-5" strokeWidth={1.5} aria-hidden />
-          </IconBadge>
-          <div className="flex flex-col gap-1.5">
-            <h2 className="text-base font-semibold">System Thinker</h2>
-            <p className="text-sm leading-relaxed text-muted">
-              Exploring mechanisms, behavioral economics &amp; code.
-            </p>
-          </div>
-        </BentoCard>
+        <p className="mt-6 max-w-2xl text-lg text-zinc-400 md:text-xl">
+          I&apos;m Amir Alborz, a Senior UX Designer &amp; Information Architect blending
+          behavioral economics, system thinking, and technical logic.
+        </p>
       </motion.div>
+
+      <ScrollIndicator reduceMotion={!!reduceMotion} />
     </section>
   );
 }
 
-function IconBadge({ children }: { children: ReactNode }) {
+function RotatingGreeting({ reduceMotion }: { reduceMotion: boolean }) {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(
+      () => setIndex((i) => (i + 1) % greetings.length),
+      GREETING_INTERVAL_MS,
+    );
+    return () => window.clearInterval(id);
+  }, []);
+
+  const greeting = greetings[index];
+  const offset = reduceMotion ? 0 : 12;
+
   return (
-    <span className="inline-flex size-10 items-center justify-center rounded-full border border-hairline/10 bg-hairline/5 text-accent">
-      {children}
-    </span>
+    <p className="relative h-10 text-2xl font-medium text-accent md:h-12 md:text-4xl">
+      {/* Static label for assistive tech so the cycling text isn't re-announced */}
+      <span className="sr-only">Hello.</span>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={greeting.text}
+          aria-hidden
+          lang={greeting.lang}
+          dir={greeting.dir}
+          className="inline-block"
+          initial={{ opacity: 0, y: offset }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -offset }}
+          transition={{ duration: 0.5, ease }}
+        >
+          {greeting.text}
+        </motion.span>
+      </AnimatePresence>
+    </p>
   );
 }
 
-function PulseDot({ animate }: { animate: boolean }) {
+function ScrollIndicator({ reduceMotion }: { reduceMotion: boolean }) {
   return (
-    <span aria-hidden className="relative flex size-3">
-      {animate && (
+    <motion.a
+      href="#at-a-glance"
+      aria-label="Scroll to the next section"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 1.2, duration: 0.8, ease }}
+      className="group absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 text-subtle hover:text-foreground"
+    >
+      <span className="text-eyebrow uppercase">Scroll</span>
+      <span className="flex h-10 w-6 justify-center rounded-full border border-hairline/20 pt-2 transition-colors duration-300 group-hover:border-hairline/40">
         <motion.span
-          className="absolute inset-0 rounded-full bg-emerald-400"
-          initial={{ scale: 1, opacity: 0.6 }}
-          animate={{ scale: 2.6, opacity: 0 }}
-          transition={{ duration: 1.8, ease: "easeOut", repeat: Infinity }}
+          aria-hidden
+          className="block h-2 w-1 rounded-full bg-current"
+          animate={reduceMotion ? undefined : { y: [0, 10, 0], opacity: [1, 0.2, 1] }}
+          transition={{ duration: 1.8, ease: "easeInOut", repeat: Infinity }}
         />
-      )}
-      <span className="relative size-3 rounded-full bg-emerald-500 shadow-[0_0_12px_rgb(16_185_129/0.6)]" />
-    </span>
+      </span>
+    </motion.a>
   );
 }
