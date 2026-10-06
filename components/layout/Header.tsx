@@ -60,24 +60,29 @@ export function Header() {
           ))}
         </nav>
 
-        {/* Desktop CTA */}
-        <div className="hidden justify-self-end md:block">
-          <Button href="/contact" size="sm">
+        {/* Primary CTA — always visible, on every breakpoint */}
+        <div className="flex items-center gap-2 justify-self-end">
+          <Button
+            href="/contact"
+            size="sm"
+            aria-current={isActive("/contact") ? "page" : undefined}
+            className="shadow-glow"
+          >
             Get in touch
           </Button>
-        </div>
 
-        {/* Mobile toggle */}
-        <button
-          type="button"
-          onClick={() => setOpen(!open)}
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          aria-label={open ? "Close menu" : "Open menu"}
-          className="inline-flex size-10 items-center justify-center rounded-full border border-white/10 text-white transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent md:hidden"
-        >
-          {open ? <X className="size-5" /> : <Menu className="size-5" />}
-        </button>
+          {/* Mobile toggle */}
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? "Close menu" : "Open menu"}
+            className="inline-flex size-10 items-center justify-center rounded-full border border-white/10 text-white transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent md:hidden"
+          >
+            {open ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile dropdown */}
@@ -104,9 +109,6 @@ export function Header() {
                   {label}
                 </Link>
               ))}
-              <Button href="/contact" size="lg" className="mt-3 w-full">
-                Get in touch
-              </Button>
             </nav>
           </motion.div>
         )}
