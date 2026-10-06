@@ -15,17 +15,16 @@ const NAV_LINKS = [
 
 export function Header() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-
-  // Close the mobile menu after navigating.
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  // Remember which route the mobile menu was opened on; navigating anywhere
+  // else closes it without needing an effect to reset state.
+  const [openOn, setOpenOn] = useState<string | null>(null);
+  const open = openOn === pathname;
+  const setOpen = (next: boolean) => setOpenOn(next ? pathname : null);
 
   // Close on Escape.
   useEffect(() => {
     if (!open) return;
-    const onKeyDown = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    const onKeyDown = (e: KeyboardEvent) => e.key === "Escape" && setOpenOn(null);
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open]);
@@ -71,7 +70,7 @@ export function Header() {
         {/* Mobile toggle */}
         <button
           type="button"
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => setOpen(!open)}
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? "Close menu" : "Open menu"}
