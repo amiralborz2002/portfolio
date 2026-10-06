@@ -3,7 +3,6 @@
 import {
   AnimatePresence,
   motion,
-  useMotionValue,
   useReducedMotion,
   useScroll,
   useSpring,
@@ -13,7 +12,7 @@ import {
   type TargetAndTransition,
 } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
-import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode, type Ref } from "react";
+import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -29,7 +28,7 @@ type Testimonial = {
 
 /*
  * PLACEHOLDER CONTENT: replace every entry with a real recommendation
- * (and real names) before publishing. Any even count balances the columns.
+ * (and real names) before publishing. Desktop shows nine, three per column.
  */
 const TESTIMONIALS: Testimonial[] = [
   {
@@ -96,6 +95,14 @@ const TESTIMONIALS: Testimonial[] = [
     role: "Product Manager",
     company: "Company",
   },
+  {
+    id: "a9",
+    quote:
+      "Amir documents his thinking so clearly that onboarding new teammates became effortless. The design rationale outlived the project and still guides us.",
+    name: "Recommender Name",
+    role: "Design Director",
+    company: "Company",
+  },
 ];
 
 export function AboutTestimonials() {
@@ -108,93 +115,59 @@ export function AboutTestimonials() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Desktop: two columns drifting in opposite directions                 */
+/* Desktop: three columns, only the centre one drifts                   */
 /* ------------------------------------------------------------------ */
 
-const LEFT = TESTIMONIALS.filter((_, i) => i % 2 === 0);
-const RIGHT = TESTIMONIALS.filter((_, i) => i % 2 === 1);
+// Columns are slices of the data: 0-2 left, 3-5 centre, 6-8 right.
+const LEFT = TESTIMONIALS.slice(0, 3);
+const CENTER = TESTIMONIALS.slice(3, 6);
+const RIGHT = TESTIMONIALS.slice(6, 9);
+
+// The centre column drifts from DRIFT px below its resting spot to DRIFT px
+// above it over the whole scroll: slow enough to read while it moves.
+const DRIFT = 48;
 
 function ParallaxColumns() {
   const reduceMotion = !!useReducedMotion();
-  const frameRef = useRef<HTMLDivElement>(null);
-  const leftRef = useRef<HTMLDivElement>(null);
-  const rightRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
-  // How far each column overflows the frame: exactly the distance it can
-  // travel without ever exposing an empty edge. Measured, since card heights
-  // follow their copy.
-  const leftTravel = useMotionValue(0);
-  const rightTravel = useMotionValue(0);
-
-  useEffect(() => {
-    const frame = frameRef.current;
-    const left = leftRef.current;
-    const right = rightRef.current;
-    if (!frame || !left || !right) return;
-
-    const measure = () => {
-      leftTravel.set(Math.max(0, left.offsetHeight - frame.clientHeight));
-      rightTravel.set(Math.max(0, right.offsetHeight - frame.clientHeight));
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    [frame, left, right].forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [leftTravel, rightTravel]);
-
-  // 0 as the frame's top enters at the bottom of the viewport, 1 as its bottom
+  // 0 as the grid's top enters at the bottom of the viewport, 1 as its bottom
   // reaches the bottom. That end point is always reachable, even this close
   // to the foot of the page, so the full drift always plays out.
-  const { scrollYProgress } = useScroll({ target: frameRef, offset: ["start end", "end end"] });
-  // A light spring keeps wheel steps from making the columns judder.
+  const { scrollYProgress } = useScroll({ target: gridRef, offset: ["start end", "end end"] });
+  // A light spring keeps wheel steps from making the column judder.
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
-
-  // Left starts flush with the top and rises; right starts raised and sinks.
-  const leftY = useTransform(
-    [progress, leftTravel],
-    ([p, travel]: number[]) => -p * travel,
-  );
-  const rightY = useTransform(
-    [progress, rightTravel],
-    ([p, travel]: number[]) => -(1 - p) * travel,
-  );
+  const centerY = useTransform(progress, [0, 1], [DRIFT, -DRIFT]);
 
   return (
-    <div
-      ref={frameRef}
-      className={cn(
-        // items-start: columns keep their natural (taller) height so they overflow the frame.
-        "relative hidden items-start gap-6 md:flex",
-        // Reduced motion: no drifting, so show every card instead of clipping.
-        !reduceMotion && "h-[800px] overflow-hidden",
-      )}
-      style={
-        reduceMotion
-          ? undefined
-          : {
-              // Cards fade in and out at the frame's edges instead of being cut off.
-              maskImage: "linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent)",
-              WebkitMaskImage: "linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent)",
-            }
-      }
-    >
-      <Column items={LEFT} y={reduceMotion ? undefined : leftY} columnRef={leftRef} />
-      <Column items={RIGHT} y={reduceMotion ? undefined : rightY} columnRef={rightRef} />
+    <div ref={gridRef} className="hidden items-start gap-6 md:grid md:grid-cols-3">
+      <Column items={LEFT} />
+
+      {/*
+        The centre column alone is masked, so the static side columns stay
+        crisp. The wrapper reaches 96px past the grid at both ends: the column
+        drifts into that margin and fades as it nears the edge instead of
+        being clipped.
+      */}
+      <div
+        className="-my-24 self-stretch overflow-hidden py-24"
+        style={{
+          maskImage: "linear-gradient(to bottom, transparent, #000 96px, #000 calc(100% - 96px), transparent)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent, #000 96px, #000 calc(100% - 96px), transparent)",
+        }}
+      >
+        <Column items={CENTER} y={reduceMotion ? undefined : centerY} />
+      </div>
+
+      <Column items={RIGHT} />
     </div>
   );
 }
 
-function Column({
-  items,
-  y,
-  columnRef,
-}: {
-  items: Testimonial[];
-  y?: MotionValue<number>;
-  columnRef: Ref<HTMLDivElement>;
-}) {
+function Column({ items, y }: { items: Testimonial[]; y?: MotionValue<number> }) {
   return (
-    <motion.div ref={columnRef} style={{ y }} className="flex flex-1 flex-col gap-6 will-change-transform">
+    <motion.div style={{ y }} className={cn("flex flex-col gap-6", y && "will-change-transform")}>
       {items.map((t) => (
         <TestimonialCard key={t.id} testimonial={t} />
       ))}
