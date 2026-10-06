@@ -1,0 +1,174 @@
+@import "tailwindcss";
+
+/* Dark is the default; keep the class variant available for a future light theme */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─────────────────────────────────────────────
+   Design tokens — Tailwind v4 reads these and generates utilities:
+   bg-surface/50, border-hairline/10, text-display-xl, shadow-ambient, ease-apple, py-section …
+   ───────────────────────────────────────────── */
+@theme {
+  /* Colors */
+  --color-background: #09090b;        /* zinc-950 */
+  --color-surface: #18181b;           /* zinc-900 — use as bg-surface/50 */
+  --color-surface-raised: #27272a;    /* zinc-800 */
+  --color-foreground: #fafafa;        /* zinc-50  — headings */
+  --color-muted: #a1a1aa;             /* zinc-400 — paragraphs */
+  --color-subtle: #71717a;            /* zinc-500 — meta / captions only */
+  --color-hairline: #ffffff;          /* use at /10 – /20 */
+  --color-accent: #f97316;            /* orange-500 */
+  --color-accent-hover: #fb923c;      /* orange-400 */
+  --color-accent-foreground: #09090b; /* text on accent */
+
+  /* Display type scale — tight tracking, compact leading, confident weight */
+  --text-display-2xl: clamp(3.5rem, 7vw, 5.5rem);
+  --text-display-2xl--line-height: 1.02;
+  --text-display-2xl--letter-spacing: -0.045em;
+  --text-display-2xl--font-weight: 600;
+
+  --text-display-xl: clamp(2.75rem, 5vw, 4rem);
+  --text-display-xl--line-height: 1.05;
+  --text-display-xl--letter-spacing: -0.04em;
+  --text-display-xl--font-weight: 600;
+
+  --text-display-lg: clamp(2rem, 3.5vw, 2.75rem);
+  --text-display-lg--line-height: 1.1;
+  --text-display-lg--letter-spacing: -0.03em;
+  --text-display-lg--font-weight: 600;
+
+  --text-title: 1.5rem;
+  --text-title--line-height: 1.25;
+  --text-title--letter-spacing: -0.02em;
+  --text-title--font-weight: 600;
+
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1rem;
+  --text-eyebrow--letter-spacing: 0.14em;
+  --text-eyebrow--font-weight: 500;
+
+  --tracking-tightest: -0.045em;
+
+  /* Geometry (rounded-2xl / 3xl / 4xl / full are built into v4) */
+  --spacing-section: clamp(6rem, 12vw, 10rem); /* py-section, gap-section */
+  --container-prose: 65ch;                     /* max-w-prose */
+  --container-page: 80rem;                     /* max-w-page */
+
+  /* Soft, diffuse ambient shadows — never a hard drop-shadow */
+  --shadow-ambient: inset 0 1px 0 0 rgb(255 255 255 / 0.04), 0 24px 48px -24px rgb(0 0 0 / 0.55);
+  --shadow-ambient-lg: inset 0 1px 0 0 rgb(255 255 255 / 0.06), 0 40px 80px -32px rgb(0 0 0 / 0.7);
+  --shadow-glow: 0 0 0 1px rgb(249 115 22 / 0.35), 0 10px 30px -10px rgb(249 115 22 / 0.45);
+
+  /* Motion */
+  --ease-apple: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Fonts come from next/font CSS variables set on <html>; `inline` resolves them at use site */
+@theme inline {
+  --font-sans: var(--font-geist-sans), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+/* ─────────────────────────────────────────────
+   Reset + base
+   ───────────────────────────────────────────── */
+@layer base {
+  :root {
+    --header-height: 4rem;
+    color-scheme: dark;
+  }
+
+  /* v4 defaults borders to currentColor — make every border a hairline */
+  *,
+  ::before,
+  ::after,
+  ::backdrop {
+    border-color: color-mix(in oklab, var(--color-hairline) 10%, transparent);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-height) + 1rem);
+    @apply bg-background antialiased;
+  }
+
+  body {
+    @apply min-h-dvh bg-background font-sans text-base leading-relaxed text-muted;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight text-balance text-foreground;
+  }
+
+  p {
+    @apply text-pretty;
+  }
+
+  a {
+    @apply transition-colors duration-300 ease-apple;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer; /* v4 resets buttons to cursor: default */
+  }
+
+  ::selection {
+    @apply bg-accent/30 text-foreground;
+  }
+
+  :focus-visible {
+    @apply rounded-md outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-background;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--color-hairline) 15%, transparent) transparent;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Custom utilities (work with variants: md:glass, hover:… )
+   ───────────────────────────────────────────── */
+
+/* Page shell — centered, generous gutters */
+@utility container {
+  margin-inline: auto;
+  max-width: var(--container-page);
+  padding-inline: 1.25rem;
+  @media (width >= 40rem) { padding-inline: 2rem; }
+  @media (width >= 64rem) { padding-inline: 3rem; }
+}
+
+/* Glass surface — the Bento material */
+@utility glass {
+  @apply border border-hairline/10 bg-surface/50 shadow-ambient backdrop-blur-xl;
+}
+
+/* Small uppercase label above headings */
+@utility eyebrow {
+  @apply font-mono text-eyebrow uppercase text-subtle;
+}
+
+/* Vertical rhythm between page sections */
+@utility section {
+  @apply py-section;
+}
+
+/* ─────────────────────────────────────────────
+   Accessibility — respect reduced motion
+   ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
