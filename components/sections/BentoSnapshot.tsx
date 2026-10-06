@@ -350,11 +350,15 @@ function CodeMockup({ reduceMotion }: { reduceMotion: boolean }) {
 /* ───────────────────────── 4. tool marquee ───────────────────────── */
 
 const TOOLS: { name: string; icon: ReactNode }[] = [
+  // Ordered along the design → deploy spectrum
   { name: "Figma", icon: <FigmaMark /> },
+  { name: "FigJam", icon: <FigJamMark /> },
+  { name: "Photoshop", icon: <AdobeMark label="Ps" bg="#001E36" fg="#31A8FF" /> },
+  { name: "Illustrator", icon: <AdobeMark label="Ai" bg="#330000" fg="#FF9A00" /> },
+  { name: "Blender", icon: <BlenderMark /> },
   { name: "Cursor", icon: <CursorMark /> },
   { name: "Python", icon: <PythonMark /> },
   { name: "Terminal", icon: <SquareTerminal className="size-4 text-emerald-400" strokeWidth={1.75} /> },
-  { name: "Blender", icon: <BlenderMark /> },
   { name: "GitHub", icon: <GitHubMark /> },
 ];
 
@@ -592,6 +596,36 @@ function FigmaMark() {
       <path d="M12 9H8.5a3.5 3.5 0 0 0 0 7H12z" fill="#A259FF" />
       <circle cx="15.5" cy="12.5" r="3.5" fill="#1ABCFE" />
       <path d="M12 16H8.5a3.5 3.5 0 1 0 3.5 3.5z" fill="#0ACF83" />
+    </svg>
+  );
+}
+
+function FigJamMark() {
+  // Sticky note with a folded corner
+  return (
+    <svg viewBox="0 0 24 24" className="size-4">
+      <path d="M4 3h16v12l-5 6H4z" fill="#FFC943" />
+      <path d="M20 15h-5v6z" fill="#E5A800" />
+      <path d="M8 8h8M8 11.5h5" stroke="#7A5800" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function AdobeMark({ label, bg, fg }: { label: string; bg: string; fg: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className="size-4">
+      <rect width="24" height="24" rx="5" fill={bg} />
+      <text
+        x="12"
+        y="16.5"
+        textAnchor="middle"
+        fontSize="12"
+        fontWeight="700"
+        fontFamily="ui-sans-serif, system-ui"
+        fill={fg}
+      >
+        {label}
+      </text>
     </svg>
   );
 }
