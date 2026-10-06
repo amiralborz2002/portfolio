@@ -32,7 +32,7 @@ export function Header() {
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-zinc-950/70 backdrop-blur-md">
+    <header className="sticky top-0 z-[100] border-b border-white/10 bg-zinc-950/70 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6 md:grid md:grid-cols-[1fr_auto_1fr]">
         {/* Logo / name */}
         <Link
