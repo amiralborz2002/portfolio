@@ -195,7 +195,7 @@ function EditorCard({ reduceMotion }: { reduceMotion: boolean }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
               transition={{ duration: 0.35, ease }}
-              className="absolute right-3 bottom-2 flex items-center gap-2.5 rounded-full border border-white/15 bg-zinc-900/70 py-1 pr-1 pl-3.5 shadow-ambient-lg backdrop-blur-md sm:right-4 sm:bottom-3 sm:gap-3 sm:pl-4"
+              className="pointer-events-auto absolute right-3 bottom-2 z-10 flex items-center gap-2.5 rounded-full border border-white/15 bg-zinc-900/70 py-1 pr-1 pl-3.5 shadow-ambient-lg backdrop-blur-md sm:right-4 sm:bottom-3 sm:gap-3 sm:pl-4"
             >
               <p className="font-mono text-[9px] tracking-[0.18em] text-zinc-500 sm:text-[10px]">
                 PREVIEW
@@ -220,9 +220,6 @@ function EditorCard({ reduceMotion }: { reduceMotion: boolean }) {
 
 /* ───────────────────────────── Card 2: Terminal ───────────────────────────── */
 
-const GREEN_GLOW =
-  "transition-[text-shadow] duration-300 group-hover:[text-shadow:0_0_10px_rgb(74_222_128/0.75),0_0_24px_rgb(74_222_128/0.35)]";
-
 function TerminalCard({ reduceMotion }: { reduceMotion: boolean }) {
   const lines: ReactNode[] = [
     <Fragment key="cmd">
@@ -235,7 +232,7 @@ function TerminalCard({ reduceMotion }: { reduceMotion: boolean }) {
       <span className="text-zinc-500">&gt; </span>
       <span className="text-zinc-400">establishing secure line...</span>
     </Fragment>,
-    <span key="ok" className={`text-green-400 ${GREEN_GLOW}`}>
+    <span key="ok" className="text-green-400">
       ✓ Status: Ready to connect
     </span>,
   ];
