@@ -18,13 +18,15 @@ const WORDS = MANIFESTO.split(" ");
 
 const DIM = 0.15; // matches text-white/15
 
-// Where the reveal finishes, as wrapper progress. Ending before 1 holds the
-// finished statement on screen for a moment before it unpins.
-const REVEAL_END = 0.9;
+// How far the reader scrolls, in viewport heights, from the moment the text's
+// top enters at the bottom of the screen until the last word is lit. At 1.3
+// the first line is fully lit by the time the block is about a quarter of the
+// way up the screen, and the rest lights at an even, comfortable reading pace.
+const REVEAL_LENGTH_VH = 1.3;
 
-// Each word fades over this many word-slots, so several words are mid-fade at
+// Each word fades over this many word-slots, so a few words are mid-fade at
 // once and the light sweeps across the text instead of switching word by word.
-const FADE_SPAN = 4;
+const FADE_SPAN = 3;
 
 export function ManifestoScroll() {
   const ref = useRef<HTMLElement>(null);
@@ -36,10 +38,11 @@ export function ManifestoScroll() {
   // early covers the stretch where the text is still scrolling up into place.
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end end"] });
 
-  // Wrapper progress at which the text block's top crosses the viewport centre.
-  // The text sits partway down the wrapper (it is vertically centred in the
-  // sticky viewport), so this is measured rather than expressed as an offset.
-  const revealStart = useMotionValue(0.3);
+  // The reveal window, as wrapper progress. The text sits partway down the
+  // wrapper (it is vertically centred in the sticky viewport), so the window
+  // is measured from the real layout rather than written as a fixed offset.
+  const revealStart = useMotionValue(0.1);
+  const revealEnd = useMotionValue(0.7);
 
   useEffect(() => {
     const section = ref.current;
@@ -48,10 +51,14 @@ export function ManifestoScroll() {
 
     const measure = () => {
       // The sticky box is the text's offsetParent, so offsetTop is the text's
-      // distance below the wrapper's top before pinning. It reaches the centre
-      // after the wrapper has scrolled (viewport / 2 + offsetTop) past the bottom.
-      const start = (window.innerHeight / 2 + text.offsetTop) / section.offsetHeight;
-      revealStart.set(Math.min(start, REVEAL_END - 0.1));
+      // distance below the wrapper's top before pinning. Progress 0 has the
+      // wrapper's top at the viewport bottom, so the text's top enters the
+      // screen once the wrapper has scrolled offsetTop past that point.
+      const total = section.offsetHeight;
+      const start = text.offsetTop / total;
+      const end = (text.offsetTop + REVEAL_LENGTH_VH * window.innerHeight) / total;
+      revealStart.set(start);
+      revealEnd.set(Math.min(end, 1));
     };
 
     measure();
@@ -63,16 +70,17 @@ export function ManifestoScroll() {
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [revealStart]);
+  }, [revealStart, revealEnd]);
 
-  // Remap to 0..1 across the reveal window: 0 = text top at viewport centre.
+  // Linear remap to 0..1 across the window, so every word gets an equal share
+  // of scroll distance: 0 = text top at viewport bottom, 1 = last word lit.
   const reveal = useTransform(
-    [scrollYProgress, revealStart],
-    ([p, start]: number[]) => Math.min(Math.max((p - start) / (REVEAL_END - start), 0), 1),
+    [scrollYProgress, revealStart, revealEnd],
+    ([p, start, end]: number[]) => Math.min(Math.max((p - start) / (end - start), 0), 1),
   );
 
   // A light spring absorbs coarse mouse-wheel steps without visibly lagging.
-  const progress = useSpring(reveal, { stiffness: 200, damping: 30, mass: 0.4 });
+  const progress = useSpring(reveal, { stiffness: 400, damping: 40, mass: 0.3 });
 
   const slot = 1 / (WORDS.length + FADE_SPAN - 1);
 
