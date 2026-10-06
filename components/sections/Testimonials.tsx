@@ -87,14 +87,16 @@ export const TESTIMONIALS: Testimonial[] = [
 const VISIBLE = 3; // cards drawn in the stack; the rest wait invisibly behind
 const SWIPE_THRESHOLD = 90; // px of horizontal drag that counts as "next"
 
-// Visual state for a card by its position in the deck (0 = front).
+// Visual state for a card by its position in the deck (0 = front). The
+// alternating tilt makes the stack read as a loose physical deck, so it
+// looks swipeable without any instructions.
 function stackPose(position: number): TargetAndTransition {
   const poses = [
-    { scale: 1, opacity: 1, y: 0, zIndex: 50 },
-    { scale: 0.95, opacity: 0.6, y: 20, zIndex: 40 },
-    { scale: 0.9, opacity: 0.3, y: 40, zIndex: 30 },
+    { scale: 1, opacity: 1, y: 0, rotate: 0, zIndex: 50 },
+    { scale: 0.95, opacity: 0.6, y: 20, rotate: -3, zIndex: 40 },
+    { scale: 0.9, opacity: 0.3, y: 40, rotate: 3, zIndex: 30 },
   ];
-  return { x: 0, rotate: 0, ...poses[Math.min(position, poses.length - 1)] };
+  return { x: 0, ...poses[Math.min(position, poses.length - 1)] };
 }
 
 export function Testimonials() {
@@ -157,7 +159,7 @@ export function Testimonials() {
       reduceMotion
         ? { opacity: 0 }
         : dir > 0
-          ? { opacity: 0, scale: 0.85, y: 60, x: 0, rotate: 0, zIndex: 20 }
+          ? { opacity: 0, scale: 0.85, y: 60, x: 0, rotate: 6, zIndex: 20 }
           : { opacity: 0, scale: 1, y: 0, x: -180, rotate: -8, zIndex: 60 },
     exit: (dir: 1 | -1): TargetAndTransition =>
       reduceMotion
@@ -238,7 +240,7 @@ export function Testimonials() {
                     // Solid base under the glass so stacked cards never show through each other;
                     // origin-bottom so scaled-down cards peek out below the front one.
                     "absolute inset-x-0 top-0 origin-bottom touch-pan-y rounded-3xl bg-background",
-                    front ? "cursor-pointer active:cursor-grabbing" : "pointer-events-none",
+                    front ? "cursor-grab active:cursor-grabbing" : "pointer-events-none",
                   )}
                 >
                   <TestimonialCard testimonial={t} front={front} />
@@ -290,10 +292,6 @@ export function Testimonials() {
             <ChevronRight className="size-5" strokeWidth={1.75} />
           </ControlButton>
         </div>
-
-        <p className="mt-4 hidden text-center text-xs text-subtle sm:block">
-          Click the card, swipe it away, or use ← → keys
-        </p>
       </div>
     </section>
   );
