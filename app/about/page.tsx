@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AboutHero } from "@/components/sections/about/AboutHero";
 import { AboutTestimonials } from "@/components/sections/about/AboutTestimonials";
+import { FAQ } from "@/components/sections/about/FAQ";
 import { ManifestoScroll } from "@/components/sections/about/ManifestoScroll";
 import { WhyMeBento } from "@/components/sections/about/WhyMeBento";
 
@@ -30,6 +31,9 @@ export default function AboutPage() {
         </h2>
         <AboutTestimonials />
       </section>
+      <div className="py-24 md:py-32">
+        <FAQ />
+      </div>
     </div>
   );
 }

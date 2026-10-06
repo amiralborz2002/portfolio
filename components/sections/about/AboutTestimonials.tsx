@@ -263,9 +263,13 @@ function MobileDeck() {
       aria-roledescription="carousel"
       aria-label="Testimonials"
       onKeyDown={onKeyDown}
-      className="flex flex-col md:hidden"
+      // overflow-anchor: none stops the browser's scroll anchoring from picking a
+      // card that is mid-transition and nudging the page to compensate.
+      className="flex flex-col [overflow-anchor:none] md:hidden"
     >
-      <div className="relative h-[440px]">
+      {/* Fixed height: cards are absolutely positioned, so the deck's footprint
+          never changes while they enter, exit and restack. */}
+      <div className="relative h-[450px] shrink-0">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-6 top-10 bottom-0 -z-10 rounded-full bg-[radial-gradient(closest-side,rgb(249_115_22/0.10),transparent)] blur-2xl"
@@ -286,10 +290,23 @@ function MobileDeck() {
                 drag={front && !reduceMotion ? "x" : false}
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.7}
-                onPointerDown={() => (dragged.current = false)}
+                onPointerDown={(e) => {
+                  dragged.current = false;
+                  // Mouse/touch presses must not focus the card: mobile browsers
+                  // scroll a newly focused element into view, which made the page
+                  // jump mid-transition. Keyboard focus (Tab) is unaffected.
+                  e.preventDefault();
+                }}
                 onDragStart={() => (dragged.current = true)}
                 onDragEnd={front ? onDragEnd : undefined}
-                onTap={front ? () => !dragged.current && next() : undefined}
+                onTap={
+                  front
+                    ? (e) => {
+                        e.preventDefault();
+                        if (!dragged.current) next();
+                      }
+                    : undefined
+                }
                 onKeyDown={
                   front
                     ? (e) => {
@@ -330,7 +347,10 @@ function MobileDeck() {
               <button
                 key={t.id}
                 type="button"
-                onClick={() => goTo(i)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  goTo(i);
+                }}
                 aria-label={`Show testimonial ${i + 1} of ${total}`}
                 aria-current={i === activeIndex ? "true" : undefined}
                 className="group flex h-6 items-center px-0.5"
@@ -432,7 +452,10 @@ function ControlButton({
   return (
     <motion.button
       type="button"
-      onClick={onClick}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick();
+      }}
       aria-label={label}
       whileTap={{ scale: 0.92 }}
       className="flex size-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-zinc-300 backdrop-blur-md transition-colors duration-300 hover:border-white/20 hover:bg-white/10 hover:text-white"
