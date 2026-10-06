@@ -137,6 +137,12 @@ function ScrollIndicator({ reduceMotion }: { reduceMotion: boolean }) {
     <motion.a
       href="#at-a-glance"
       aria-label="Scroll to the next section"
+      onClick={(event) => {
+        const target = document.getElementById("at-a-glance");
+        if (!target) return;
+        event.preventDefault();
+        target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+      }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 1.2, duration: 0.8, ease }}

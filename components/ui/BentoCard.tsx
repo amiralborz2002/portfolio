@@ -27,7 +27,7 @@ export interface BentoCardProps extends Omit<HTMLMotionProps<"div">, "children">
   padding?: keyof typeof paddings;
   /** Corner radius. Default "3xl" for main Bento cards. */
   radius?: keyof typeof radii;
-  /** Hover lift, brighter hairline and a cursor-following accent spotlight. */
+  /** Hover scale, brighter hairline and a cursor-following accent spotlight. */
   interactive?: boolean;
   /** Classes for the inner content wrapper (grid/flex layout of the card body). */
   contentClassName?: string;
@@ -51,7 +51,7 @@ export const BentoCard = forwardRef<HTMLDivElement, BentoCardProps>(function Ben
   const reduceMotion = useReducedMotion();
   const mouseX = useMotionValue(-400);
   const mouseY = useMotionValue(-400);
-  const spotlight = useMotionTemplate`radial-gradient(420px circle at ${mouseX}px ${mouseY}px, rgb(var(--accent) / 0.10), transparent 70%)`;
+  const spotlight = useMotionTemplate`radial-gradient(420px circle at ${mouseX}px ${mouseY}px, color-mix(in oklab, var(--color-accent) 12%, transparent), transparent 70%)`;
 
   return (
     <motion.div
@@ -64,7 +64,7 @@ export const BentoCard = forwardRef<HTMLDivElement, BentoCardProps>(function Ben
         }
         onPointerMove?.(event);
       }}
-      whileHover={interactive && !reduceMotion ? { y: -4 } : undefined}
+      whileHover={interactive && !reduceMotion ? { scale: 1.02 } : undefined}
       transition={spring}
       className={cn(
         // Material: translucent glass, ultra-thin hairline, soft ambient shadow

@@ -60,6 +60,13 @@
 
   /* Motion */
   --ease-apple: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-marquee: marquee 32s linear infinite;
+  --animate-radar: spin 4s linear infinite;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
 }
 
 /* Fonts come from next/font CSS variables set on <html>; `inline` resolves them at use site */
