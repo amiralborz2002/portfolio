@@ -2,6 +2,7 @@ import { BentoSnapshot } from "@/components/sections/BentoSnapshot";
 import { ExperienceJourney } from "@/components/sections/ExperienceJourney";
 import { FinalCTA } from "@/components/sections/FinalCTA";
 import { Hero } from "@/components/sections/Hero";
+import { Testimonials } from "@/components/sections/Testimonials";
 
 export default function HomePage() {
   return (
@@ -9,6 +10,7 @@ export default function HomePage() {
       <Hero />
       <BentoSnapshot />
       <ExperienceJourney />
+      <Testimonials />
       <FinalCTA />
     </div>
   );
