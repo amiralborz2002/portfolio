@@ -11,22 +11,33 @@ import {
   type MotionValue,
   type Variants,
 } from "framer-motion";
-import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+  type ReactNode,
+} from "react";
 import { cn } from "@/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
-const snappy = { type: "spring", stiffness: 260, damping: 26 } as const;
+const soft = { type: "spring", stiffness: 120, damping: 20, mass: 0.8 } as const;
 
 /*
- * Desktop (3 cols × 220px rows), every cell filled:
+ * Desktop: 12 columns × 220px rows. Column edges land at different points on
+ * every row (7, then 4, then none) so no gutter runs the full height.
  *
- *   ┌───────────────────┬─────────┐
- *   │ 1 Business logic  │ 2       │
- *   ├─────────┬─────────┤ Failure │
- *   │ 3 BE    │ 4 Dev   │ (tall)  │
- *   ├─────────┴─────────┼─────────┤
- *   │ 5 Storytelling    │ 6 Align │
- *   └───────────────────┴─────────┘
+ *   ┌──────────────────────┬────────────────┐
+ *   │ 1 Business logic     │ 2 Battle-      │
+ *   │   (7 × 2)            │   tested (5×2) │
+ *   │                      │                │
+ *   ├────────────┬─────────┴────────────────┤
+ *   │ 3 Psych    │ 4 Bridging the gap       │
+ *   │   (4)      │   (8)                    │
+ *   ├────────────┴──────────────────────────┤
+ *   │ 5 Stakeholder synergy (12)            │
+ *   └───────────────────────────────────────┘
  */
 export function WhyMeBento() {
   const reduceMotion = !!useReducedMotion();
@@ -50,75 +61,62 @@ export function WhyMeBento() {
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, amount: 0.1 }}
-        // 220px rows; a row only grows where narrow cards wrap their copy
-        // (tablets, small laptops) instead of clipping it.
-        className="grid auto-rows-[minmax(220px,auto)] grid-cols-1 gap-4 md:grid-cols-3 md:gap-5"
+        // 250px / 220px rows; a row grows only where a narrow card would
+        // otherwise clip its copy (phones, tablets).
+        className="grid auto-rows-[minmax(250px,auto)] grid-cols-1 gap-6 md:auto-rows-[minmax(220px,auto)] md:grid-cols-12"
       >
-        <SpotlightCard className="md:col-span-2" reduceMotion={reduceMotion}>
+        <SpotlightCard className="md:col-span-7 md:row-span-2" reduceMotion={reduceMotion}>
           {(active) => (
-            <div className="flex h-full flex-col gap-6 md:flex-row md:items-end">
+            <div className="flex h-full flex-col gap-4">
+              <BusinessNetwork active={active} reduceMotion={reduceMotion} />
               <CardCopy
-                className="md:max-w-xs"
-                title="Business Logic First"
-                body="I don't just design screens; I map out dynamic pricing, inventory calculations, and multi-channel flows."
+                className="max-w-md"
+                title="Business Logic & Viability"
+                body="Balancing user needs with scalable business models, market realities, and holistic product strategies."
               />
-              <GrowthGraph active={active} reduceMotion={reduceMotion} />
             </div>
           )}
         </SpotlightCard>
 
-        <SpotlightCard className="md:row-span-2" reduceMotion={reduceMotion}>
+        <SpotlightCard className="md:col-span-5 md:row-span-2" reduceMotion={reduceMotion}>
           {() => <ChaosToOrder reduceMotion={reduceMotion} />}
         </SpotlightCard>
 
-        <SpotlightCard tilt reduceMotion={reduceMotion}>
+        <SpotlightCard tilt className="md:col-span-4" reduceMotion={reduceMotion}>
           {(active) => (
-            <div className="flex h-full flex-col">
-              <DecoyTiers active={active} />
+            <div className="flex h-full flex-col gap-4">
+              <ConvergingWaves active={active} reduceMotion={reduceMotion} />
               <CardCopy
                 className="mt-auto"
-                title="Behavioral Economics"
-                body="Designing for actual human psychology, irrationalities, and behavioral loops."
+                title="Psychology & Behavior"
+                body="Merging cognitive psychology, emotional design, and behavioral principles to craft intuitive habits."
               />
             </div>
           )}
         </SpotlightCard>
 
-        <SpotlightCard reduceMotion={reduceMotion}>
+        <SpotlightCard className="md:col-span-8" reduceMotion={reduceMotion}>
           {(active) => (
-            <div className="flex h-full flex-col">
+            <div className="flex h-full flex-col gap-5 md:flex-row md:items-center md:gap-8">
+              <CardCopy
+                className="md:max-w-sm"
+                title="Bridging the Gap"
+                body="I explore various tech stacks not to write production code, but to deeply understand engineering constraints and build feasible architectures."
+              />
               <Terminal active={active} reduceMotion={reduceMotion} />
-              <CardCopy
-                className="mt-auto pt-3"
-                title="Fluent in Developer"
-                body="From Python to Next.js constraints, I speak the language of your engineering team."
-              />
             </div>
           )}
         </SpotlightCard>
 
-        <SpotlightCard className="md:col-span-2" reduceMotion={reduceMotion}>
+        <SpotlightCard className="md:col-span-12" reduceMotion={reduceMotion}>
           {(active) => (
-            <div className="flex h-full flex-col gap-4 md:flex-row md:items-end">
+            <div className="flex h-full flex-col-reverse gap-4 md:flex-row md:items-center md:gap-10">
               <CardCopy
-                className="md:max-w-xs"
-                title="Technical Storytelling"
-                body="Translating complex physical and digital mechanisms into intuitive, scannable visual narratives."
+                className="md:max-w-md"
+                title="Stakeholder Synergy"
+                body="Great products live at the exact intersection of Design, Engineering, and Business. I facilitate that handshake."
               />
-              <AssemblingCube active={active} reduceMotion={reduceMotion} />
-            </div>
-          )}
-        </SpotlightCard>
-
-        <SpotlightCard reduceMotion={reduceMotion}>
-          {(active) => (
-            <div className="flex h-full flex-col">
-              <AlignmentNodes active={active} reduceMotion={reduceMotion} />
-              <CardCopy
-                className="mt-auto"
-                title="Stakeholder Alignment"
-                body="Getting founders, PMs, and engineers to agree on one plan, and keeping it that way."
-              />
+              <VennDiagram active={active} reduceMotion={reduceMotion} />
             </div>
           )}
         </SpotlightCard>
@@ -171,8 +169,8 @@ function SpotlightCard({ className, tilt = false, reduceMotion, children }: Spot
   // Cursor position as 0..1 across the card, driving the optional tilt.
   const relX = useMotionValue(0.5);
   const relY = useMotionValue(0.5);
-  const rotateY = useSpring(useTransform(relX, [0, 1], [-12, 12]), tiltSpring);
-  const rotateX = useSpring(useTransform(relY, [0, 1], [10, -10]), tiltSpring);
+  const rotateY = useSpring(useTransform(relX, [0, 1], [-10, 10]), tiltSpring);
+  const rotateX = useSpring(useTransform(relY, [0, 1], [8, -8]), tiltSpring);
 
   const track = (event: PointerEvent<HTMLDivElement>, jump = false) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -241,7 +239,7 @@ function SpotlightCard({ className, tilt = false, reduceMotion, children }: Spot
 
 function CardCopy({ title, body, className }: { title: string; body: string; className?: string }) {
   return (
-    <div className={className}>
+    <div className={cn("shrink-0", className)}>
       <h3 className="text-lg font-semibold tracking-tight text-white">{title}</h3>
       <p className="mt-1.5 text-sm leading-relaxed text-zinc-400">{body}</p>
     </div>
@@ -249,65 +247,116 @@ function CardCopy({ title, body, className }: { title: string; body: string; cla
 }
 
 /* ------------------------------------------------------------------ */
-/* 1. Business Logic First: flat line grows into an upward curve       */
+/* 1. Business Logic & Viability: variables settle into a network      */
 /* ------------------------------------------------------------------ */
 
-// Same command structure in both paths so Framer Motion can morph between them.
-const FLAT = "M0 118 C 60 118, 100 118, 160 118 C 220 118, 260 118, 320 118 C 350 118, 380 118, 400 118";
-const RISE = "M0 128 C 60 126, 100 110, 160 94 C 220 78, 260 58, 320 34 C 350 22, 380 14, 400 10";
-const area = (line: string) => `${line} L400 160 L0 160 Z`;
+const HUB = { x: 200, y: 120 };
+const NET_RADIUS = 92;
 
-function GrowthGraph({ active, reduceMotion }: { active: boolean; reduceMotion: boolean }) {
-  const transition = reduceMotion ? { duration: 0 } : { duration: 0.9, ease };
+// Each variable has a loose resting spot and a balanced spot on a ring around the hub.
+const VARIABLES = [
+  { label: "Users", angle: -90, loose: { x: 236, y: 22 } },
+  { label: "Revenue", angle: -30, loose: { x: 318, y: 58 } },
+  { label: "Market", angle: 30, loose: { x: 330, y: 186 } },
+  { label: "Ops", angle: 90, loose: { x: 160, y: 226 } },
+  { label: "Brand", angle: 150, loose: { x: 70, y: 196 } },
+  { label: "Strategy", angle: 210, loose: { x: 96, y: 40 } },
+].map((v) => {
+  const rad = (v.angle * Math.PI) / 180;
+  return {
+    ...v,
+    tight: {
+      x: Math.round(HUB.x + NET_RADIUS * Math.cos(rad)),
+      y: Math.round(HUB.y + NET_RADIUS * Math.sin(rad)),
+    },
+  };
+});
+
+function BusinessNetwork({ active, reduceMotion }: { active: boolean; reduceMotion: boolean }) {
+  const move = reduceMotion ? { duration: 0 } : soft;
+  const at = (i: number) => (active ? VARIABLES[i].tight : VARIABLES[i].loose);
 
   return (
-    <div aria-hidden className="relative h-28 min-w-0 flex-1 md:h-full">
-      <svg viewBox="0 0 400 160" preserveAspectRatio="none" className="absolute inset-0 size-full overflow-visible">
-        <defs>
-          <linearGradient id="why-graph-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgb(249 115 22)" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="rgb(249 115 22)" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        {[40, 80, 120].map((y) => (
-          <line
-            key={y}
-            x1="0"
-            x2="400"
-            y1={y}
-            y2={y}
-            stroke="white"
-            strokeOpacity="0.06"
-            strokeDasharray="4 6"
-            vectorEffect="non-scaling-stroke"
+    <div aria-hidden className="relative min-h-40 flex-1">
+      <svg viewBox="0 0 400 250" className="absolute inset-0 size-full overflow-visible">
+        {/* Ring links: neighbouring variables connect once they are in balance */}
+        {VARIABLES.map((_, i) => {
+          const a = at(i);
+          const b = at((i + 1) % VARIABLES.length);
+          return (
+            <motion.line
+              key={`ring-${i}`}
+              initial={false}
+              animate={{ x1: a.x, y1: a.y, x2: b.x, y2: b.y, opacity: active ? 0.45 : 0 }}
+              transition={move}
+              stroke="rgb(249 115 22)"
+              strokeWidth="1"
+            />
+          );
+        })}
+
+        {/* Spokes: every variable stays tied to the product at the centre */}
+        {VARIABLES.map((_, i) => {
+          const p = at(i);
+          return (
+            <motion.line
+              key={`spoke-${i}`}
+              x1={HUB.x}
+              y1={HUB.y}
+              initial={false}
+              animate={{ x2: p.x, y2: p.y, opacity: active ? 0.6 : 0.18 }}
+              transition={move}
+              stroke={active ? "rgb(249 115 22)" : "white"}
+              strokeWidth="1"
+              strokeDasharray={active ? "0" : "3 5"}
+            />
+          );
+        })}
+
+        {/* Signals travelling out along the spokes while in balance */}
+        {active &&
+          !reduceMotion &&
+          VARIABLES.map((v, i) => (
+            <motion.circle
+              key={`pulse-${v.label}`}
+              r="2.5"
+              fill="rgb(253 186 116)"
+              initial={{ cx: HUB.x, cy: HUB.y, opacity: 0 }}
+              animate={{ cx: [HUB.x, v.tight.x], cy: [HUB.y, v.tight.y], opacity: [0, 1, 0] }}
+              transition={{ duration: 1.8, delay: 0.5 + i * 0.25, repeat: Infinity, repeatDelay: 0.6, ease: "easeInOut" }}
+            />
+          ))}
+
+        {VARIABLES.map((v, i) => {
+          const p = at(i);
+          return (
+            <motion.g key={v.label} initial={false} animate={{ x: p.x, y: p.y }} transition={move}>
+              <circle
+                r="6"
+                className={cn("transition-colors duration-500", active ? "fill-accent" : "fill-zinc-600")}
+              />
+              <text y="-12" textAnchor="middle" className="fill-zinc-500 font-mono text-[10px]">
+                {v.label}
+              </text>
+            </motion.g>
+          );
+        })}
+
+        {/* Hub with a slow breathing ring */}
+        {!reduceMotion && (
+          <motion.circle
+            cx={HUB.x}
+            cy={HUB.y}
+            r="14"
+            fill="none"
+            stroke="rgb(249 115 22)"
+            animate={{ scale: [1, 1.9], opacity: [0.5, 0] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeOut" }}
+            style={{ transformBox: "fill-box", transformOrigin: "center" }}
           />
-        ))}
-        <motion.path
-          initial={false}
-          animate={{ d: area(active ? RISE : FLAT), opacity: active ? 1 : 0.25 }}
-          transition={transition}
-          fill="url(#why-graph-fill)"
-        />
-        <motion.path
-          initial={false}
-          animate={{ d: active ? RISE : FLAT }}
-          transition={transition}
-          fill="none"
-          stroke={active ? "rgb(249 115 22)" : "rgb(255 255 255 / 0.35)"}
-          strokeWidth="2"
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-          className="transition-[stroke] duration-500"
-        />
+        )}
+        <circle cx={HUB.x} cy={HUB.y} r="11" className="fill-accent/90" />
       </svg>
-      <motion.span
-        initial={false}
-        animate={{ opacity: active ? 1 : 0, y: active ? 0 : 8 }}
-        transition={{ duration: 0.5, delay: active ? 0.5 : 0, ease }}
-        className="absolute top-0 left-0 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 font-mono text-[11px] text-accent"
-      >
-        margin ↑
-      </motion.span>
     </div>
   );
 }
@@ -318,6 +367,7 @@ function GrowthGraph({ active, reduceMotion }: { active: boolean; reduceMotion: 
 
 const COLS = 6;
 const ROWS = 4;
+const THUMB = 20; // px, matches the size-5 thumb below
 
 // Deterministic scatter (same on server and client, so no hydration mismatch).
 function seeded(seed: number) {
@@ -335,6 +385,22 @@ function ChaosToOrder({ reduceMotion }: { reduceMotion: boolean }) {
   const target = useMotionValue(0);
   const order = useSpring(target, reduceMotion ? { stiffness: 1000, damping: 100 } : { stiffness: 120, damping: 18 });
 
+  const update = (next: number) => {
+    setValue(next);
+    target.set(next / 100);
+  };
+
+  // Pointer drag anywhere across the 48px-tall control, not just on the thumb.
+  // Mobile browsers otherwise need a precise grab of a tiny thumb and tend to
+  // treat the gesture as a page scroll.
+  const fromPointer = (event: PointerEvent<HTMLInputElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const ratio = (event.clientX - rect.left - THUMB / 2) / (rect.width - THUMB);
+    update(Math.round(Math.min(Math.max(ratio, 0), 1) * 100));
+  };
+
+  const track = `linear-gradient(to right, rgb(249 115 22 / 0.6) ${value}%, rgb(255 255 255 / 0.1) ${value}%)`;
+
   return (
     <div className="flex h-full flex-col">
       <CardCopy
@@ -342,7 +408,7 @@ function ChaosToOrder({ reduceMotion }: { reduceMotion: boolean }) {
         body="Real business acumen isn't learned in courses. Building and pivoting my own startups taught me how to balance pixel-perfection with time-to-market and harsh market realities."
       />
 
-      <div aria-hidden className="relative my-4 min-h-0 flex-1">
+      <div aria-hidden className="relative my-4 min-h-32 flex-1">
         <svg viewBox="0 0 240 150" className="absolute inset-0 size-full">
           {DOTS.map((dot, i) => (
             <Dot key={i} dot={dot} order={order} />
@@ -351,7 +417,7 @@ function ChaosToOrder({ reduceMotion }: { reduceMotion: boolean }) {
       </div>
 
       <div>
-        <div className="mb-2 flex justify-between font-mono text-[11px] tracking-wider uppercase">
+        <div className="flex justify-between font-mono text-[11px] tracking-wider uppercase">
           <span className={cn("transition-colors", value < 50 ? "text-white" : "text-zinc-500")}>Chaos</span>
           <span className={cn("transition-colors", value >= 50 ? "text-accent" : "text-zinc-500")}>Order</span>
         </div>
@@ -361,20 +427,25 @@ function ChaosToOrder({ reduceMotion }: { reduceMotion: boolean }) {
           max={100}
           value={value}
           aria-label="Drag from chaos to order"
-          onChange={(event) => {
-            const next = Number(event.target.value);
-            setValue(next);
-            target.set(next / 100);
+          onChange={(event) => update(Number(event.target.value))}
+          onPointerDown={(event) => {
+            event.currentTarget.setPointerCapture(event.pointerId);
+            fromPointer(event);
           }}
+          onPointerMove={(event) => {
+            if (event.currentTarget.hasPointerCapture(event.pointerId)) fromPointer(event);
+          }}
+          style={{ "--track": track } as CSSProperties}
           className={cn(
-            "h-1.5 w-full cursor-grab appearance-none rounded-full bg-white/10 outline-none active:cursor-grabbing",
-            "focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-4 focus-visible:ring-offset-zinc-950",
-            "[&::-webkit-slider-thumb]:size-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-zinc-950 [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:shadow-glow",
+            // Tall, transparent hit area; the visible track is drawn by the pseudo-elements.
+            "block h-12 w-full cursor-grab touch-none appearance-none bg-transparent outline-none active:cursor-grabbing",
+            "rounded-full focus-visible:ring-2 focus-visible:ring-accent/60",
+            "[&::-webkit-slider-runnable-track]:h-1.5 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-[image:var(--track)]",
+            "[&::-webkit-slider-thumb]:-mt-[7px] [&::-webkit-slider-thumb]:size-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-zinc-950 [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:shadow-glow",
+            "[&::-moz-range-track]:h-1.5 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-white/10",
+            "[&::-moz-range-progress]:h-1.5 [&::-moz-range-progress]:rounded-full [&::-moz-range-progress]:bg-accent/60",
             "[&::-moz-range-thumb]:size-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-zinc-950 [&::-moz-range-thumb]:bg-accent",
           )}
-          style={{
-            background: `linear-gradient(to right, rgb(249 115 22 / 0.6) ${value}%, rgb(255 255 255 / 0.1) ${value}%)`,
-          }}
         />
       </div>
     </div>
@@ -391,49 +462,76 @@ function Dot({ dot, order }: { dot: (typeof DOTS)[number]; order: MotionValue<nu
 }
 
 /* ------------------------------------------------------------------ */
-/* 3. Behavioral Economics: decoy pricing tiers (card tilts in 3D)      */
+/* 3. Psychology & Behavior: drifting waves converge and pulse          */
 /* ------------------------------------------------------------------ */
 
-function DecoyTiers({ active }: { active: boolean }) {
-  const tiers = [
-    { label: "Basic", h: "h-8" },
-    { label: "Pro", h: "h-14", pick: true },
-    { label: "Max", h: "h-11" },
-  ];
+const WAVELENGTH = 80;
 
+/** A sine-like wave from quadratic half-waves; identical structure for any amp/phase, so it morphs. */
+function wavePath(amp: number, phase: number, mid = 50) {
+  let x = -2 * WAVELENGTH + phase;
+  let d = `M ${x} ${mid}`;
+  for (let i = 0; i < 12; i++) {
+    const dir = i % 2 === 0 ? -1 : 1;
+    d += ` Q ${x + WAVELENGTH / 4} ${mid + dir * amp * 2} ${x + WAVELENGTH / 2} ${mid}`;
+    x += WAVELENGTH / 2;
+  }
+  return d;
+}
+
+const WAVES = [
+  { rest: { amp: 16, phase: 0 }, focus: { amp: 13, phase: 0 }, stroke: "rgb(249 115 22)" },
+  { rest: { amp: 9, phase: 27 }, focus: { amp: 13, phase: 4 }, stroke: "rgb(253 186 116)" },
+  { rest: { amp: 21, phase: 53 }, focus: { amp: 13, phase: 8 }, stroke: "rgb(255 255 255)" },
+] as const;
+
+function ConvergingWaves({ active, reduceMotion }: { active: boolean; reduceMotion: boolean }) {
   return (
-    // Lifted toward the viewer so it parallaxes against the tilting card.
-    <div aria-hidden className="flex items-end gap-2" style={{ transform: "translateZ(40px)" }}>
-      {tiers.map((tier) => (
-        <div key={tier.label} className="flex flex-col items-center gap-1.5">
-          <motion.div
-            animate={tier.pick && active ? { y: -6 } : { y: 0 }}
-            transition={snappy}
-            className={cn(
-              "w-10 rounded-lg border",
-              tier.h,
-              tier.pick
-                ? "border-accent/50 bg-accent/20 shadow-glow"
-                : "border-white/10 bg-white/[0.04]",
-            )}
-          />
-          <span className={cn("font-mono text-[10px]", tier.pick ? "text-accent" : "text-zinc-500")}>
-            {tier.label}
-          </span>
-        </div>
-      ))}
+    <div aria-hidden className="relative h-16 shrink-0 overflow-hidden">
+      <svg viewBox="0 0 240 100" preserveAspectRatio="none" className="absolute inset-0 size-full">
+        {/* Continuous drift by exactly one wavelength, so the loop is seamless */}
+        <motion.g
+          animate={reduceMotion ? undefined : { x: [0, -WAVELENGTH] }}
+          transition={{ duration: active ? 2.4 : 5, repeat: Infinity, ease: "linear" }}
+        >
+          {WAVES.map((wave, i) => {
+            const shape = active ? wave.focus : wave.rest;
+            return (
+              <motion.path
+                key={i}
+                initial={false}
+                animate={{
+                  d: wavePath(shape.amp, shape.phase),
+                  strokeOpacity: active ? [0.55, 1, 0.55] : 0.3,
+                }}
+                transition={{
+                  d: reduceMotion ? { duration: 0 } : { duration: 0.9, ease },
+                  strokeOpacity: active
+                    ? { duration: 1.6, repeat: Infinity, ease: "easeInOut", delay: i * 0.15 }
+                    : { duration: 0.4 },
+                }}
+                fill="none"
+                stroke={wave.stroke}
+                strokeWidth="2"
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            );
+          })}
+        </motion.g>
+      </svg>
     </div>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* 4. Fluent in Developer: terminal types a snippet on hover            */
+/* 4. Bridging the Gap: a calm, collaborative terminal                  */
 /* ------------------------------------------------------------------ */
 
 const TERMINAL_LINES = [
-  { prompt: "$", text: "python pricing.py --channels 3", tone: "text-zinc-200" },
-  { prompt: "$", text: "next build", tone: "text-zinc-200" },
-  { prompt: "✓", text: "compiled · 0 errors", tone: "text-emerald-400" },
+  { prompt: ">", text: "Understanding system constraints...", tone: "text-zinc-200" },
+  { prompt: ">", text: "Listening to the engineering team...", tone: "text-zinc-400" },
+  { prompt: "✓", text: "Feasible architecture, built together", tone: "text-emerald-400" },
 ] as const;
 
 const TOTAL_CHARS = TERMINAL_LINES.reduce((sum, line) => sum + line.text.length, 0);
@@ -441,7 +539,7 @@ const TOTAL_CHARS = TERMINAL_LINES.reduce((sum, line) => sum + line.text.length,
 const LINE_STARTS = TERMINAL_LINES.map((_, i) =>
   TERMINAL_LINES.slice(0, i).reduce((sum, line) => sum + line.text.length, 0),
 );
-const TYPE_MS = 28;
+const TYPE_MS = 38; // unhurried
 
 function Terminal({ active, reduceMotion }: { active: boolean; reduceMotion: boolean }) {
   const [ticks, setTicks] = useState(0);
@@ -472,18 +570,21 @@ function Terminal({ active, reduceMotion }: { active: boolean; reduceMotion: boo
   const done = typed >= TOTAL_CHARS;
 
   return (
-    <div aria-hidden className="shrink-0 overflow-hidden rounded-xl border border-white/10 bg-zinc-950/70 font-mono text-[11px] leading-4">
-      <div className="flex gap-1.5 border-b border-white/5 px-3 py-1.5">
+    <div
+      aria-hidden
+      className="min-w-0 flex-1 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-zinc-950/70 font-mono text-xs leading-5"
+    >
+      <div className="flex gap-1.5 border-b border-white/5 px-3 py-2">
         <span className="size-2 rounded-full bg-white/15" />
         <span className="size-2 rounded-full bg-white/15" />
         <span className="size-2 rounded-full bg-white/15" />
       </div>
-      <div className="h-14 px-3 py-1">
+      <div className="h-[76px] px-3 py-2">
         {rows.map((row, i) => {
           const visible = row.shown > 0 || i === cursorRow;
           if (!visible) return null;
           return (
-            <div key={i} className="flex gap-2 whitespace-pre">
+            <div key={i} className="flex gap-2 truncate whitespace-pre">
               <span className={row.prompt === "✓" ? "text-emerald-400" : "text-accent"}>{row.prompt}</span>
               <span className={row.tone}>
                 {row.text.slice(0, row.shown)}
@@ -500,121 +601,91 @@ function Terminal({ active, reduceMotion }: { active: boolean; reduceMotion: boo
 function Caret() {
   return (
     <motion.span
-      className="ml-px inline-block h-3 w-1.5 translate-y-0.5 bg-accent"
+      className="ml-px inline-block h-3.5 w-1.5 translate-y-0.5 bg-accent"
       animate={{ opacity: [1, 1, 0, 0] }}
-      transition={{ duration: 1, times: [0, 0.5, 0.5, 1], repeat: Infinity, ease: "linear" }}
+      transition={{ duration: 1.1, times: [0, 0.5, 0.5, 1], repeat: Infinity, ease: "linear" }}
     />
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* 5. Technical Storytelling: scattered faces assemble into a cube      */
+/* 5. Stakeholder Synergy: three circles, glowing shared centre          */
 /* ------------------------------------------------------------------ */
 
-const FACES = [
-  {
-    // top
-    points: "100,50 143,75 100,100 57,75",
-    fill: "rgb(249 115 22 / 0.85)",
-    apart: { x: -78, y: -18, rotate: -28 },
-  },
-  {
-    // left
-    points: "57,75 100,100 100,150 57,125",
-    fill: "rgb(249 115 22 / 0.35)",
-    apart: { x: -34, y: 30, rotate: 18 },
-  },
-  {
-    // right
-    points: "143,75 100,100 100,150 143,125",
-    fill: "rgb(255 255 255 / 0.12)",
-    apart: { x: 70, y: 8, rotate: 34 },
-  },
+const VENN = [
+  // Labels sit in each circle's outer lobe, which stays exclusive in both states.
+  { label: "Biz", rest: { cx: 124, cy: 86 }, focus: { cx: 140, cy: 96 }, labelAt: { x: 104, y: 72 } },
+  { label: "Tech", rest: { cx: 236, cy: 86 }, focus: { cx: 220, cy: 96 }, labelAt: { x: 256, y: 72 } },
+  { label: "Design", rest: { cx: 180, cy: 180 }, focus: { cx: 180, cy: 165 }, labelAt: { x: 180, y: 222 } },
 ] as const;
+const VENN_R = 78;
+const VENN_CENTER = { x: 180, y: 119 }; // centroid of the focused circles
 
-function AssemblingCube({ active, reduceMotion }: { active: boolean; reduceMotion: boolean }) {
+function VennDiagram({ active, reduceMotion }: { active: boolean; reduceMotion: boolean }) {
+  const move = reduceMotion ? { duration: 0 } : soft;
+
   return (
-    <div aria-hidden className="relative h-36 min-w-0 flex-1 md:h-full">
-      <svg viewBox="0 0 200 180" className="absolute inset-0 size-full overflow-visible">
-        <motion.ellipse
-          cx="100"
-          cy="160"
-          rx="48"
-          ry="8"
-          fill="rgb(249 115 22)"
+    // From md up it bleeds through the card's vertical padding to use the full row height.
+    <div aria-hidden className="relative h-64 w-full shrink-0 md:-my-6 md:h-[calc(100%+3rem)] md:flex-1">
+      <svg viewBox="44 6 272 254" className="absolute inset-0 size-full">
+        <defs>
+          <radialGradient id="venn-core">
+            <stop offset="0%" stopColor="rgb(255 237 213)" stopOpacity="1" />
+            <stop offset="35%" stopColor="rgb(249 115 22)" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="rgb(249 115 22)" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+
+        {/* Additive fills: overlaps brighten on their own, the triple overlap most */}
+        <g style={{ mixBlendMode: "screen" }}>
+          {VENN.map((c) => (
+            <motion.circle
+              key={c.label}
+              r={VENN_R}
+              initial={false}
+              animate={{
+                ...(active ? c.focus : c.rest),
+                fillOpacity: active ? 0.16 : 0.05,
+                strokeOpacity: active ? 0.55 : 0.2,
+              }}
+              transition={move}
+              fill="rgb(249 115 22)"
+              stroke="white"
+              strokeWidth="1"
+            />
+          ))}
+        </g>
+
+        <motion.circle
+          cx={VENN_CENTER.x}
+          cy={VENN_CENTER.y}
+          r="34"
+          fill="url(#venn-core)"
           initial={false}
-          animate={{ opacity: active ? 0.25 : 0, scale: active ? 1 : 0.6 }}
-          transition={{ duration: 0.6, ease }}
-          style={{ filter: "blur(8px)" }}
+          animate={
+            active
+              ? { opacity: reduceMotion ? 1 : [0.75, 1, 0.75], scale: reduceMotion ? 1 : [1, 1.12, 1] }
+              : { opacity: 0, scale: 0.6 }
+          }
+          transition={active ? { duration: 2, repeat: Infinity, ease: "easeInOut" } : { duration: 0.4 }}
+          style={{ transformBox: "fill-box", transformOrigin: "center", filter: "blur(2px)" }}
         />
-        {FACES.map((face, i) => (
-          <motion.polygon
-            key={face.points}
-            points={face.points}
-            fill={face.fill}
-            stroke="rgb(255 255 255 / 0.25)"
-            strokeWidth="1"
-            strokeLinejoin="round"
-            initial={false}
-            animate={active ? { x: 0, y: 0, rotate: 0 } : face.apart}
-            transition={reduceMotion ? { duration: 0 } : { ...snappy, delay: active ? i * 0.06 : 0 }}
-            style={{ transformBox: "fill-box", transformOrigin: "center" }}
-          />
+
+        {VENN.map((c) => (
+          <text
+            key={c.label}
+            x={c.labelAt.x}
+            y={c.labelAt.y}
+            textAnchor="middle"
+            className={cn(
+              "font-mono text-[12px] tracking-wider uppercase transition-colors duration-500",
+              active ? "fill-white" : "fill-zinc-400",
+            )}
+          >
+            {c.label}
+          </text>
         ))}
       </svg>
     </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* 6. Stakeholder Alignment: misaligned nodes snap onto one line        */
-/* ------------------------------------------------------------------ */
-
-const NODES = [
-  { x: 36, apart: -22, label: "Biz" },
-  { x: 100, apart: 20, label: "Design" },
-  { x: 164, apart: -8, label: "Eng" },
-] as const;
-
-function AlignmentNodes({ active, reduceMotion }: { active: boolean; reduceMotion: boolean }) {
-  const transition = reduceMotion ? { duration: 0 } : snappy;
-
-  return (
-    <svg aria-hidden viewBox="0 0 200 80" className="h-20 w-full max-w-[220px] overflow-visible">
-      <motion.line
-        x1="36"
-        x2="164"
-        y1="34"
-        y2="34"
-        stroke="rgb(249 115 22)"
-        strokeWidth="1.5"
-        initial={false}
-        animate={{ pathLength: active ? 1 : 0, opacity: active ? 1 : 0 }}
-        transition={reduceMotion ? { duration: 0 } : { duration: 0.5, delay: active ? 0.2 : 0, ease }}
-      />
-      {NODES.map((node) => (
-        <motion.g
-          key={node.label}
-          initial={false}
-          animate={{ y: active ? 0 : node.apart }}
-          transition={transition}
-        >
-          <circle
-            cx={node.x}
-            cy="34"
-            r="7"
-            className={cn("transition-colors duration-500", active ? "fill-accent" : "fill-zinc-600")}
-          />
-          <text
-            x={node.x}
-            y="58"
-            textAnchor="middle"
-            className="fill-zinc-500 font-mono text-[10px]"
-          >
-            {node.label}
-          </text>
-        </motion.g>
-      ))}
-    </svg>
   );
 }
