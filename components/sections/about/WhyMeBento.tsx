@@ -70,7 +70,7 @@ export function WhyMeBento() {
         <SpotlightCard className="md:col-span-7 md:row-span-2" reduceMotion={reduceMotion}>
           {(active) => (
             <div className="flex h-full flex-col gap-4">
-              <ProductWheel active={active} reduceMotion={reduceMotion} />
+              <BusinessNetwork active={active} reduceMotion={reduceMotion} />
               <CardCopy
                 className="max-w-md"
                 title="Business Logic & Viability"
@@ -262,172 +262,150 @@ function CardCopy({ title, body, className }: { title: string; body: string; cla
 }
 
 /* ------------------------------------------------------------------ */
-/* 1. Business Logic & Viability: a segmented product-competency wheel  */
+/* 1. Business Logic & Viability: variables settle into a network      */
 /* ------------------------------------------------------------------ */
 
-// Inspired by Ravi Mehta's Product Manager competency wheel.
-const WHEEL_C = 160; // centre (viewBox is 320 × 320)
-const RING_R = 108;
-const RING_W = 16;
-const GAP_DEG = 10;
+const HUB = { x: 200, y: 120 };
+const NET_RADIUS = 92;
+const HEARTBEAT_S = 1.6; // one lub-dub per cycle
 
-const SEGMENTS = [
-  { label: "Strategy", color: "rgb(249 115 22)" }, // orange
-  { label: "Execution", color: "rgb(251 191 36)" }, // amber
-  { label: "Insight", color: "rgb(251 113 133)" }, // rose
-  { label: "Influence", color: "rgb(167 139 250)" }, // violet
-] as const;
-
-function polar(r: number, deg: number) {
-  const rad = (deg * Math.PI) / 180;
-  return `${(WHEEL_C + r * Math.cos(rad)).toFixed(2)} ${(WHEEL_C + r * Math.sin(rad)).toFixed(2)}`;
-}
-
-/** Clockwise arc (screen coordinates); `reverse` draws it counter-clockwise. */
-function arc(r: number, from: number, to: number, reverse = false) {
-  return reverse
-    ? `M ${polar(r, to)} A ${r} ${r} 0 0 0 ${polar(r, from)}`
-    : `M ${polar(r, from)} A ${r} ${r} 0 0 1 ${polar(r, to)}`;
-}
-
-// Quarter arcs starting at 12 o'clock, separated by small gaps.
-const ARCS = SEGMENTS.map((segment, i) => {
-  const from = -90 + i * 90 + GAP_DEG / 2;
-  const to = from + 90 - GAP_DEG;
-  const mid = (from + to) / 2;
-  // Lower-half labels run counter-clockwise so they read left to right, on a
-  // slightly larger radius so their glyphs sit just outside the ring like the top ones.
-  const bottom = Math.sin((mid * Math.PI) / 180) > 0;
+// Each variable has a loose resting spot and a balanced spot on a ring around the hub.
+const VARIABLES = [
+  { label: "Strategy", angle: -90, loose: { x: 236, y: 22 } },
+  { label: "Execution", angle: -30, loose: { x: 318, y: 58 } },
+  { label: "Market", angle: 30, loose: { x: 330, y: 186 } },
+  { label: "Users", angle: 90, loose: { x: 160, y: 226 } },
+  { label: "Insight", angle: 150, loose: { x: 70, y: 196 } },
+  { label: "Influence", angle: 210, loose: { x: 96, y: 40 } },
+].map((v) => {
+  const rad = (v.angle * Math.PI) / 180;
   return {
-    ...segment,
-    ring: arc(RING_R, from, to),
-    inner: arc(RING_R - 22, from + 6, to - 6),
-    labelPath: bottom ? arc(RING_R + 32, from, to, true) : arc(RING_R + 20, from, to),
+    ...v,
+    tight: {
+      x: Math.round(HUB.x + NET_RADIUS * Math.cos(rad)),
+      y: Math.round(HUB.y + NET_RADIUS * Math.sin(rad)),
+    },
   };
 });
 
-const CYCLE_MS = 1400;
-
-function ProductWheel({ active, reduceMotion }: { active: boolean; reduceMotion: boolean }) {
-  // While hovered, the highlight walks around the wheel one competency at a time.
-  const [step, setStep] = useState(0);
-
-  useEffect(() => {
-    if (!active || reduceMotion) return;
-    const id = window.setInterval(() => setStep((n) => n + 1), CYCLE_MS);
-    return () => {
-      window.clearInterval(id);
-      setStep(0);
-    };
-  }, [active, reduceMotion]);
-
-  const lit = (i: number) => active && (reduceMotion || step % ARCS.length === i);
+function BusinessNetwork({ active, reduceMotion }: { active: boolean; reduceMotion: boolean }) {
+  const move = reduceMotion ? { duration: 0 } : soft;
+  const at = (i: number) => (active ? VARIABLES[i].tight : VARIABLES[i].loose);
 
   return (
-    <div aria-hidden className="relative min-h-44 flex-1">
-      <svg viewBox="0 0 320 320" className="absolute inset-0 size-full overflow-visible">
+    <div aria-hidden className="relative min-h-40 flex-1">
+      <svg viewBox="0 0 400 250" className="absolute inset-0 size-full overflow-visible">
         <defs>
-          <radialGradient id="wheel-core">
-            <stop offset="0%" stopColor="rgb(249 115 22)" stopOpacity="0.55" />
+          <radialGradient id="hub-glow">
+            <stop offset="0%" stopColor="rgb(249 115 22)" stopOpacity="0.45" />
             <stop offset="100%" stopColor="rgb(249 115 22)" stopOpacity="0" />
           </radialGradient>
-          {ARCS.map((a, i) => (
-            <path key={i} id={`wheel-label-${i}`} d={a.labelPath} />
-          ))}
         </defs>
+        {/* Ring links: neighbouring variables connect once they are in balance */}
+        {VARIABLES.map((_, i) => {
+          const a = at(i);
+          const b = at((i + 1) % VARIABLES.length);
+          return (
+            <motion.line
+              key={`ring-${i}`}
+              initial={false}
+              animate={{ x1: a.x, y1: a.y, x2: b.x, y2: b.y, opacity: active ? 0.45 : 0 }}
+              transition={move}
+              stroke="rgb(249 115 22)"
+              strokeWidth="1"
+            />
+          );
+        })}
 
-        {/* Slow-turning guide rings give the wheel a sense of motion at rest */}
-        <motion.g
-          animate={reduceMotion ? undefined : { rotate: 360 }}
-          transition={{ duration: active ? 18 : 60, repeat: Infinity, ease: "linear" }}
-          style={{ transformOrigin: `${WHEEL_C}px ${WHEEL_C}px` }}
-        >
-          <circle
-            cx={WHEEL_C}
-            cy={WHEEL_C}
-            r={RING_R - 46}
+        {/* Spokes: every variable stays tied to the product at the centre */}
+        {VARIABLES.map((_, i) => {
+          const p = at(i);
+          return (
+            <motion.line
+              key={`spoke-${i}`}
+              x1={HUB.x}
+              y1={HUB.y}
+              initial={false}
+              animate={{ x2: p.x, y2: p.y, opacity: active ? 0.6 : 0.18 }}
+              transition={move}
+              stroke={active ? "rgb(249 115 22)" : "white"}
+              strokeWidth="1"
+              strokeDasharray={active ? "0" : "3 5"}
+            />
+          );
+        })}
+
+        {/* Signals travelling out along the spokes while in balance */}
+        {active &&
+          !reduceMotion &&
+          VARIABLES.map((v, i) => (
+            <motion.circle
+              key={`pulse-${v.label}`}
+              r="2.5"
+              fill="rgb(253 186 116)"
+              initial={{ cx: HUB.x, cy: HUB.y, opacity: 0 }}
+              animate={{ cx: [HUB.x, v.tight.x], cy: [HUB.y, v.tight.y], opacity: [0, 1, 0] }}
+              transition={{ duration: 1.8, delay: 0.5 + i * 0.25, repeat: Infinity, repeatDelay: 0.6, ease: "easeInOut" }}
+            />
+          ))}
+
+        {VARIABLES.map((v, i) => {
+          const p = at(i);
+          return (
+            <motion.g key={v.label} initial={false} animate={{ x: p.x, y: p.y }} transition={move}>
+              <circle
+                r="6"
+                className={cn("transition-colors duration-500", active ? "fill-accent" : "fill-zinc-600")}
+              />
+              <text y="-12" textAnchor="middle" className="fill-zinc-500 font-mono text-[10px]">
+                {v.label}
+              </text>
+            </motion.g>
+          );
+        })}
+
+        {/* Hub: a continuous heartbeat (double beat, glow swelling with it)
+            plus a ring that ripples out on every beat */}
+        <circle cx={HUB.x} cy={HUB.y} r="40" fill="url(#hub-glow)" />
+        {!reduceMotion && (
+          <motion.circle
+            cx={HUB.x}
+            cy={HUB.y}
+            r="14"
             fill="none"
-            stroke="white"
-            strokeOpacity="0.12"
-            strokeDasharray="2 7"
+            stroke="rgb(249 115 22)"
+            animate={{ scale: [1, 2], opacity: [0.55, 0] }}
+            transition={{ duration: HEARTBEAT_S, repeat: Infinity, ease: "easeOut" }}
+            style={{ transformBox: "fill-box", transformOrigin: "center" }}
           />
-          <circle
-            cx={WHEEL_C}
-            cy={WHEEL_C}
-            r={RING_R + 8 + RING_W / 2}
-            fill="none"
-            stroke="white"
-            strokeOpacity="0.05"
-            strokeDasharray="1 5"
-          />
-        </motion.g>
-
-        {/* Inner competency band, echoing the outer segments */}
-        {ARCS.map((a, i) => (
-          <motion.path
-            key={`inner-${a.label}`}
-            d={a.inner}
-            fill="none"
-            stroke={a.color}
-            strokeWidth="4"
-            strokeLinecap="round"
-            initial={false}
-            animate={{ strokeOpacity: lit(i) ? 0.7 : active ? 0.25 : 0.15 }}
-            transition={{ duration: 0.5, ease }}
-          />
-        ))}
-
-        {/* Outer segmented ring */}
-        {ARCS.map((a, i) => (
-          <motion.path
-            key={a.label}
-            d={a.ring}
-            fill="none"
-            stroke={a.color}
-            strokeLinecap="round"
-            initial={false}
-            animate={{
-              strokeOpacity: lit(i) ? 1 : active ? 0.45 : 0.3,
-              strokeWidth: lit(i) ? RING_W + 4 : RING_W,
-            }}
-            transition={{ duration: 0.5, ease }}
-            style={{ filter: lit(i) ? `drop-shadow(0 0 10px ${a.color})` : "none" }}
-          />
-        ))}
-
-        {ARCS.map((a, i) => (
-          <text
-            key={`label-${a.label}`}
-            className={cn(
-              "font-mono text-[11px] tracking-[0.2em] uppercase transition-[fill] duration-500",
-              lit(i) ? "fill-white" : "fill-zinc-500",
-            )}
-          >
-            <textPath href={`#wheel-label-${i}`} startOffset="50%" textAnchor="middle">
-              {a.label}
-            </textPath>
-          </text>
-        ))}
-
-        <circle cx={WHEEL_C} cy={WHEEL_C} r="44" fill="url(#wheel-core)" />
+        )}
         <motion.circle
-          cx={WHEEL_C}
-          cy={WHEEL_C}
-          r="20"
-          className="fill-zinc-950 stroke-accent/60"
-          strokeWidth="1"
-          animate={active && !reduceMotion ? { scale: [1, 1.08, 1] } : { scale: 1 }}
-          transition={{ duration: CYCLE_MS / 1000, repeat: Infinity, ease: "easeInOut" }}
+          cx={HUB.x}
+          cy={HUB.y}
+          r="11"
+          className="fill-accent"
+          animate={
+            reduceMotion
+              ? undefined
+              : {
+                  scale: [1, 1.22, 1, 1.12, 1],
+                  filter: [
+                    "drop-shadow(0 0 3px rgb(249 115 22 / 0.5))",
+                    "drop-shadow(0 0 14px rgb(249 115 22 / 0.95))",
+                    "drop-shadow(0 0 5px rgb(249 115 22 / 0.6))",
+                    "drop-shadow(0 0 10px rgb(249 115 22 / 0.8))",
+                    "drop-shadow(0 0 3px rgb(249 115 22 / 0.5))",
+                  ],
+                }
+          }
+          transition={{
+            duration: HEARTBEAT_S,
+            times: [0, 0.14, 0.3, 0.44, 1],
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
           style={{ transformBox: "fill-box", transformOrigin: "center" }}
         />
-        <text
-          x={WHEEL_C}
-          y={WHEEL_C + 3.5}
-          textAnchor="middle"
-          className="fill-accent font-mono text-[10px] font-semibold tracking-wider"
-        >
-          PM
-        </text>
       </svg>
     </div>
   );
