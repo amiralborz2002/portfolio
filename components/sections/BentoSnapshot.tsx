@@ -9,7 +9,7 @@ import { Button } from "../ui/Button";
 
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
 
-export function Hero() {
+export function BentoSnapshot() {
   const reduceMotion = useReducedMotion();
 
   const grid: Variants = {
