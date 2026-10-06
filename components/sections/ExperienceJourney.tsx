@@ -16,16 +16,25 @@ import { cn } from "@/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
 
-type Milestone = {
+export type Experience = {
+  /** URL-safe id; also the default detail page: /work/<slug> */
   slug: string;
   title: string;
+  /** Discipline shown in the pill */
   tag: string;
   description: string;
+  /** Any lucide-react icon */
   Icon: LucideIcon;
+  /** Override the "View Details" target (defaults to /work/<slug>) */
+  href?: string;
 };
 
-// Most recent first.
-const MILESTONES: Milestone[] = [
+/*
+ * Work history, most recent first. To add an entry, append an object here —
+ * the timeline, step numbers ("01 / 04"), progress pips and left/right
+ * alternation all derive from this array.
+ */
+export const EXPERIENCES: Experience[] = [
   {
     slug: "karo-platform",
     title: "Karo Platform",
@@ -92,12 +101,12 @@ export function ExperienceJourney() {
         <TimelineLine progress={fill} />
 
         <ol ref={listRef} className="relative flex flex-col gap-10 md:gap-16">
-          {MILESTONES.map((m, i) => (
-            <MilestoneRow
+          {EXPERIENCES.map((m, i) => (
+            <ExperienceRow
               key={m.slug}
-              milestone={m}
+              experience={m}
               index={i}
-              total={MILESTONES.length}
+              total={EXPERIENCES.length}
               reduceMotion={reduceMotion}
             />
           ))}
@@ -126,13 +135,13 @@ function TimelineLine({ progress }: { progress: MotionValue<number> }) {
 
 /* ───────────────────────── row ───────────────────────── */
 
-function MilestoneRow({
-  milestone,
+function ExperienceRow({
+  experience,
   index,
   total,
   reduceMotion,
 }: {
-  milestone: Milestone;
+  experience: Experience;
   index: number;
   total: number;
   reduceMotion: boolean;
@@ -160,8 +169,8 @@ function MilestoneRow({
           left ? "md:col-start-1" : "md:col-start-3",
         )}
       >
-        <MilestoneCard
-          milestone={milestone}
+        <ExperienceCard
+          experience={experience}
           active={active}
           step={step}
           total={total}
@@ -225,15 +234,15 @@ function Node({
 
 /* ───────────────────────── card ───────────────────────── */
 
-function MilestoneCard({
-  milestone: { slug, title, tag, description, Icon },
+function ExperienceCard({
+  experience: { slug, title, tag, description, Icon, href },
   active,
   step,
   total,
   side,
   reduceMotion,
 }: {
-  milestone: Milestone;
+  experience: Experience;
   active: boolean;
   step: string;
   total: number;
@@ -295,7 +304,7 @@ function MilestoneCard({
 
       <div className="mt-6 flex items-center justify-between border-t border-white/5 pt-5">
         <Link
-          href={`/work/${slug}`}
+          href={href ?? `/work/${slug}`}
           className="inline-flex items-center gap-1.5 rounded-full px-1 text-sm font-medium text-zinc-300 hover:text-white"
         >
           View Details

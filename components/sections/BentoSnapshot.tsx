@@ -7,7 +7,7 @@ import {
   useReducedMotion,
   type Variants,
 } from "framer-motion";
-import { SquareTerminal } from "lucide-react";
+import { Flame, SquareTerminal } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
@@ -322,7 +322,7 @@ function CodeMockup({ reduceMotion }: { reduceMotion: boolean }) {
           {"\n  "}
           <span className={a}>className</span>=<span className={v}>&quot;rounded-full</span>
           {"\n    "}
-          <span className={v}>bg-accent px-6&quot;</span>
+          <span className={v}>bg-accent px-8&quot;</span>
           {"\n"}
           <span className={k}>{">"}</span>
           {"\n  Let's Talk"}
@@ -350,16 +350,14 @@ function CodeMockup({ reduceMotion }: { reduceMotion: boolean }) {
 /* ───────────────────────── 4. tool marquee ───────────────────────── */
 
 const TOOLS: { name: string; icon: ReactNode }[] = [
-  // Ordered along the design → deploy spectrum
+  // Design → research & analytics → build
   { name: "Figma", icon: <FigmaMark /> },
-  { name: "FigJam", icon: <FigJamMark /> },
-  { name: "Photoshop", icon: <AdobeMark label="Ps" bg="#001E36" fg="#31A8FF" /> },
-  { name: "Illustrator", icon: <AdobeMark label="Ai" bg="#330000" fg="#FF9A00" /> },
-  { name: "Blender", icon: <BlenderMark /> },
+  { name: "Maze", icon: <MazeMark /> },
+  { name: "Hotjar", icon: <Flame className="size-4 text-[#FF3C00]" strokeWidth={2} fill="#FF3C00" fillOpacity={0.25} /> },
+  { name: "Google Analytics", icon: <AnalyticsMark /> },
   { name: "Cursor", icon: <CursorMark /> },
   { name: "Python", icon: <PythonMark /> },
   { name: "Terminal", icon: <SquareTerminal className="size-4 text-emerald-400" strokeWidth={1.75} /> },
-  { name: "GitHub", icon: <GitHubMark /> },
 ];
 
 function ToolMarquee() {
@@ -600,36 +598,6 @@ function FigmaMark() {
   );
 }
 
-function FigJamMark() {
-  // Sticky note with a folded corner
-  return (
-    <svg viewBox="0 0 24 24" className="size-4">
-      <path d="M4 3h16v12l-5 6H4z" fill="#FFC943" />
-      <path d="M20 15h-5v6z" fill="#E5A800" />
-      <path d="M8 8h8M8 11.5h5" stroke="#7A5800" strokeWidth="1.4" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function AdobeMark({ label, bg, fg }: { label: string; bg: string; fg: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className="size-4">
-      <rect width="24" height="24" rx="5" fill={bg} />
-      <text
-        x="12"
-        y="16.5"
-        textAnchor="middle"
-        fontSize="12"
-        fontWeight="700"
-        fontFamily="ui-sans-serif, system-ui"
-        fill={fg}
-      >
-        {label}
-      </text>
-    </svg>
-  );
-}
-
 function CursorMark() {
   // Isometric cube, shaded faces
   return (
@@ -653,21 +621,30 @@ function PythonMark() {
   );
 }
 
-function BlenderMark() {
+function MazeMark() {
+  // Rounded tile with a stylised maze path
   return (
-    <svg viewBox="0 0 24 24" className="size-4" fill="none">
-      <path d="M2.5 9.5h8M5 14l5.5-4.5" stroke="#E87D0D" strokeWidth="2.4" strokeLinecap="round" />
-      <circle cx="14.5" cy="13" r="6.5" fill="#E87D0D" />
-      <circle cx="14.5" cy="13" r="3.6" fill="#fff" />
-      <circle cx="14.5" cy="13" r="2.1" fill="#265787" />
+    <svg viewBox="0 0 24 24" className="size-4">
+      <rect width="24" height="24" rx="6" fill="#2F6BFF" />
+      <path
+        d="M6 18V6h12v9h-8V9h5"
+        fill="none"
+        stroke="#fff"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
-function GitHubMark() {
+function AnalyticsMark() {
+  // Ascending bars, Google Analytics palette
   return (
-    <svg viewBox="0 0 16 16" className="size-4" fill="currentColor">
-      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+    <svg viewBox="0 0 24 24" className="size-4">
+      <rect x="15" y="2" width="6" height="20" rx="3" fill="#F9AB00" />
+      <rect x="9" y="9" width="6" height="13" rx="3" fill="#E37400" />
+      <circle cx="6" cy="19" r="3" fill="#E37400" />
     </svg>
   );
 }
