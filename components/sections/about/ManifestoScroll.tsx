@@ -18,12 +18,6 @@ const WORDS = MANIFESTO.split(" ");
 
 const DIM = 0.15; // matches text-white/15
 
-// How far the reader scrolls, in viewport heights, from the moment the text's
-// top enters at the bottom of the screen until the last word is lit. At 1.3
-// the first line is fully lit by the time the block is about a quarter of the
-// way up the screen, and the rest lights at an even, comfortable reading pace.
-const REVEAL_LENGTH_VH = 1.3;
-
 // Each word fades over this many word-slots, so a few words are mid-fade at
 // once and the light sweeps across the text instead of switching word by word.
 const FADE_SPAN = 3;
@@ -34,15 +28,15 @@ export function ManifestoScroll() {
   const reduceMotion = !!useReducedMotion();
 
   // 0 when the wrapper's top enters at the viewport bottom, 1 when its bottom
-  // meets the viewport bottom (the moment the text unpins). Starting this
-  // early covers the stretch where the text is still scrolling up into place.
+  // meets the viewport bottom: the moment the text unpins and the next
+  // section starts arriving. The reveal ends exactly there, so there is no
+  // dead scroll on a finished statement.
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end end"] });
 
-  // The reveal window, as wrapper progress. The text sits partway down the
-  // wrapper (it is vertically centred in the sticky viewport), so the window
-  // is measured from the real layout rather than written as a fixed offset.
-  const revealStart = useMotionValue(0.1);
-  const revealEnd = useMotionValue(0.7);
+  // Where the reveal starts, as wrapper progress: the moment the text's top
+  // enters the screen. The text sits partway down the wrapper (vertically
+  // centred in the sticky viewport), so this is measured, not a fixed offset.
+  const revealStart = useMotionValue(0.15);
 
   useEffect(() => {
     const section = ref.current;
@@ -54,11 +48,7 @@ export function ManifestoScroll() {
       // distance below the wrapper's top before pinning. Progress 0 has the
       // wrapper's top at the viewport bottom, so the text's top enters the
       // screen once the wrapper has scrolled offsetTop past that point.
-      const total = section.offsetHeight;
-      const start = text.offsetTop / total;
-      const end = (text.offsetTop + REVEAL_LENGTH_VH * window.innerHeight) / total;
-      revealStart.set(start);
-      revealEnd.set(Math.min(end, 1));
+      revealStart.set(text.offsetTop / section.offsetHeight);
     };
 
     measure();
@@ -70,13 +60,14 @@ export function ManifestoScroll() {
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [revealStart, revealEnd]);
+  }, [revealStart]);
 
   // Linear remap to 0..1 across the window, so every word gets an equal share
-  // of scroll distance: 0 = text top at viewport bottom, 1 = last word lit.
+  // of scroll distance: 0 = text top at viewport bottom, 1 = last word lit,
+  // exactly as the wrapper's bottom reaches the viewport bottom.
   const reveal = useTransform(
-    [scrollYProgress, revealStart, revealEnd],
-    ([p, start, end]: number[]) => Math.min(Math.max((p - start) / (end - start), 0), 1),
+    [scrollYProgress, revealStart],
+    ([p, start]: number[]) => Math.min(Math.max((p - start) / (1 - start), 0), 1),
   );
 
   // A light spring absorbs coarse mouse-wheel steps without visibly lagging.
@@ -85,7 +76,9 @@ export function ManifestoScroll() {
   const slot = 1 / (WORDS.length + FADE_SPAN - 1);
 
   return (
-    <section ref={ref} aria-label="Manifesto" className="relative h-[250vh]">
+    // 150vh: from the text entering to the unpin is ~1.25 screens of scroll,
+    // the same reading pace as before, with the pinned hold trimmed away.
+    <section ref={ref} aria-label="Manifesto" className="relative h-[150vh]">
       {/* pt-16 clears the sticky header so the copy centres in the visible area */}
       <div className="sticky top-0 flex h-svh items-center justify-center overflow-hidden pt-16">
         <p ref={textRef} className="max-w-4xl px-6 text-center text-2xl leading-snug font-bold tracking-tight text-white md:text-4xl lg:text-[min(3rem,6svh)]">

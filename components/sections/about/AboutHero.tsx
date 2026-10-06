@@ -39,7 +39,9 @@ export function AboutHero() {
   return (
     <section
       aria-labelledby="about-hero-title"
-      className="relative mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-6xl flex-col items-center justify-center gap-10 px-6 pt-8 pb-20 lg:grid lg:min-h-[90vh] lg:grid-cols-3 lg:gap-8 lg:py-16"
+      // Below lg: both personas side by side on top, portrait spanning beneath,
+      // so the whole split persona reads in one screen. lg+: the 3-column stage.
+      className="relative mx-auto grid min-h-[calc(100svh-4rem)] w-full max-w-6xl grid-cols-2 content-center items-start gap-x-5 gap-y-6 px-6 pt-6 pb-12 sm:gap-y-8 lg:min-h-[90vh] lg:grid-cols-3 lg:content-normal lg:items-center lg:gap-8 lg:py-16"
     >
       <h1 id="about-hero-title" className="sr-only">
         About Amir Alborz — Product Designer and System Thinker
@@ -52,12 +54,15 @@ export function AboutHero() {
         onActivate={setActive}
         reduceMotion={reduceMotion}
         delay={0.2}
+        className="col-start-1 row-start-1"
       />
 
       <motion.div
         {...rise(0, reduceMotion)}
-        // Image leads on mobile; sits in the middle column on desktop.
-        className="relative order-first w-full max-w-sm lg:order-none lg:max-w-none"
+        // Below lg: spans both columns under the personas, its width capped by
+        // the viewport height so the whole portrait stays on the first screen.
+        // lg+: the middle column.
+        className="relative col-span-2 row-start-2 w-[min(100%,24rem,calc((100svh-4rem)*0.42))] justify-self-center lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:w-full"
       >
         {/* Accent glow drifts toward whichever persona is in focus */}
         <motion.div
@@ -79,6 +84,7 @@ export function AboutHero() {
         onActivate={setActive}
         reduceMotion={reduceMotion}
         delay={0.3}
+        className="col-start-2 row-start-1 lg:col-start-3"
       />
     </section>
   );
@@ -122,9 +128,10 @@ type PersonaProps = {
   onActivate: (id: PersonaId | null) => void;
   reduceMotion: boolean;
   delay: number;
+  className?: string;
 };
 
-function Persona({ id, align, active, onActivate, reduceMotion, delay }: PersonaProps) {
+function Persona({ id, align, active, onActivate, reduceMotion, delay, className }: PersonaProps) {
   const { title, body } = PERSONAS[id];
   const isActive = active === id;
   const isDimmed = active !== null && !isActive;
@@ -137,7 +144,7 @@ function Persona({ id, align, active, onActivate, reduceMotion, delay }: Persona
 
   return (
     // Outer layer runs the entrance; inner layer reacts to the active persona.
-    <motion.div {...rise(delay, reduceMotion)} className="w-full">
+    <motion.div {...rise(delay, reduceMotion)} className={cn("w-full", className)}>
       <motion.div
         tabIndex={0}
         onPointerEnter={handleEnter}
@@ -150,11 +157,12 @@ function Persona({ id, align, active, onActivate, reduceMotion, delay }: Persona
         }}
         transition={{ duration: 0.5, ease }}
         className={cn(
-          "rounded-2xl text-center outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-8 focus-visible:ring-offset-background",
-          align === "left" ? "lg:text-left" : "lg:text-right",
+          "rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-8 focus-visible:ring-offset-background",
+          // Each persona hugs its own outer edge, on mobile and desktop alike.
+          align === "left" ? "text-left" : "text-right",
         )}
       >
-        <h2 className="text-[clamp(2.75rem,12vw,4.5rem)] leading-[0.92] font-bold tracking-tighter text-white lg:text-[clamp(2.75rem,4.6vw,4.75rem)]">
+        <h2 className="text-[clamp(1.75rem,9vw,3rem)] leading-[0.92] font-bold tracking-tighter text-white lg:text-[clamp(2.75rem,4.6vw,4.75rem)]">
           {title.map((line, i) => (
             <span
               key={line}
@@ -166,8 +174,8 @@ function Persona({ id, align, active, onActivate, reduceMotion, delay }: Persona
         </h2>
         <p
           className={cn(
-            "mx-auto mt-5 max-w-xs text-base text-balance text-zinc-400 md:text-lg lg:mt-6",
-            align === "left" ? "lg:mx-0" : "lg:ml-auto lg:mr-0",
+            "mt-3 max-w-xs text-sm text-balance text-zinc-400 sm:text-base lg:mt-6 lg:text-lg",
+            align === "left" ? "mr-auto" : "ml-auto",
           )}
         >
           {body}
