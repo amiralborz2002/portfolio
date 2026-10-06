@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/Button";
 
@@ -8,7 +8,10 @@ const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
 
 const words = ["Systems.", "Mechanisms.", "Architectures.", "Logic."] as const;
 
-const WORD_INTERVAL_MS = 2600;
+const TYPE_MS = 90; // per character typed
+const DELETE_MS = 45; // per character erased
+const HOLD_MS = 4000; // fully typed word stays visible
+const GAP_MS = 400; // pause on the empty line before the next word
 
 export function Hero() {
   const reduceMotion = !!useReducedMotion();
@@ -22,46 +25,49 @@ export function Hero() {
   return (
     <section
       aria-labelledby="hero-title"
-      className="relative mx-auto flex min-h-svh w-full max-w-6xl flex-col items-center justify-center px-6 pt-24 pb-32 text-center"
+      className="relative mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-6xl flex-col items-center justify-center px-6 pt-8 pb-24 text-center md:pt-16 md:pb-32"
     >
-      <motion.div {...rise(0)}>
-        <span className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] px-4 py-1.5 text-xs font-medium tracking-widest text-zinc-400 uppercase backdrop-blur-md">
-          <span aria-hidden className="relative flex size-2">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75 motion-reduce:animate-none" />
-            <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+      {/* Sits above true center so the scroll indicator always has room below */}
+      <div className="mb-10 flex w-full flex-col items-center md:mb-[8svh]">
+        <motion.div {...rise(0)}>
+          <span className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] px-4 py-1.5 text-xs font-medium tracking-widest text-zinc-400 uppercase backdrop-blur-md">
+            <span aria-hidden className="relative flex size-2">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75 motion-reduce:animate-none" />
+              <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+            </span>
+            Available for projects
           </span>
-          Available for projects
-        </span>
-      </motion.div>
+        </motion.div>
 
-      <motion.h1
-        id="hero-title"
-        {...rise(0.1)}
-        className="mt-8 text-[clamp(2.25rem,10vw,7.5rem)] leading-[0.95] font-bold tracking-tighter text-white"
-      >
-        I design complex
-        <RotatingWord reduceMotion={reduceMotion} />
-      </motion.h1>
+        <motion.h1
+          id="hero-title"
+          {...rise(0.1)}
+          className="mt-6 text-[clamp(2.25rem,min(10vw,12svh),7.5rem)] leading-[0.95] font-bold tracking-tighter text-white md:mt-8"
+        >
+          I design complex
+          <RotatingWord reduceMotion={reduceMotion} />
+        </motion.h1>
 
-      <motion.p
-        {...rise(0.2)}
-        className="mt-8 max-w-2xl text-lg text-balance text-zinc-400 md:text-xl"
-      >
-        I&apos;m Amir Alborz, a Senior UX Designer &amp; Information Architect blending
-        behavioral economics, system thinking, and technical logic.
-      </motion.p>
+        <motion.p
+          {...rise(0.2)}
+          className="mt-6 max-w-2xl text-lg text-balance text-zinc-400 md:mt-8 md:text-xl"
+        >
+          I&apos;m Amir Alborz, a Senior UX Designer &amp; Information Architect blending
+          behavioral economics, system thinking, and technical logic.
+        </motion.p>
 
-      <motion.div
-        {...rise(0.3)}
-        className="mt-10 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row"
-      >
-        <Button href="/contact" variant="primary" size="lg" className="w-full sm:w-auto">
-          Let&apos;s Talk
-        </Button>
-        <Button href="/work" variant="outline" size="lg" className="w-full sm:w-auto">
-          View Works
-        </Button>
-      </motion.div>
+        <motion.div
+          {...rise(0.3)}
+          className="mt-8 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row md:mt-10"
+        >
+          <Button href="/contact" variant="primary" size="lg" className="w-full sm:w-auto">
+            Let&apos;s Talk
+          </Button>
+          <Button href="/work" variant="outline" size="lg" className="w-full sm:w-auto">
+            View Works
+          </Button>
+        </motion.div>
+      </div>
 
       <ScrollIndicator reduceMotion={reduceMotion} />
     </section>
@@ -70,45 +76,58 @@ export function Hero() {
 
 function RotatingWord({ reduceMotion }: { reduceMotion: boolean }) {
   const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    if (reduceMotion) return;
-    const id = window.setInterval(
-      () => setIndex((i) => (i + 1) % words.length),
-      WORD_INTERVAL_MS,
-    );
-    return () => window.clearInterval(id);
-  }, [reduceMotion]);
+  const [length, setLength] = useState(0);
+  const [deleting, setDeleting] = useState(false);
 
   const word = words[index];
 
+  useEffect(() => {
+    // Reduced motion: skip the per-character animation, just swap whole words.
+    if (reduceMotion) {
+      const id = window.setTimeout(() => setIndex((i) => (i + 1) % words.length), HOLD_MS);
+      return () => window.clearTimeout(id);
+    }
+
+    let next: () => void;
+    let delay: number;
+
+    if (!deleting && length < word.length) {
+      next = () => setLength((l) => l + 1);
+      delay = TYPE_MS;
+    } else if (!deleting) {
+      next = () => setDeleting(true);
+      delay = HOLD_MS;
+    } else if (length > 0) {
+      next = () => setLength((l) => l - 1);
+      delay = DELETE_MS;
+    } else {
+      next = () => {
+        setDeleting(false);
+        setIndex((i) => (i + 1) % words.length);
+      };
+      delay = GAP_MS;
+    }
+
+    const id = window.setTimeout(next, delay);
+    return () => window.clearTimeout(id);
+  }, [reduceMotion, deleting, length, word]);
+
+  const visible = reduceMotion ? word : word.slice(0, length);
+
   return (
-    // Own line with a fixed line box, so swapping words of different
-    // lengths never reflows the heading or shifts the content below.
-    <span className="relative block h-[1.1em] overflow-hidden pb-[0.1em]">
-      {/* Static label for assistive tech so the cycling word isn't re-announced */}
+    // Own line with a fixed line box, so the heading height never changes
+    // while characters are typed or erased.
+    <span className="relative block h-[1.1em] pb-[0.1em]">
+      {/* Static label for assistive tech so every keystroke isn't re-announced */}
       <span className="sr-only">{words.join(" ")}</span>
-      <AnimatePresence mode="wait" initial={false}>
+      <span aria-hidden className="inline-flex items-center text-accent">
+        <span className="whitespace-pre">{visible}</span>
         <motion.span
-          key={word}
-          aria-hidden
-          className="inline-block text-accent"
-          initial={
-            reduceMotion
-              ? { opacity: 0 }
-              : { opacity: 0, y: "0.4em", filter: "blur(12px)", scale: 0.96 }
-          }
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
-          exit={
-            reduceMotion
-              ? { opacity: 0 }
-              : { opacity: 0, y: "-0.4em", filter: "blur(12px)", scale: 1.02 }
-          }
-          transition={{ duration: 0.55, ease }}
-        >
-          {word}
-        </motion.span>
-      </AnimatePresence>
+          className="ml-[0.06em] inline-block h-[0.8em] w-[0.06em] translate-y-[0.04em] rounded-full bg-accent"
+          animate={reduceMotion ? undefined : { opacity: [1, 1, 0, 0] }}
+          transition={{ duration: 1, times: [0, 0.5, 0.5, 1], repeat: Infinity, ease: "linear" }}
+        />
+      </span>
     </span>
   );
 }
