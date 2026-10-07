@@ -34,7 +34,13 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`dark ${geistSans.variable} ${geistMono.variable}`}>
+    <html
+      lang="en"
+      className={`dark ${geistSans.variable} ${geistMono.variable}`}
+      // globals.css sets smooth scrolling for in-page anchors; this tells Next.js to switch it
+      // off during route changes so new pages start at the top instantly.
+      data-scroll-behavior="smooth"
+    >
       <body className="relative min-h-dvh overflow-x-hidden bg-background font-sans text-muted antialiased">
         {/* اسکیپ لینک برای دسترسی‌پذیری و کیبورد */}
         <a

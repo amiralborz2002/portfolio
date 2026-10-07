@@ -36,8 +36,8 @@ export function CaseStudyLayout({
   return (
     <article>
       {/* Top bar, hero and TL;DR — built for the 10-second scan */}
-      <header className="mx-auto max-w-7xl px-6 pb-12 pt-24">
-        <nav aria-label="Breadcrumb" className="mb-12 text-sm">
+      <header className="mx-auto max-w-7xl px-6 pb-12 pt-16 md:pt-32">
+        <nav aria-label="Breadcrumb" className="mb-8 text-sm md:mb-12">
           <ol className="flex flex-wrap items-center gap-2 text-zinc-500">
             <li>
               <Link
@@ -61,7 +61,7 @@ export function CaseStudyLayout({
         <p className="mb-4 font-mono text-xs uppercase tracking-widest text-orange-400">{category}</p>
         <h1 className="mb-8 text-5xl font-bold tracking-tight text-white md:text-7xl">{title}</h1>
 
-        <dl className="mb-16 grid grid-cols-2 gap-6 border-b border-t border-white/10 py-8 md:grid-cols-4">
+        <dl className="mb-8 grid grid-cols-2 gap-6 border-b border-t border-white/10 py-8 md:mb-16 md:grid-cols-4">
           {quickScan.map(({ label, value }) => (
             <div key={label}>
               <dt className="mb-1 font-mono text-xs text-zinc-500">{label}</dt>
@@ -71,7 +71,7 @@ export function CaseStudyLayout({
         </dl>
 
         {/* Hero media placeholder — replace with <Image> or <video> per case study */}
-        <div aria-hidden className="mb-24 h-[50vh] w-full rounded-3xl bg-zinc-900 md:h-[70vh]" />
+        <div aria-hidden className="mb-12 h-[50vh] w-full rounded-3xl bg-zinc-900 md:mb-24 md:h-[70vh]" />
       </header>
 
       {/* Two-column body: sticky TOC for orientation, long-form content for deep readers */}

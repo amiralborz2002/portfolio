@@ -1,55 +1,32 @@
 import Link from "next/link";
+import { getCaseStudy } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
-type CaseStudy = {
-  slug: string;
-  title: string;
-  tags: string[];
+type CardLayout = {
   /** Grid placement on the 12-column md+ layout. */
   span: string;
   /** Placeholder image height; row-span-2 cards get the taller variant. */
   height: string;
 };
 
-const CASE_STUDIES: CaseStudy[] = [
-  {
-    slug: "design-system",
-    title: "The Design System",
-    tags: ["System Architecture", "Design Tokens", "B2B"],
-    span: "md:col-span-7 md:row-span-2",
-    height: "h-[400px] md:h-[640px]",
-  },
-  {
-    slug: "nubar-cloud",
-    title: "Nubar Cloud Console",
-    tags: ["Cloud Infrastructure", "Dashboard"],
-    span: "md:col-span-5 md:row-span-2",
-    height: "h-[400px] md:h-[640px]",
-  },
-  {
-    slug: "digi-express-annual-report",
-    title: "Digi Express Annual Report",
-    tags: ["Data Storytelling", "Web"],
-    span: "md:col-span-4",
-    height: "h-[300px] md:h-[400px]",
-  },
-  {
-    slug: "fragrance-b2b",
-    title: "Fragrance B2B SPA",
-    tags: ["E-commerce", "B2B"],
-    span: "md:col-span-4",
-    height: "h-[300px] md:h-[400px]",
-  },
-  {
-    slug: "escape-room-marketplace",
-    title: "Escape Room Marketplace",
-    tags: ["Marketplace", "Booking"],
-    span: "md:col-span-4",
-    height: "h-[300px] md:h-[400px]",
-  },
-];
+// Grid placement for each flagship, in display order. Titles, tags and slugs come
+// from lib/data so every card always links to a case study that exists.
+const CARD_LAYOUT: Record<string, CardLayout> = {
+  "design-system": { span: "md:col-span-7 md:row-span-2", height: "h-[400px] md:h-[640px]" },
+  "nubar-cloud": { span: "md:col-span-5 md:row-span-2", height: "h-[400px] md:h-[640px]" },
+  "digi-express": { span: "md:col-span-4", height: "h-[300px] md:h-[400px]" },
+  "fragrance-spa": { span: "md:col-span-4", height: "h-[300px] md:h-[400px]" },
+  "escape-room": { span: "md:col-span-4", height: "h-[300px] md:h-[400px]" },
+};
 
-function WorkCard({ study }: { study: CaseStudy }) {
+const FEATURED = Object.entries(CARD_LAYOUT).flatMap(([slug, layout]) => {
+  const study = getCaseStudy(slug);
+  return study ? [{ ...study, ...layout }] : [];
+});
+
+type FeaturedCard = (typeof FEATURED)[number];
+
+function WorkCard({ study }: { study: FeaturedCard }) {
   return (
     <Link
       href={`/work/${study.slug}`}
@@ -113,7 +90,7 @@ export function FeaturedWorks() {
       </header>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
-        {CASE_STUDIES.map((study) => (
+        {FEATURED.map((study) => (
           <WorkCard key={study.slug} study={study} />
         ))}
       </div>
