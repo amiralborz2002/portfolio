@@ -12,8 +12,9 @@ export default function LabPage() {
     // One root element so navigation scrolls to the top of the page, as on /work.
     <div>
       <section className="mx-auto max-w-7xl px-6 pt-32 pb-16">
-        <h1 className="mb-6 font-mono text-4xl font-bold text-white md:text-5xl">
-          &gt; /lab/experiments<span className="animate-pulse">_</span>
+        <h1 className="mb-6 break-words font-mono text-3xl font-bold tracking-tight text-white min-[400px]:text-4xl md:text-5xl">
+          {/* nbsp keeps the prompt on the path; <wbr> breaks at the slash, not mid-word. */}
+          &gt;&nbsp;/lab/<wbr />experiments<span className="animate-pulse">_</span>
         </h1>
         <p className="max-w-2xl font-mono text-lg leading-relaxed text-zinc-400">
           This is not my design portfolio. This is a workbench for automations, internal tools,
