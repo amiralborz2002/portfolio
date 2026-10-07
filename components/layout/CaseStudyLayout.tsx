@@ -36,7 +36,7 @@ export function CaseStudyLayout({
   return (
     <article>
       {/* Top bar, hero and TL;DR — built for the 10-second scan */}
-      <header className="mx-auto max-w-7xl px-6 pb-12 pt-16 md:pt-32">
+      <header className="mx-auto max-w-7xl px-6 pt-12 min-[400px]:pt-16 md:pt-32 pb-12">
         <nav aria-label="Breadcrumb" className="mb-8 text-sm md:mb-12">
           <ol className="flex flex-wrap items-center gap-2 text-zinc-500">
             <li>

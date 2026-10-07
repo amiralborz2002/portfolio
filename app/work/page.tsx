@@ -13,7 +13,7 @@ export default function WorkPage() {
     // One root element: Next.js scrolls a navigated page's first DOM node into view, and with a
     // Fragment it could target the Archive section instead of the top of the page.
     <div>
-      <div className="mx-auto w-full max-w-7xl px-6 pt-32 md:pt-40">
+      <div className="mx-auto w-full max-w-7xl px-6 pt-12 min-[400px]:pt-16 md:pt-32">
         <FeaturedWorks />
       </div>
       <ArchiveList />
