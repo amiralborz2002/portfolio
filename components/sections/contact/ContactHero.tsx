@@ -2,11 +2,20 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
-import { Fragment, useState, useSyncExternalStore, type ReactNode } from "react";
+import {
+  Fragment,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
 
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
 
 const EMAIL = "amiralborz2002@gmail.com";
+const MAILTO = `mailto:${EMAIL}`;
 const PHONE_DISPLAY = "+98 938 816 3359";
 const PHONE_HREF = "tel:+989388163359";
 
@@ -140,8 +149,36 @@ function EditorCard({ reduceMotion }: { reduceMotion: boolean }) {
   const canHover = useCanHover();
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
-  // Touch devices can't hover, so the preview simply stays open there.
-  const showPreview = !canHover || hovered || focused;
+  const [showEmailMenu, setShowEmailMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  // Touch devices can't hover, so the preview simply stays open there. It also
+  // stays open while the email menu is, so the menu can't vanish under the cursor.
+  const showPreview = !canHover || hovered || focused || showEmailMenu;
+
+  // While the menu is open, a click outside it or Escape closes it.
+  useEffect(() => {
+    if (!showEmailMenu) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (!menuRef.current?.contains(e.target as Node)) setShowEmailMenu(false);
+    };
+    const onKeyDown = (e: KeyboardEvent) => e.key === "Escape" && setShowEmailMenu(false);
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [showEmailMenu]);
+
+  // Phones hand off to the native mail app; desktop gets a choice of client.
+  const handleEmailClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (window.innerWidth < 768) {
+      window.location.href = MAILTO;
+    } else {
+      setShowEmailMenu((open) => !open);
+    }
+  };
 
   return (
     <div
@@ -200,20 +237,99 @@ function EditorCard({ reduceMotion }: { reduceMotion: boolean }) {
               <p className="font-mono text-[9px] tracking-[0.18em] text-zinc-500 sm:text-[10px]">
                 PREVIEW
               </p>
-              <a
-                href={`mailto:${EMAIL}`}
-                className="group/btn inline-flex h-8 items-center gap-1.5 rounded-full bg-accent px-3.5 text-xs font-medium whitespace-nowrap text-accent-foreground shadow-glow transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 sm:h-9 sm:px-4 sm:text-sm"
-              >
-                Say Hello
-                <ArrowUpRight
-                  aria-hidden
-                  className="size-4 transition-transform duration-300 ease-apple group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
-                />
-              </a>
+              <div ref={menuRef} className="relative">
+                <button
+                  type="button"
+                  onClick={handleEmailClick}
+                  aria-haspopup="menu"
+                  aria-expanded={showEmailMenu}
+                  className="group/btn inline-flex h-8 items-center gap-1.5 rounded-full bg-accent px-3.5 text-xs font-medium whitespace-nowrap text-accent-foreground shadow-glow transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 sm:h-9 sm:px-4 sm:text-sm"
+                >
+                  Say Hello
+                  <ArrowUpRight
+                    aria-hidden
+                    className="size-4 transition-transform duration-300 ease-apple group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
+                  />
+                </button>
+
+                {showEmailMenu && <EmailMenu onSelect={() => setShowEmailMenu(false)} />}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+    </div>
+  );
+}
+
+const EMAIL_OPTIONS = [
+  {
+    label: "Open in Gmail",
+    href: `https://mail.google.com/mail/?view=cm&fs=1&to=${EMAIL}`,
+    letter: "G",
+    external: true,
+  },
+  {
+    label: "Open in Outlook",
+    href: `https://outlook.office.com/mail/deeplink/compose?to=${EMAIL}`,
+    letter: "O",
+    external: true,
+  },
+  { label: "System Default", href: MAILTO, letter: null, external: false },
+] as const;
+
+/** IDE-style context menu listing the ways to compose an email. */
+function EmailMenu({ onSelect }: { onSelect: () => void }) {
+  return (
+    // Opens upwards: the editor window clips anything below its bottom edge.
+    <div
+      role="menu"
+      aria-label="Choose email client"
+      className="absolute right-0 bottom-full mb-3 w-56 bg-zinc-900 border border-zinc-800 rounded-lg shadow-2xl overflow-hidden z-50 flex flex-col"
+    >
+      {EMAIL_OPTIONS.map(({ label, href, letter, external }) => (
+        <a
+          key={label}
+          role="menuitem"
+          href={href}
+          onClick={onSelect}
+          {...(external && { target: "_blank", rel: "noopener noreferrer" })}
+          className="flex items-center gap-3 px-4 py-3 text-sm font-mono text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors focus-visible:bg-zinc-800 focus-visible:text-white focus-visible:outline-none"
+        >
+          <svg
+            aria-hidden
+            viewBox="0 0 16 16"
+            className="size-4 shrink-0"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.25"
+          >
+            {letter ? (
+              <>
+                <rect x="1" y="1" width="14" height="14" rx="3" />
+                <text
+                  x="8"
+                  y="11.5"
+                  textAnchor="middle"
+                  fontSize="9"
+                  fontWeight="700"
+                  fill="currentColor"
+                  stroke="none"
+                  fontFamily="ui-monospace, monospace"
+                >
+                  {letter}
+                </text>
+              </>
+            ) : (
+              <>
+                <rect x="1" y="2" width="14" height="9.5" rx="1.5" />
+                <path d="M5.5 14.5h5M8 11.5v3" strokeLinecap="round" />
+              </>
+            )}
+          </svg>
+          {label}
+        </a>
+      ))}
     </div>
   );
 }
@@ -244,7 +360,7 @@ function TerminalCard({ reduceMotion }: { reduceMotion: boolean }) {
       whileHover={reduceMotion ? undefined : { scale: 1.015 }}
       whileTap={reduceMotion ? undefined : { scale: 0.99 }}
       transition={{ duration: 0.3, ease }}
-      className={`group block ${windowFrame} hover:border-green-400/30 hover:shadow-[0_0_0_1px_rgb(74_222_128/0.08),0_24px_60px_-24px_rgb(74_222_128/0.25)] focus-visible:border-green-400/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40`}
+      className={`group block ${windowFrame} hover:border-zinc-700 focus-visible:border-green-400/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40`}
     >
       <TitleBar title="zsh — connection" meta="80×24" />
 
