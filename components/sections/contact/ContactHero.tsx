@@ -170,14 +170,9 @@ function EditorCard({ reduceMotion }: { reduceMotion: boolean }) {
     };
   }, [showEmailMenu]);
 
-  // Phones hand off to the native mail app; desktop gets a choice of client.
-  const handleEmailClick = (e: MouseEvent<HTMLButtonElement>) => {
+  const handleDesktopClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (window.innerWidth < 768) {
-      window.location.href = MAILTO;
-    } else {
-      setShowEmailMenu((open) => !open);
-    }
+    setShowEmailMenu((open) => !open);
   };
 
   return (
@@ -237,19 +232,20 @@ function EditorCard({ reduceMotion }: { reduceMotion: boolean }) {
               <p className="font-mono text-[9px] tracking-[0.18em] text-zinc-500 sm:text-[10px]">
                 PREVIEW
               </p>
-              <div ref={menuRef} className="relative">
+              {/* Phones get a plain mailto link, so the native mail app opens with no JS
+                  in the way; md+ gets a button that opens the email client menu. */}
+              <a href={MAILTO} className={`flex md:hidden ${sayHelloButton}`}>
+                <SayHelloLabel />
+              </a>
+              <div ref={menuRef} className="relative hidden md:block">
                 <button
                   type="button"
-                  onClick={handleEmailClick}
+                  onClick={handleDesktopClick}
                   aria-haspopup="menu"
                   aria-expanded={showEmailMenu}
-                  className="group/btn inline-flex h-8 items-center gap-1.5 rounded-full bg-accent px-3.5 text-xs font-medium whitespace-nowrap text-accent-foreground shadow-glow transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 sm:h-9 sm:px-4 sm:text-sm"
+                  className={`hidden md:flex ${sayHelloButton}`}
                 >
-                  Say Hello
-                  <ArrowUpRight
-                    aria-hidden
-                    className="size-4 transition-transform duration-300 ease-apple group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
-                  />
+                  <SayHelloLabel />
                 </button>
 
                 {showEmailMenu && <EmailMenu onSelect={() => setShowEmailMenu(false)} />}
@@ -259,6 +255,21 @@ function EditorCard({ reduceMotion }: { reduceMotion: boolean }) {
         </AnimatePresence>
       </div>
     </div>
+  );
+}
+
+const sayHelloButton =
+  "group/btn h-8 items-center gap-1.5 rounded-full bg-accent px-3.5 text-xs font-medium whitespace-nowrap text-accent-foreground shadow-glow transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 sm:h-9 sm:px-4 sm:text-sm";
+
+function SayHelloLabel() {
+  return (
+    <>
+      Say Hello
+      <ArrowUpRight
+        aria-hidden
+        className="size-4 transition-transform duration-300 ease-apple group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5"
+      />
+    </>
   );
 }
 
