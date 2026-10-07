@@ -2,7 +2,7 @@ import { BentoSnapshot } from "@/components/sections/BentoSnapshot";
 import { ExperienceJourney } from "@/components/sections/ExperienceJourney";
 import { FinalCTA } from "@/components/sections/FinalCTA";
 import { Hero } from "@/components/sections/Hero";
-import { Testimonials } from "@/components/sections/Testimonials";
+import { TestimonialsSlider } from "@/components/sections/home/TestimonialsSlider";
 
 export default function HomePage() {
   return (
@@ -23,7 +23,7 @@ export default function HomePage() {
             Trusted by teams I&apos;ve worked with.
           </h2>
         </div>
-        <Testimonials limit={6} />
+        <TestimonialsSlider />
       </section>
       <FinalCTA />
     </div>
