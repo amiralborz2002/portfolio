@@ -50,18 +50,25 @@ function ArchiveRowContent({ item, clickable }: { item: ArchiveEntry; clickable:
   const hover = clickable ? "transition-colors group-hover:text-orange-400 group-focus-visible:text-orange-400" : "";
 
   return (
-    <div className="flex w-full flex-col justify-between border-b border-zinc-800/50 py-6 md:flex-row md:items-center">
-      <div className="flex w-full items-center gap-6 md:w-2/3 md:gap-12">
-        <span className="w-12 shrink-0 font-mono text-sm text-zinc-500">{item.year}</span>
-        <h3 className={`text-lg font-medium leading-tight text-white ${hover}`}>{item.title}</h3>
-      </div>
-      <div className="mt-4 flex w-full items-center justify-between gap-4 md:mt-0 md:w-1/3">
-        <span className="text-sm text-zinc-500">{item.type}</span>
-        <span
-          className={`whitespace-nowrap font-mono text-xs uppercase tracking-wider ${clickable ? `text-zinc-300 ${hover}` : "text-zinc-600"}`}
-        >
-          {ACTION_LABEL[item.linkType]}
+    <div className="flex w-full flex-col justify-between gap-4 border-b border-zinc-800/50 py-6 md:flex-row md:items-center md:gap-0">
+      {/* Mobile: title left, year right. Desktop: year column, then title. */}
+      <div className="flex w-full min-w-0 items-center justify-between md:w-2/3 md:justify-start md:gap-12">
+        <span className="order-2 shrink-0 text-right font-mono text-sm text-zinc-500 md:order-1 md:w-12 md:text-left">
+          {item.year}
         </span>
+        <h3 className={`order-1 min-w-0 truncate pr-4 text-lg font-medium leading-tight text-white md:order-2 md:pr-0 ${hover}`}>
+          {item.title}
+        </h3>
+      </div>
+      <div className="mt-2 flex w-full min-w-0 items-center justify-between md:mt-0 md:w-1/3">
+        <span className="min-w-0 truncate pr-4 text-sm text-zinc-500">{item.type}</span>
+        <div className="shrink-0">
+          <span
+            className={`whitespace-nowrap font-mono text-xs uppercase tracking-wider ${clickable ? `text-zinc-300 ${hover}` : "text-zinc-600"}`}
+          >
+            {ACTION_LABEL[item.linkType]}
+          </span>
+        </div>
       </div>
     </div>
   );
