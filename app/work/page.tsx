@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ArchiveList } from "@/components/sections/work/ArchiveList";
 import { FeaturedWorks } from "@/components/sections/work/FeaturedWorks";
 
 export const metadata: Metadata = {
@@ -9,8 +10,11 @@ export const metadata: Metadata = {
 
 export default function WorkPage() {
   return (
-    <div className="mx-auto w-full max-w-7xl px-6 pb-24 pt-32 md:pb-32 md:pt-40">
-      <FeaturedWorks />
-    </div>
+    <>
+      <div className="mx-auto w-full max-w-7xl px-6 pt-32 md:pt-40">
+        <FeaturedWorks />
+      </div>
+      <ArchiveList />
+    </>
   );
 }
