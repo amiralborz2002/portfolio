@@ -65,7 +65,7 @@ export function Footer() {
   return (
     <footer className="mt-auto w-full border-t border-zinc-900 py-8">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 md:flex-row">
-        <div className="font-mono text-sm text-zinc-500">© 2026 Amir Alborz. All rights reserved.</div>
+        <div className="whitespace-nowrap font-mono text-[10px] text-zinc-500 min-[375px]:text-xs md:text-sm">© 2026 Amir Alborz. All rights reserved.</div>
 
         {/* Icons sit above the copyright on mobile, on the right on desktop. */}
         <div className="order-first flex items-center gap-6 md:order-none">
