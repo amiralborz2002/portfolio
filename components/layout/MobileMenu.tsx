@@ -7,9 +7,11 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
 
 const LINKS = [
-  { num: "01", label: "Work", href: "/work" },
-  { num: "02", label: "Lab", href: "/lab" },
-  { num: "03", label: "About", href: "/about" },
+  { num: "01", label: "Home", href: "/" },
+  { num: "02", label: "Work", href: "/work" },
+  { num: "03", label: "Lab", href: "/lab" },
+  { num: "04", label: "About", href: "/about" },
+  { num: "05", label: "Contact", href: "/contact" },
 ] as const;
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -58,7 +60,9 @@ export function MobileMenu() {
     };
   }, [isOpen]);
 
-  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  // Home matches only itself; other sections stay lit on their sub-pages (e.g. /work/[slug]).
+  const isActive = (href: string) =>
+    pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
   const lineTransition = { duration: reduceMotion ? 0 : 0.3, ease: EASE };
 
   return (
@@ -105,7 +109,7 @@ export function MobileMenu() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: reduceMotion ? 0 : 0.3, ease: "easeOut" }}
-                className="fixed inset-0 z-50 flex flex-col justify-center bg-zinc-950/95 px-8 backdrop-blur-2xl md:hidden"
+                className="fixed inset-0 z-50 flex h-[100dvh] flex-col overflow-y-auto bg-zinc-950/95 px-8 pt-16 backdrop-blur-2xl md:hidden"
               >
                 <motion.nav
                   aria-label="Mobile"
@@ -113,26 +117,37 @@ export function MobileMenu() {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  className="flex flex-col"
+                  className="flex flex-1 flex-col justify-center py-8"
                 >
-                  {LINKS.map((link) => (
-                    <motion.div key={link.href} variants={itemVariants}>
-                      <Link
-                        href={link.href}
-                        onClick={() => setIsOpen(false)}
-                        aria-current={isActive(link.href) ? "page" : undefined}
-                        className="group mb-8 flex w-fit items-baseline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                      >
-                        <span className="mr-4 font-mono text-sm text-orange-400 transition-transform group-hover:-translate-x-2 md:text-base">
-                          {"// "}
-                          {link.num}
-                        </span>
-                        <span className="text-4xl font-bold text-white transition-colors group-hover:text-zinc-300 min-[400px]:text-5xl">
-                          {link.label}
-                        </span>
-                      </Link>
-                    </motion.div>
-                  ))}
+                  {LINKS.map((link) => {
+                    const active = isActive(link.href);
+                    return (
+                      <motion.div key={link.href} variants={itemVariants}>
+                        <Link
+                          href={link.href}
+                          onClick={() => setIsOpen(false)}
+                          aria-current={active ? "page" : undefined}
+                          className="group mb-8 flex w-fit items-baseline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                        >
+                          <span
+                            className={`mr-4 font-mono text-sm transition-transform group-hover:-translate-x-2 md:text-base ${
+                              active ? "text-orange-400" : "text-zinc-700"
+                            }`}
+                          >
+                            {"// "}
+                            {link.num}
+                          </span>
+                          <span
+                            className={`text-4xl font-bold transition-colors min-[400px]:text-5xl ${
+                              active ? "text-white" : "text-zinc-600 group-hover:text-zinc-300"
+                            }`}
+                          >
+                            {link.label}
+                          </span>
+                        </Link>
+                      </motion.div>
+                    );
+                  })}
                 </motion.nav>
 
                 <motion.div
@@ -140,7 +155,7 @@ export function MobileMenu() {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  className="mt-12 flex justify-between border-t border-zinc-800 pt-8 font-mono text-xs text-zinc-500"
+                  className="mb-8 mt-auto flex justify-between border-t border-zinc-800 pt-8 font-mono text-xs text-zinc-500"
                 >
                   <span>STATUS: ONLINE</span>
                   <span>SYS_V1.0</span>
