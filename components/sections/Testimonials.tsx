@@ -195,7 +195,7 @@ export function Testimonials() {
         className="mx-auto max-w-2xl"
       >
         {/* The deck */}
-        <div className="relative h-[460px] sm:h-[400px]">
+        <div className="relative h-[540px] sm:h-[480px]">
           {/* Soft halo under the deck */}
           <div
             aria-hidden
@@ -317,7 +317,7 @@ function TestimonialCard({
   return (
     <figure
       className={cn(
-        "group flex h-[380px] flex-col rounded-3xl border bg-white/5 p-8 backdrop-blur-md select-none sm:h-[320px]",
+        "group flex h-[460px] flex-col rounded-3xl border bg-white/5 p-8 backdrop-blur-md select-none sm:h-[400px]",
         "shadow-[0_30px_60px_-30px_rgb(0_0_0/0.8)] transition-[border-color,box-shadow] duration-500 ease-apple",
         front
           ? "border-white/10 hover:border-accent/40 hover:shadow-[0_30px_70px_-30px_rgb(249_115_22/0.45)]"
@@ -336,7 +336,7 @@ function TestimonialCard({
         </span>
       </div>
 
-      <blockquote className="mt-5 mb-8 text-base leading-relaxed text-zinc-300 sm:text-lg">
+      <blockquote className="mt-5 mb-8 line-clamp-9 text-base leading-relaxed text-zinc-300 sm:line-clamp-6 sm:text-lg">
         <p>&ldquo;{quote}&rdquo;</p>
       </blockquote>
 
