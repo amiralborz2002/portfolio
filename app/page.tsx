@@ -6,7 +6,7 @@ import { Testimonials } from "@/components/sections/Testimonials";
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col gap-24 pb-16 md:gap-32">
+    <div className="relative flex w-full flex-col gap-24 overflow-x-hidden pb-16 md:gap-32">
       <Hero />
       <BentoSnapshot />
       <ExperienceJourney />

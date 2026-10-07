@@ -175,7 +175,8 @@ export function Testimonials() {
     <section
       id="testimonials"
       aria-labelledby="testimonials-title"
-      className="mx-auto w-full max-w-6xl px-6"
+      // Swiped/exiting cards fly up to 220px sideways; clip so they never widen the page.
+      className="mx-auto w-full max-w-6xl overflow-x-clip px-6"
     >
       <div className="text-center">
         <p className="text-xs font-medium tracking-widest text-zinc-500 uppercase">

@@ -41,7 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       // off during route changes so new pages start at the top instantly.
       data-scroll-behavior="smooth"
     >
-      <body className="relative min-h-dvh overflow-x-hidden bg-background font-sans text-muted antialiased">
+      <body className="relative min-h-dvh w-full overflow-x-clip bg-background font-sans text-muted antialiased">
         {/* اسکیپ لینک برای دسترسی‌پذیری و کیبورد */}
         <a
           href="#content"
@@ -51,15 +51,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
 
         {/* هاله‌های نوری پس‌زمینه */}
-        <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
+        <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
           <div className="absolute left-1/2 top-[-20%] h-[640px] w-[960px] -translate-x-1/2 rounded-full bg-accent/[0.06] blur-[140px]" />
           <div className="absolute bottom-[-25%] right-[-10%] h-[520px] w-[520px] rounded-full bg-surface-raised/40 blur-[120px]" />
         </div>
 
         {/* ساختار فلکس برای چسباندن فوتر به پایین صفحه */}
-        <div className="relative flex min-h-dvh flex-col">
+        {/* overflow-x-clip (not hidden) trims stray horizontal overflow without creating a
+            scroll container, so position: sticky keeps working for the header and case studies. */}
+        <div className="relative flex min-h-dvh w-full flex-col overflow-x-clip">
           <Header />
-          <main id="content" className="flex-1">
+          <main id="content" className="w-full min-w-0 flex-1 overflow-x-clip">
             {children}
           </main>
           <Footer />
