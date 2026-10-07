@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* Dark is the default; keep the class variant available for a future light theme */
 @custom-variant dark (&:where(.dark, .dark *));
