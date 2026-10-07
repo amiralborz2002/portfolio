@@ -10,7 +10,21 @@ export default function HomePage() {
       <Hero />
       <BentoSnapshot />
       <ExperienceJourney />
-      <Testimonials />
+      <section
+        id="testimonials"
+        aria-labelledby="testimonials-title"
+        className="mx-auto w-full max-w-6xl px-6"
+      >
+        <div className="mb-16 text-center">
+          <p className="text-xs font-medium tracking-widest text-zinc-500 uppercase">
+            What others say
+          </p>
+          <h2 id="testimonials-title" className="mt-3 text-3xl font-bold text-white md:text-5xl">
+            Trusted by teams I&apos;ve worked with.
+          </h2>
+        </div>
+        <Testimonials limit={6} />
+      </section>
       <FinalCTA />
     </div>
   );

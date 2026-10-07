@@ -4,111 +4,127 @@ import {
   AnimatePresence,
   motion,
   useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+  type MotionValue,
   type PanInfo,
   type TargetAndTransition,
 } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import Image from "next/image";
 import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
+import { testimonials, type Testimonial } from "@/data/testimonials";
 import { cn } from "@/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
 
-export type Testimonial = {
-  id: string;
-  quote: string;
-  name: string;
-  role: string;
-  company: string;
-  year: number;
-};
+interface Props {
+  /** Show only the first `limit` testimonials; omit to show them all. */
+  limit?: number;
+}
 
-/*
- * PLACEHOLDER CONTENT — replace each entry with a real LinkedIn
- * recommendation before publishing. Any number of entries works; newest first.
- */
-export const TESTIMONIALS: Testimonial[] = [
-  {
-    id: "t1",
-    quote:
-      "Amir turned a service catalogue of hundreds of overlapping categories into a structure our users and our database could both understand. Estimates dropped the moment the architecture docs landed.",
-    name: "Recommender Name",
-    role: "Product Lead",
-    company: "Company",
-    year: 2026,
-  },
-  {
-    id: "t2",
-    quote:
-      "A rare designer who reads the business logic before opening Figma. Pricing rules, currency conversions and inventory edge cases became flows developers shipped without a single follow-up meeting.",
-    name: "Recommender Name",
-    role: "Engineering Manager",
-    company: "Company",
-    year: 2025,
-  },
-  {
-    id: "t3",
-    quote:
-      "Working with Amir felt like pairing with a systems engineer and a UX lead at once: hard questions asked early, every decision documented, and a shared language left behind for the whole team.",
-    name: "Recommender Name",
-    role: "Senior Product Designer",
-    company: "Company",
-    year: 2024,
-  },
-  {
-    id: "t4",
-    quote:
-      "The information architecture work reshaped how we onboard technicians. Profiles, skills and service areas finally map to how the business actually operates, and support tickets fell noticeably.",
-    name: "Recommender Name",
-    role: "Operations Director",
-    company: "Company",
-    year: 2023,
-  },
-  {
-    id: "t5",
-    quote:
-      "Complex engineering mechanisms explained so clearly that our non-technical stakeholders could make decisions on them. That kind of visual storytelling is incredibly hard to find.",
-    name: "Recommender Name",
-    role: "Technical Program Manager",
-    company: "Company",
-    year: 2022,
-  },
-  {
-    id: "t6",
-    quote:
-      "Thorough, curious and calm under ambiguity. Research, data and constraints were always on the table before a single screen was drawn, which saved us weeks of rework.",
-    name: "Recommender Name",
-    role: "UX Research Lead",
-    company: "Company",
-    year: 2022,
-  },
-];
+export function Testimonials({ limit }: Props) {
+  const displayData = limit ? testimonials.slice(0, limit) : testimonials;
+  return (
+    <>
+      <ParallaxColumns items={displayData} />
+      <MobileDeck items={displayData} />
+    </>
+  );
+}
 
-const VISIBLE = 3; // cards drawn in the stack; the rest wait invisibly behind
-const SWIPE_THRESHOLD = 90; // px of horizontal drag that counts as "next"
+/* ------------------------------------------------------------------ */
+/* Desktop: three columns, only the centre one drifts                   */
+/* ------------------------------------------------------------------ */
 
-// Visual state for a card by its position in the deck (0 = front). The
-// alternating tilt makes the stack read as a loose physical deck, so it
-// looks swipeable without any instructions.
+// The centre column drifts from DRIFT px below its resting spot to DRIFT px
+// above it over the whole scroll: slow enough to read while it moves.
+const DRIFT = 48;
+
+function ParallaxColumns({ items }: { items: Testimonial[] }) {
+  // Columns are consecutive slices of the data: left, centre, right.
+  const perColumn = Math.ceil(items.length / 3);
+  const left = items.slice(0, perColumn);
+  const center = items.slice(perColumn, perColumn * 2);
+  const right = items.slice(perColumn * 2);
+
+  const reduceMotion = !!useReducedMotion();
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  // 0 as the grid's top enters at the bottom of the viewport, 1 as its bottom
+  // reaches the bottom. That end point is always reachable, even this close
+  // to the foot of the page, so the full drift always plays out.
+  const { scrollYProgress } = useScroll({ target: gridRef, offset: ["start end", "end end"] });
+  // A light spring keeps wheel steps from making the column judder.
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
+  const centerY = useTransform(progress, [0, 1], [DRIFT, -DRIFT]);
+
+  return (
+    <div ref={gridRef} className="hidden items-start gap-6 md:grid md:grid-cols-3">
+      <Column items={left} />
+
+      {/*
+        The centre column alone is masked, so the static side columns stay
+        crisp. The wrapper reaches 96px past the grid at both ends: the column
+        drifts into that margin and fades as it nears the edge instead of
+        being clipped.
+      */}
+      <div
+        className="-my-24 self-stretch overflow-hidden py-24"
+        style={{
+          maskImage: "linear-gradient(to bottom, transparent, #000 96px, #000 calc(100% - 96px), transparent)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent, #000 96px, #000 calc(100% - 96px), transparent)",
+        }}
+      >
+        <Column items={center} y={reduceMotion ? undefined : centerY} />
+      </div>
+
+      <Column items={right} />
+    </div>
+  );
+}
+
+function Column({ items, y }: { items: Testimonial[]; y?: MotionValue<number> }) {
+  return (
+    <motion.div style={{ y }} className={cn("flex flex-col gap-6", y && "will-change-transform")}>
+      {items.map((t) => (
+        <TestimonialCard key={t.id} testimonial={t} />
+      ))}
+    </motion.div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Mobile: swipeable stacked deck (no scroll-jacking)                   */
+/* ------------------------------------------------------------------ */
+
+const VISIBLE = 4; // cards drawn in the stack; the rest wait invisibly behind
+const SWIPE_THRESHOLD = 80; // px of horizontal drag that counts as "next"
+
+// Visual state by position in the deck (0 = front). Alternating tilt makes
+// the stack read as a loose physical deck, so it looks swipeable.
 function stackPose(position: number): TargetAndTransition {
   const poses = [
     { scale: 1, opacity: 1, y: 0, rotate: 0, zIndex: 50 },
-    { scale: 0.95, opacity: 0.6, y: 20, rotate: -3, zIndex: 40 },
-    { scale: 0.9, opacity: 0.3, y: 40, rotate: 3, zIndex: 30 },
+    { scale: 0.95, opacity: 0.7, y: 16, rotate: -2.5, zIndex: 40 },
+    { scale: 0.9, opacity: 0.45, y: 32, rotate: 2.5, zIndex: 30 },
+    { scale: 0.85, opacity: 0.2, y: 48, rotate: -1.5, zIndex: 20 },
   ];
   return { x: 0, ...poses[Math.min(position, poses.length - 1)] };
 }
 
-export function Testimonials() {
+function MobileDeck({ items }: { items: Testimonial[] }) {
   const reduceMotion = !!useReducedMotion();
-  // `order` is the deck: ids front to back. Cycling rotates this array.
-  const [order, setOrder] = useState(() => TESTIMONIALS.map((t) => t.id));
-  // 1 = moved forward (front card dealt away), -1 = moved back.
+  // The deck, front to back; cycling rotates this array.
+  const [order, setOrder] = useState(() => items.map((t) => t.id));
   const [direction, setDirection] = useState<1 | -1>(1);
 
-  const byId = new Map(TESTIMONIALS.map((t) => [t.id, t]));
-  const activeIndex = TESTIMONIALS.findIndex((t) => t.id === order[0]);
-  const total = TESTIMONIALS.length;
+  const byId = new Map(items.map((t) => [t.id, t]));
+  const activeIndex = items.findIndex((t) => t.id === order[0]);
+  const total = items.length;
 
   const next = () => {
     setDirection(1);
@@ -121,7 +137,7 @@ export function Testimonials() {
   };
 
   const goTo = (index: number) => {
-    const id = TESTIMONIALS[index].id;
+    const id = items[index].id;
     if (id === order[0]) return;
     setDirection(index > activeIndex ? 1 : -1);
     setOrder((deck) => {
@@ -140,173 +156,202 @@ export function Testimonials() {
     }
   };
 
-  // A drag must never also count as a click on the card.
+  // A drag must never also count as a tap on the card.
   const dragged = useRef(false);
 
   const onDragEnd = (_: unknown, info: PanInfo) => {
-    if (Math.abs(info.offset.x) > SWIPE_THRESHOLD || Math.abs(info.velocity.x) > 600) next();
+    if (info.offset.x < -SWIPE_THRESHOLD || info.velocity.x < -500) next();
+    else if (info.offset.x > SWIPE_THRESHOLD || info.velocity.x > 500) prev();
   };
 
-  // framer-motion's tap also fires for Enter on the focused card.
-  const onTap = () => {
-    if (dragged.current) return;
-    next();
-  };
-
-  // Entering / leaving animations depend on direction (passed via `custom`).
   const variants = {
     enter: (dir: 1 | -1): TargetAndTransition =>
       reduceMotion
         ? { opacity: 0 }
         : dir > 0
-          ? { opacity: 0, scale: 0.85, y: 60, x: 0, rotate: 6, zIndex: 20 }
-          : { opacity: 0, scale: 1, y: 0, x: -180, rotate: -8, zIndex: 60 },
+          ? { opacity: 0, scale: 0.8, y: 64, x: 0, rotate: 4, zIndex: 10 }
+          : { opacity: 0, scale: 1, y: 0, x: 220, rotate: 8, zIndex: 60 },
     exit: (dir: 1 | -1): TargetAndTransition =>
       reduceMotion
         ? { opacity: 0, transition: { duration: 0.2 } }
         : dir > 0
-          ? { opacity: 0, x: 220, y: -10, rotate: 10, zIndex: 60, transition: { duration: 0.45, ease } }
-          : { opacity: 0, scale: 0.85, y: 60, zIndex: 20, transition: { duration: 0.35, ease } },
+          ? { opacity: 0, x: -240, y: -8, rotate: -10, zIndex: 60, transition: { duration: 0.4, ease } }
+          : { opacity: 0, scale: 0.8, y: 64, zIndex: 10, transition: { duration: 0.35, ease } },
   };
 
-  const visible = order.slice(0, VISIBLE);
-
   return (
-    <section
-      id="testimonials"
-      aria-labelledby="testimonials-title"
-      // Swiped/exiting cards fly up to 220px sideways; clip so they never widen the page.
-      className="mx-auto w-full max-w-6xl overflow-x-clip px-6"
+    <div
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Testimonials"
+      onKeyDown={onKeyDown}
+      // overflow-anchor: none stops the browser's scroll anchoring from picking a
+      // card that is mid-transition and nudging the page to compensate.
+      className="flex flex-col [overflow-anchor:none] md:hidden"
     >
-      <div className="text-center">
-        <p className="text-xs font-medium tracking-widest text-zinc-500 uppercase">
-          What others say
-        </p>
-        <h2 id="testimonials-title" className="mt-3 mb-12 text-3xl font-bold text-white md:text-5xl">
-          Trusted by teams I&apos;ve worked with.
-        </h2>
-      </div>
-
-      <div
-        role="region"
-        aria-roledescription="carousel"
-        aria-label="Testimonials"
-        onKeyDown={onKeyDown}
-        className="mx-auto max-w-2xl"
-      >
-        {/* The deck */}
-        <div className="relative h-[460px] sm:h-[400px]">
-          {/* Soft halo under the deck */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-10 top-10 bottom-0 -z-10 rounded-full bg-[radial-gradient(closest-side,rgb(249_115_22/0.10),transparent)] blur-2xl"
-          />
-          <AnimatePresence initial={false} custom={direction}>
-            {visible.map((id, position) => {
-              const t = byId.get(id)!;
-              const front = position === 0;
-              return (
-                <motion.div
-                  key={id}
-                  custom={direction}
-                  variants={variants}
-                  initial="enter"
-                  animate={stackPose(position)}
-                  exit="exit"
-                  transition={{ duration: reduceMotion ? 0.2 : 0.55, ease }}
-                  whileHover={front && !reduceMotion ? { y: -6 } : undefined}
-                  drag={front && !reduceMotion ? "x" : false}
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.6}
-                  onPointerDown={() => (dragged.current = false)}
-                  onDragStart={() => (dragged.current = true)}
-                  onDragEnd={front ? onDragEnd : undefined}
-                  onTap={front ? onTap : undefined}
-                  onKeyDown={
-                    front
-                      ? (e) => {
-                          // Enter comes through onTap; Space is the other button key.
-                          if (e.key === " ") {
-                            e.preventDefault();
-                            next();
-                          }
+      {/* Fixed height: cards are absolutely positioned, so the deck's footprint
+          never changes while they enter, exit and restack. */}
+      <div className="relative h-[490px] shrink-0">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-6 top-10 bottom-0 -z-10 rounded-full bg-[radial-gradient(closest-side,rgb(249_115_22/0.10),transparent)] blur-2xl"
+        />
+        <AnimatePresence initial={false} custom={direction}>
+          {order.slice(0, VISIBLE).map((id, position) => {
+            const t = byId.get(id)!;
+            const front = position === 0;
+            return (
+              <motion.div
+                key={id}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate={stackPose(position)}
+                exit="exit"
+                transition={{ duration: reduceMotion ? 0.2 : 0.5, ease }}
+                drag={front && !reduceMotion ? "x" : false}
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.7}
+                onPointerDown={(e) => {
+                  dragged.current = false;
+                  // Mouse/touch presses must not focus the card: mobile browsers
+                  // scroll a newly focused element into view, which made the page
+                  // jump mid-transition. Keyboard focus (Tab) is unaffected.
+                  e.preventDefault();
+                }}
+                onDragStart={() => (dragged.current = true)}
+                onDragEnd={front ? onDragEnd : undefined}
+                onTap={
+                  front
+                    ? (e) => {
+                        e.preventDefault();
+                        if (!dragged.current) next();
+                      }
+                    : undefined
+                }
+                onKeyDown={
+                  front
+                    ? (e) => {
+                        // Enter arrives via onTap; Space is the other button key.
+                        if (e.key === " ") {
+                          e.preventDefault();
+                          next();
                         }
-                      : undefined
-                  }
-                  role={front ? "button" : undefined}
-                  tabIndex={front ? 0 : -1}
-                  aria-hidden={!front}
-                  aria-label={front ? "Show next testimonial" : undefined}
-                  className={cn(
-                    // Solid base under the glass so stacked cards never show through each other;
-                    // origin-bottom so scaled-down cards peek out below the front one.
-                    "absolute inset-x-0 top-0 origin-bottom touch-pan-y rounded-3xl bg-background",
-                    front ? "cursor-grab active:cursor-grabbing" : "pointer-events-none",
-                  )}
-                >
-                  <TestimonialCard testimonial={t} front={front} />
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </div>
-
-        {/* Controls */}
-        <div className="mt-2 flex items-center justify-between gap-6">
-          <ControlButton label="Previous testimonial" onClick={prev}>
-            <ChevronLeft className="size-5" strokeWidth={1.75} />
-          </ControlButton>
-
-          <div className="flex flex-col items-center gap-3">
-            <div className="flex items-center gap-1.5">
-              {TESTIMONIALS.map((t, i) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => goTo(i)}
-                  aria-label={`Show testimonial ${i + 1} of ${total}`}
-                  aria-current={i === activeIndex ? "true" : undefined}
-                  className="group flex h-6 items-center"
-                >
-                  <span
-                    className={cn(
-                      "block h-1 rounded-full transition-all duration-500 ease-apple",
-                      i === activeIndex
-                        ? "w-6 bg-accent"
-                        : "w-2 bg-white/15 group-hover:bg-white/35",
-                    )}
-                  />
-                </button>
-              ))}
-            </div>
-            <p aria-live="polite" className="font-mono text-xs text-subtle tabular-nums">
-              <span className="text-zinc-300">{String(activeIndex + 1).padStart(2, "0")}</span>
-              {" / "}
-              {String(total).padStart(2, "0")}
-              <span className="sr-only">
-                : {byId.get(order[0])!.role}, {byId.get(order[0])!.company}
-              </span>
-            </p>
-          </div>
-
-          <ControlButton label="Next testimonial" onClick={next}>
-            <ChevronRight className="size-5" strokeWidth={1.75} />
-          </ControlButton>
-        </div>
+                      }
+                    : undefined
+                }
+                role={front ? "button" : undefined}
+                tabIndex={front ? 0 : -1}
+                aria-hidden={!front}
+                aria-label={front ? "Show next testimonial" : undefined}
+                className={cn(
+                  // Solid base so stacked glass cards never show through each other;
+                  // touch-pan-y keeps vertical page scrolling free while x is dragged.
+                  "absolute inset-x-0 top-0 origin-bottom touch-pan-y rounded-3xl bg-background",
+                  front ? "cursor-grab active:cursor-grabbing" : "pointer-events-none",
+                )}
+              >
+                <TestimonialCard testimonial={t} className="h-[420px] select-none" clamp />
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
-    </section>
+
+      <div className="flex items-center justify-between gap-4">
+        <ControlButton label="Previous testimonial" onClick={prev}>
+          <ChevronLeft className="size-5" strokeWidth={1.75} />
+        </ControlButton>
+
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex items-center gap-1">
+            {items.map((t, i) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  goTo(i);
+                }}
+                aria-label={`Show testimonial ${i + 1} of ${total}`}
+                aria-current={i === activeIndex ? "true" : undefined}
+                className="group flex h-6 items-center px-0.5"
+              >
+                <span
+                  className={cn(
+                    "block h-1 rounded-full transition-all duration-500 ease-apple",
+                    i === activeIndex ? "w-5 bg-accent" : "w-1.5 bg-white/15",
+                  )}
+                />
+              </button>
+            ))}
+          </div>
+          <p aria-live="polite" className="font-mono text-xs text-subtle tabular-nums">
+            <span className="text-zinc-300">{String(activeIndex + 1).padStart(2, "0")}</span>
+            {" / "}
+            {String(total).padStart(2, "0")}
+            <span className="sr-only">
+              : {byId.get(order[0])!.name}, {byId.get(order[0])!.role}
+            </span>
+          </p>
+        </div>
+
+        <ControlButton label="Next testimonial" onClick={next}>
+          <ChevronRight className="size-5" strokeWidth={1.75} />
+        </ControlButton>
+      </div>
+    </div>
   );
 }
 
-/* ───────────────────────── card ───────────────────────── */
+/* ------------------------------------------------------------------ */
+/* Shared card                                                          */
+/* ------------------------------------------------------------------ */
 
 function TestimonialCard({
-  testimonial: { quote, name, role, company, year },
-  front,
+  testimonial: { content, name, role, avatar },
+  className,
+  clamp = false,
 }: {
   testimonial: Testimonial;
-  front: boolean;
+  className?: string;
+  /** Fixed-height deck cards cap the quote so long copy never overflows. */
+  clamp?: boolean;
 }) {
+  return (
+    <figure
+      className={cn(
+        "group flex flex-col rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-md",
+        "shadow-[0_30px_60px_-30px_rgb(0_0_0/0.8)] transition-colors duration-500 ease-apple hover:border-white/20",
+        className,
+      )}
+    >
+      <Quote
+        aria-hidden
+        className="size-7 shrink-0 text-white/10 transition-colors duration-300 group-hover:text-accent/40"
+        strokeWidth={1.5}
+        fill="currentColor"
+      />
+      <blockquote
+        className={cn("mt-5 mb-8 text-base leading-relaxed text-zinc-300", clamp && "line-clamp-8")}
+      >
+        <p>&ldquo;{content}&rdquo;</p>
+      </blockquote>
+      <figcaption className="mt-auto flex items-center gap-3 border-t border-white/5 pt-5">
+        <Avatar src={avatar} name={name} />
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-white">{name}</p>
+          <p className="truncate text-sm text-zinc-500">{role}</p>
+        </div>
+      </figcaption>
+    </figure>
+  );
+}
+
+// Falls back to the person's initials on a dark disc when the photo is
+// missing or fails to load.
+function Avatar({ src, name }: { src: string; name: string }) {
+  const [failed, setFailed] = useState(false);
   const initials = name
     .split(/\s+/)
     .map((part) => part[0])
@@ -315,46 +360,22 @@ function TestimonialCard({
     .toUpperCase();
 
   return (
-    <figure
-      className={cn(
-        "group flex h-[380px] flex-col rounded-3xl border bg-white/5 p-8 backdrop-blur-md select-none sm:h-[320px]",
-        "shadow-[0_30px_60px_-30px_rgb(0_0_0/0.8)] transition-[border-color,box-shadow] duration-500 ease-apple",
-        front
-          ? "border-white/10 hover:border-accent/40 hover:shadow-[0_30px_70px_-30px_rgb(249_115_22/0.45)]"
-          : "border-white/10",
-      )}
+    <span
+      aria-hidden
+      className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-zinc-800 text-xs font-semibold text-zinc-300 ring-1 ring-white/10"
     >
-      <div className="flex items-start justify-between">
-        <Quote
-          aria-hidden
-          className="size-8 text-white/10 transition-colors duration-300 group-hover:text-accent/40"
-          strokeWidth={1.5}
-          fill="currentColor"
+      {initials}
+      {!failed && (
+        <Image
+          src={src}
+          alt=""
+          width={40}
+          height={40}
+          onError={() => setFailed(true)}
+          className="absolute inset-0 size-full object-cover"
         />
-        <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-[11px] text-zinc-400 tabular-nums">
-          {year}
-        </span>
-      </div>
-
-      <blockquote className="mt-5 mb-8 text-base leading-relaxed text-zinc-300 sm:text-lg">
-        <p>&ldquo;{quote}&rdquo;</p>
-      </blockquote>
-
-      <figcaption className="mt-auto flex items-center gap-3 border-t border-white/5 pt-5">
-        <span
-          aria-hidden
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-orange-400/70 to-rose-500/40 text-xs font-semibold text-white/80 ring-1 ring-white/10"
-        >
-          {initials}
-        </span>
-        <div className="min-w-0">
-          <p className="text-sm font-medium text-white">{name}</p>
-          <p className="truncate text-sm text-zinc-500">
-            {role} · {company}
-          </p>
-        </div>
-      </figcaption>
-    </figure>
+      )}
+    </span>
   );
 }
 
@@ -370,7 +391,10 @@ function ControlButton({
   return (
     <motion.button
       type="button"
-      onClick={onClick}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick();
+      }}
       aria-label={label}
       whileTap={{ scale: 0.92 }}
       className="flex size-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-zinc-300 backdrop-blur-md transition-colors duration-300 hover:border-white/20 hover:bg-white/10 hover:text-white"
