@@ -35,7 +35,7 @@ export function LabModal({ selectedItem, onClose }: LabModalProps) {
   const reduceMotion = useReducedMotion();
   const isMobile = useIsMobile();
   const dragControls = useDragControls();
-  const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const isOpen = selectedItem !== null;
 
   // While open: Escape closes, the page behind stops scrolling, and focus moves into the
@@ -48,7 +48,7 @@ export function LabModal({ selectedItem, onClose }: LabModalProps) {
 
     document.addEventListener("keydown", onKeyDown);
     document.body.style.overflow = "hidden";
-    closeRef.current?.focus({ preventScroll: true });
+    dialogRef.current?.focus({ preventScroll: true });
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
@@ -87,7 +87,9 @@ export function LabModal({ selectedItem, onClose }: LabModalProps) {
           className="fixed inset-0 z-[110] flex items-end justify-center bg-black/80 backdrop-blur-sm md:items-center md:p-8"
         >
           <motion.div
+            ref={dialogRef}
             role="dialog"
+            tabIndex={-1}
             aria-modal="true"
             aria-labelledby="lab-modal-title"
             initial={hidden}
@@ -101,60 +103,59 @@ export function LabModal({ selectedItem, onClose }: LabModalProps) {
             dragElastic={{ top: 0, bottom: 0.6 }}
             onDragEnd={onDragEnd}
             onClick={(event) => event.stopPropagation()}
-            className="mt-auto flex h-[95vh] w-full flex-col overflow-hidden rounded-t-3xl border border-b-0 border-zinc-800 bg-zinc-950 shadow-2xl max-md:fixed max-md:inset-x-0 max-md:bottom-0 md:mt-0 md:h-auto md:max-h-[90vh] md:max-w-6xl md:rounded-2xl md:border-b"
+            className="mt-auto flex h-[95vh] w-full flex-col overflow-hidden rounded-t-3xl border border-b-0 border-zinc-800 bg-zinc-950 shadow-2xl outline-none max-md:fixed max-md:inset-x-0 max-md:bottom-0 md:mt-0 md:h-auto md:max-h-[90vh] md:max-w-6xl md:rounded-2xl md:border-b"
           >
             {/* The header doubles as the sheet's drag handle on mobile. */}
             <div
               onPointerDown={(event) => isMobile && dragControls.start(event)}
-              className="relative shrink-0 touch-none border-b border-zinc-800 bg-zinc-900 px-4 pb-2.5 pt-2.5 max-md:pt-5 md:touch-auto"
+              className="relative flex w-full shrink-0 touch-none items-center justify-between border-b border-zinc-800 bg-zinc-900 px-4 py-3 max-md:pt-5 md:touch-auto"
             >
               <span
                 aria-hidden="true"
                 className="absolute left-1/2 top-2 h-1 w-10 -translate-x-1/2 rounded-full bg-zinc-700 md:hidden"
               />
-              <div className="relative flex items-center">
-                <div className="flex items-center gap-1.5">
+              <div className="flex w-full min-w-0 items-center md:w-auto">
+                <div className="flex shrink-0 items-center gap-2">
                   <button
                     type="button"
                     onClick={onClose}
                     onPointerDown={(event) => event.stopPropagation()}
                     aria-label="Close"
-                    className="h-3 w-3 cursor-pointer rounded-full bg-red-500/80 transition-colors hover:bg-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/60"
+                    className="h-3 w-3 cursor-pointer rounded-full bg-red-500 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/60"
                   />
-                  <span aria-hidden="true" className="h-3 w-3 rounded-full bg-yellow-500/80" />
-                  <span aria-hidden="true" className="h-3 w-3 rounded-full bg-green-500/80" />
+                  <span aria-hidden="true" className="h-3 w-3 rounded-full bg-yellow-500" />
+                  <span aria-hidden="true" className="h-3 w-3 rounded-full bg-green-500" />
                 </div>
                 <h2
                   id="lab-modal-title"
-                  className="absolute left-1/2 max-w-[60%] -translate-x-1/2 truncate font-mono text-xs text-zinc-400"
+                  className="ml-auto min-w-0 truncate pl-4 font-mono text-xs text-zinc-400 md:ml-4 md:pl-0"
                 >
                   {selectedItem.filename}
                 </h2>
-                <button
-                  ref={closeRef}
-                  type="button"
-                  onClick={onClose}
-                  onPointerDown={(event) => event.stopPropagation()}
-                  aria-label="Close"
-                  className="ml-auto rounded-md p-1 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
-                >
-                  <X className="h-4 w-4" />
-                </button>
               </div>
+              {/* Mobile closes via the red dot or a swipe down, so the X is desktop-only. */}
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                className="hidden shrink-0 rounded-md p-1 text-zinc-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500 md:block"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
 
             {/* On small screens the whole body scrolls; on lg each pane scrolls on its own. */}
             <div className="flex flex-1 flex-col overflow-y-auto overscroll-contain lg:flex-row lg:overflow-hidden">
               <div className="border-b border-zinc-800 p-6 md:p-8 lg:w-1/3 lg:overflow-y-auto lg:border-b-0 lg:border-r">
                 {selectedItem.sections.map((section) => (
-                  <section key={section.title}>
-                    <div className="mb-1 font-mono text-xs uppercase text-zinc-500">{`// ${section.title}`}</div>
-                    <div className="mb-6 leading-relaxed text-zinc-300">{section.content}</div>
+                  <section key={section.title} className="mb-8 last:mb-0">
+                    <div className="mb-2 font-mono text-xs uppercase text-zinc-500">{`// ${section.title}`}</div>
+                    <p className="text-sm leading-relaxed text-zinc-300 md:text-base">{section.content}</p>
                   </section>
                 ))}
               </div>
 
-              <div className="flex flex-col bg-zinc-900 p-6 md:p-8 lg:w-2/3">
+              <div className="flex flex-col bg-zinc-900 px-6 pb-12 pt-6 md:p-8 lg:w-2/3">
                 <div className="mb-4 font-mono text-xs text-zinc-500">{"// OUTPUT_VIEWER"}</div>
                 <div className="relative flex min-h-64 flex-1 items-center justify-center overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 lg:min-h-96">
                   {selectedItem.media?.kind === "image" ? (
