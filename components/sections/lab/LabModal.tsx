@@ -1,21 +1,42 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useDragControls,
+  useReducedMotion,
+  type PanInfo,
+} from "framer-motion";
 import { X } from "lucide-react";
 import type { Experiment } from "./data";
 
 type LabModalProps = {
-  item: Experiment | null;
+  selectedItem: Experiment | null;
   onClose: () => void;
 };
 
-export function LabModal({ item, onClose }: LabModalProps) {
+/** Tracks Tailwind's `md` breakpoint: below it the modal is a bottom sheet. */
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+  return isMobile;
+}
+
+export function LabModal({ selectedItem, onClose }: LabModalProps) {
   const reduceMotion = useReducedMotion();
+  const isMobile = useIsMobile();
+  const dragControls = useDragControls();
   const closeRef = useRef<HTMLButtonElement>(null);
-  const isOpen = item !== null;
+  const isOpen = selectedItem !== null;
 
   // While open: Escape closes, the page behind stops scrolling, and focus moves into the
   // dialog and back to the card that opened it.
@@ -27,16 +48,27 @@ export function LabModal({ item, onClose }: LabModalProps) {
 
     document.addEventListener("keydown", onKeyDown);
     document.body.style.overflow = "hidden";
-    closeRef.current?.focus();
+    closeRef.current?.focus({ preventScroll: true });
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
-      opener?.focus();
+      opener?.focus({ preventScroll: true });
     };
   }, [isOpen, onClose]);
 
+  // Swipe the sheet down far or fast enough and it dismisses, like a native sheet.
+  const onDragEnd = (_: unknown, info: PanInfo) => {
+    if (info.offset.y > 120 || info.velocity.y > 500) onClose();
+  };
+
   const duration = reduceMotion ? 0 : 0.2;
+  // Mobile slides up from the bottom edge; desktop fades and scales in place.
+  const hidden = isMobile && !reduceMotion ? { y: "100%" } : { opacity: 0, scale: reduceMotion ? 1 : 0.96 };
+  const shown = isMobile ? { y: 0 } : { opacity: 1, scale: 1 };
+  const windowTransition = isMobile && !reduceMotion
+    ? { type: "spring", stiffness: 380, damping: 38 } as const
+    : { duration, ease: "easeOut" } as const;
 
   // Portalled to <body> so no transformed ancestor can trap the fixed overlay. z-[110] clears
   // the sticky site header (z-[100]).
@@ -44,7 +76,7 @@ export function LabModal({ item, onClose }: LabModalProps) {
 
   return createPortal(
     <AnimatePresence>
-      {item && (
+      {selectedItem && (
         <motion.div
           key="lab-modal"
           initial={{ opacity: 0 }}
@@ -52,81 +84,92 @@ export function LabModal({ item, onClose }: LabModalProps) {
           exit={{ opacity: 0 }}
           transition={{ duration }}
           onClick={onClose}
-          className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm md:p-8"
+          className="fixed inset-0 z-[110] flex items-end justify-center bg-black/80 backdrop-blur-sm md:items-center md:p-8"
         >
           <motion.div
             role="dialog"
             aria-modal="true"
             aria-labelledby="lab-modal-title"
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.96 }}
-            transition={{ duration, ease: "easeOut" }}
+            initial={hidden}
+            animate={shown}
+            exit={hidden}
+            transition={windowTransition}
+            drag={isMobile ? "y" : false}
+            dragListener={false}
+            dragControls={dragControls}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.6 }}
+            onDragEnd={onDragEnd}
             onClick={(event) => event.stopPropagation()}
-            className="flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl"
+            className="mt-auto flex h-[95vh] w-full flex-col overflow-hidden rounded-t-3xl border border-b-0 border-zinc-800 bg-zinc-950 shadow-2xl max-md:fixed max-md:inset-x-0 max-md:bottom-0 md:mt-0 md:h-auto md:max-h-[90vh] md:max-w-6xl md:rounded-2xl md:border-b"
           >
-            <div className="relative flex shrink-0 items-center border-b border-zinc-800 bg-zinc-900 px-4 py-2.5">
-              <div className="flex gap-1.5" aria-hidden="true">
-                <span className="h-3 w-3 rounded-full bg-red-500/80" />
-                <span className="h-3 w-3 rounded-full bg-yellow-500/80" />
-                <span className="h-3 w-3 rounded-full bg-green-500/80" />
+            {/* The header doubles as the sheet's drag handle on mobile. */}
+            <div
+              onPointerDown={(event) => isMobile && dragControls.start(event)}
+              className="relative shrink-0 touch-none border-b border-zinc-800 bg-zinc-900 px-4 pb-2.5 pt-2.5 max-md:pt-5 md:touch-auto"
+            >
+              <span
+                aria-hidden="true"
+                className="absolute left-1/2 top-2 h-1 w-10 -translate-x-1/2 rounded-full bg-zinc-700 md:hidden"
+              />
+              <div className="relative flex items-center">
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    onPointerDown={(event) => event.stopPropagation()}
+                    aria-label="Close"
+                    className="h-3 w-3 cursor-pointer rounded-full bg-red-500/80 transition-colors hover:bg-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/60"
+                  />
+                  <span aria-hidden="true" className="h-3 w-3 rounded-full bg-yellow-500/80" />
+                  <span aria-hidden="true" className="h-3 w-3 rounded-full bg-green-500/80" />
+                </div>
+                <h2
+                  id="lab-modal-title"
+                  className="absolute left-1/2 max-w-[60%] -translate-x-1/2 truncate font-mono text-xs text-zinc-400"
+                >
+                  {selectedItem.filename}
+                </h2>
+                <button
+                  ref={closeRef}
+                  type="button"
+                  onClick={onClose}
+                  onPointerDown={(event) => event.stopPropagation()}
+                  aria-label="Close"
+                  className="ml-auto rounded-md p-1 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
+                >
+                  <X className="h-4 w-4" />
+                </button>
               </div>
-              <h2
-                id="lab-modal-title"
-                className="absolute left-1/2 max-w-[60%] -translate-x-1/2 truncate font-mono text-xs text-zinc-400"
-              >
-                {item.filename}
-              </h2>
-              <button
-                ref={closeRef}
-                type="button"
-                onClick={onClose}
-                aria-label="Close"
-                className="ml-auto rounded-md p-1 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-500"
-              >
-                <X className="h-4 w-4" />
-              </button>
             </div>
 
             {/* On small screens the whole body scrolls; on lg each pane scrolls on its own. */}
-            <div className="flex flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
-              <div className="space-y-8 border-b border-zinc-800 p-8 lg:w-1/3 lg:overflow-y-auto lg:border-r lg:border-b-0">
-                <section>
-                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-500">
-                    Bottleneck
-                  </h3>
-                  <p className="leading-relaxed text-zinc-400">{item.bottleneck}</p>
-                </section>
-                <section>
-                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-500">
-                    The Fix
-                  </h3>
-                  <p className="font-medium leading-relaxed text-white">{item.fix}</p>
-                </section>
-                <section>
-                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-500">
-                    Outcome
-                  </h3>
-                  <p className="text-lg font-medium leading-relaxed text-orange-400">{item.outcome}</p>
-                </section>
+            <div className="flex flex-1 flex-col overflow-y-auto overscroll-contain lg:flex-row lg:overflow-hidden">
+              <div className="border-b border-zinc-800 p-6 md:p-8 lg:w-1/3 lg:overflow-y-auto lg:border-b-0 lg:border-r">
+                {selectedItem.sections.map((section) => (
+                  <section key={section.title}>
+                    <div className="mb-1 font-mono text-xs uppercase text-zinc-500">{`// ${section.title}`}</div>
+                    <div className="mb-6 leading-relaxed text-zinc-300">{section.content}</div>
+                  </section>
+                ))}
               </div>
 
-              <div className="flex flex-col bg-zinc-900 p-8 lg:w-2/3">
+              <div className="flex flex-col bg-zinc-900 p-6 md:p-8 lg:w-2/3">
                 <div className="mb-4 font-mono text-xs text-zinc-500">{"// OUTPUT_VIEWER"}</div>
                 <div className="relative flex min-h-64 flex-1 items-center justify-center overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 lg:min-h-96">
-                  {item.media?.kind === "image" ? (
+                  {selectedItem.media?.kind === "image" ? (
                     <Image
-                      src={item.media.src}
-                      alt={item.media.alt}
+                      src={selectedItem.media.src}
+                      alt={selectedItem.media.alt}
                       fill
                       sizes="(min-width: 1024px) 760px, 100vw"
                       className="object-contain"
-                      unoptimized={item.media.src.endsWith(".gif")}
+                      unoptimized={selectedItem.media.src.endsWith(".gif")}
                     />
-                  ) : item.media?.kind === "video" ? (
+                  ) : selectedItem.media?.kind === "video" ? (
                     <video
-                      src={item.media.src}
-                      poster={item.media.poster}
+                      src={selectedItem.media.src}
+                      poster={selectedItem.media.poster}
                       className="h-full w-full object-contain"
                       autoPlay
                       muted

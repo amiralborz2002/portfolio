@@ -57,7 +57,8 @@ export const BentoCard = forwardRef<HTMLDivElement, BentoCardProps>(function Ben
     <motion.div
       ref={ref}
       onPointerMove={(event) => {
-        if (interactive) {
+        // Touch has no hover, so a tap would otherwise leave the glow stuck where the finger landed.
+        if (interactive && event.pointerType !== "touch") {
           const rect = event.currentTarget.getBoundingClientRect();
           mouseX.set(event.clientX - rect.left);
           mouseY.set(event.clientY - rect.top);
@@ -87,7 +88,7 @@ export const BentoCard = forwardRef<HTMLDivElement, BentoCardProps>(function Ben
         <motion.span
           aria-hidden
           style={{ background: spotlight }}
-          className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 ease-apple group-hover:opacity-100"
+          className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 ease-apple group-hover:opacity-100 pointer-coarse:hidden"
         />
       )}
 
