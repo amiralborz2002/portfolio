@@ -7,6 +7,7 @@ import {
   type PanInfo,
   type TargetAndTransition,
 } from "framer-motion";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
@@ -21,6 +22,8 @@ export type Testimonial = {
   role: string;
   company: string;
   year: number;
+  /** Photo in /public; the initials show if it is missing or fails to load. */
+  avatar: string;
 };
 
 /*
@@ -36,6 +39,7 @@ export const TESTIMONIALS: Testimonial[] = [
     role: "Software Engineer",
     company: "Company",
     year: 2026,
+    avatar: "/images/testimonials/1.jpg",
   },
   {
     id: "t2",
@@ -45,6 +49,7 @@ export const TESTIMONIALS: Testimonial[] = [
     role: "Frontend Engineer",
     company: "Company",
     year: 2025,
+    avatar: "/images/testimonials/2.jpg",
   },
   {
     id: "t3",
@@ -54,6 +59,7 @@ export const TESTIMONIALS: Testimonial[] = [
     role: "DevOps & Cloud Infrastructure Engineer",
     company: "Company",
     year: 2024,
+    avatar: "/images/testimonials/3.jpg",
   },
   {
     id: "t4",
@@ -63,6 +69,7 @@ export const TESTIMONIALS: Testimonial[] = [
     role: "Front-End Developer",
     company: "Company",
     year: 2023,
+    avatar: "/images/testimonials/4.jpg",
   },
   {
     id: "t5",
@@ -72,6 +79,7 @@ export const TESTIMONIALS: Testimonial[] = [
     role: "Art Director",
     company: "Company",
     year: 2022,
+    avatar: "/images/testimonials/5.jpg",
   },
   {
     id: "t6",
@@ -81,6 +89,7 @@ export const TESTIMONIALS: Testimonial[] = [
     role: "SEO Expert",
     company: "Company",
     year: 2022,
+    avatar: "/images/testimonials/6.jpg",
   },
 ];
 
@@ -301,12 +310,13 @@ export function Testimonials() {
 /* ───────────────────────── card ───────────────────────── */
 
 function TestimonialCard({
-  testimonial: { quote, name, role, company, year },
+  testimonial: { quote, name, role, company, year, avatar },
   front,
 }: {
   testimonial: Testimonial;
   front: boolean;
 }) {
+  const [avatarFailed, setAvatarFailed] = useState(false);
   const initials = name
     .split(/\s+/)
     .map((part) => part[0])
@@ -343,9 +353,20 @@ function TestimonialCard({
       <figcaption className="mt-auto flex items-center gap-3 border-t border-white/5 pt-5">
         <span
           aria-hidden
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-orange-400/70 to-rose-500/40 text-xs font-semibold text-white/80 ring-1 ring-white/10"
+          className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-orange-400/70 to-rose-500/40 text-xs font-semibold text-white/80 ring-1 ring-white/10"
         >
           {initials}
+          {!avatarFailed && (
+            <Image
+              src={avatar}
+              alt=""
+              width={40}
+              height={40}
+              draggable={false}
+              onError={() => setAvatarFailed(true)}
+              className="absolute inset-0 size-full object-cover"
+            />
+          )}
         </span>
         <div className="min-w-0">
           <p className="text-sm font-medium text-white">{name}</p>
