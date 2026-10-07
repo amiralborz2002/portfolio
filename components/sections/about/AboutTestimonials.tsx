@@ -11,6 +11,7 @@ import {
   type PanInfo,
   type TargetAndTransition,
 } from "framer-motion";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
@@ -23,7 +24,8 @@ type Testimonial = {
   quote: string;
   name: string;
   role: string;
-  company: string;
+  /** Photo in /public; the initials show if it is missing or fails to load. */
+  avatar: string;
 };
 
 /*
@@ -34,74 +36,74 @@ const TESTIMONIALS: Testimonial[] = [
   {
     id: "a1",
     quote:
-      "Amir has a gift for turning tangled business rules into flows that feel obvious. Our pricing logic finally made sense to customers and to the engineers implementing it.",
-    name: "Recommender Name",
-    role: "Head of Product",
-    company: "Company",
+      "I had the pleasure of working with Amir at NobarCloud, and he is one of the most patient, approachable, and supportive colleagues I've had the opportunity to work with. As a Product Manager, Amir was always willing to make time for product discussions, even with his busy schedule. Whenever I had questions, he took the time to explain things clearly. What I appreciated most was his honesty—if he wasn't completely sure, he would investigate and follow up. His calm attitude, sense of humor, and genuine care create an environment where collaboration feels effortless.",
+    name: "Sina Shah Oveisi",
+    role: "Software Engineer",
+    avatar: "/images/testimonials/1.jpg",
   },
   {
     id: "a2",
     quote:
-      "He asks the uncomfortable questions early, then does the work to answer them. Every decision came with a rationale the whole team could get behind.",
-    name: "Recommender Name",
-    role: "Engineering Lead",
-    company: "Company",
+      "From the very first meeting, he was so warm and friendly that it didn’t feel like we were meeting for the first time. Amir had a great way of injecting humor and positive energy into the team while never crossing work boundaries. His work is exceptionally clean, precise, and high-quality — the kind you rarely see. He knows his craft very well, constantly seeks feedback, and has a strong self-improving mindset. He’s smart, multi-talented, and simply enjoyable to work with.",
+    name: "Mohammad Mohagheghian",
+    role: "Frontend Engineer",
+    avatar: "/images/testimonials/2.jpg",
   },
   {
     id: "a3",
     quote:
-      "Calm, collaborative and relentlessly curious. Amir made our developers feel heard, and the result was a design system they actually wanted to use.",
-    name: "Recommender Name",
-    role: "Frontend Architect",
-    company: "Company",
+      "I worked with Amir at NobarCloud and found him to be a reliable and skilled Product Designer. He has a great approach to design systems and, importantly, he understands technical constraints well, which made our collaboration between the product and engineering sides very smooth. He is a supportive teammate, pays good attention to detail, and is easy to work with.",
+    name: "Amirhossein Jafari",
+    role: "DevOps & Cloud Infrastructure Engineer",
+    avatar: "/images/testimonials/3.jpg",
   },
   {
     id: "a4",
     quote:
-      "Having lived through a startup himself, he understood our trade-offs instantly. He knew when to polish and when to ship, and he was right both times.",
-    name: "Recommender Name",
-    role: "Co-founder & CEO",
-    company: "Company",
+      "Working with Amir has been a pleasure. As a developer, I have had no issues working on Amir's Figma as he works in a clean and organized manner. Amir is patient, polite, and passionate, which makes collaboration stress-free and easy.",
+    name: "Alireza Mohseni",
+    role: "Front-End Developer",
+    avatar: "/images/testimonials/4.jpg",
   },
   {
     id: "a5",
     quote:
-      "The research synthesis he led reshaped our roadmap. Behavioral insights became concrete design principles we still reference every sprint.",
-    name: "Recommender Name",
-    role: "UX Research Lead",
-    company: "Company",
+      "As a UI/UX Designer, Amir works well outside conventional frameworks and always strives to challenge his past self. That's why you can see such variety and quality improvement throughout his work. He is highly observant, detail-oriented, and keeps himself updated with the latest trends. Working with Amir is effortless and frictionless for me because he truly knows his craft.",
+    name: "Human Rahmani",
+    role: "Art Director",
+    avatar: "/images/testimonials/5.jpg",
   },
   {
     id: "a6",
     quote:
-      "Amir bridged three teams that had been talking past each other for months. Business, design and engineering left the workshop with one shared plan.",
-    name: "Recommender Name",
-    role: "Program Manager",
-    company: "Company",
+      "One of the most important things I noticed while working on various projects with Amir was his documentation skills. Beyond that, his attention to detail and user-centric approach to design are among his greatest strengths. Apart from these, staying constantly updated in his field has had a massive positive impact on his output.",
+    name: "Pouya Mohammadi",
+    role: "SEO Expert",
+    avatar: "/images/testimonials/6.jpg",
   },
   {
     id: "a7",
     quote:
-      "His information architecture work cut our support tickets noticeably. Users found what they needed without thinking about it, which is the whole point.",
-    name: "Recommender Name",
-    role: "Customer Experience Director",
-    company: "Company",
+      "I wanted to leave a note here to say how truly inspired I am by your drive for success and constant forward momentum. The way you patiently ask about everyone's tastes just to recommend a podcast to them is wonderful too. Work-wise, there's no need to say how expert and professional you are. I'm proud to have you on our team.",
+    name: "Zohre Karrabi",
+    role: "Account Manager",
+    avatar: "/images/testimonials/7.jpg",
   },
   {
     id: "a8",
     quote:
-      "He prototypes at remarkable speed, often with AI in the loop, yet never loses sight of feasibility. We validated ideas in days instead of weeks.",
-    name: "Recommender Name",
-    role: "Product Manager",
-    company: "Company",
+      "A very young Designer, but has great passions in his career. I see he always uses his free time to improve his skills. I wish I was his age when starting my work.",
+    name: "Hamid Mansouri",
+    role: "Unreal Engine Developer",
+    avatar: "/images/testimonials/8.jpg",
   },
   {
     id: "a9",
     quote:
-      "Amir documents his thinking so clearly that onboarding new teammates became effortless. The design rationale outlived the project and still guides us.",
-    name: "Recommender Name",
-    role: "Design Director",
-    company: "Company",
+      "Despite his young age, Amir is constantly pursuing growth and learning in his areas of interest. Based on his passion for photography, we had many conversations where he asked great questions. I'm glad he never settles for standing still, and I hope he continues on this path of progress wherever he goes.",
+    name: "Amirhosein Lashgari",
+    role: "Cinematographer | Photographer",
+    avatar: "/images/testimonials/9.jpg",
   },
 ];
 
@@ -369,7 +371,7 @@ function MobileDeck() {
             {" / "}
             {String(total).padStart(2, "0")}
             <span className="sr-only">
-              : {byId.get(order[0])!.role}, {byId.get(order[0])!.company}
+              : {byId.get(order[0])!.name}, {byId.get(order[0])!.role}
             </span>
           </p>
         </div>
@@ -387,7 +389,7 @@ function MobileDeck() {
 /* ------------------------------------------------------------------ */
 
 function TestimonialCard({
-  testimonial: { quote, name, role, company },
+  testimonial: { quote, name, role, avatar },
   className,
   clamp = false,
 }: {
@@ -396,6 +398,7 @@ function TestimonialCard({
   /** Fixed-height deck cards cap the quote so long copy never overflows. */
   clamp?: boolean;
 }) {
+  const [avatarFailed, setAvatarFailed] = useState(false);
   const initials = name
     .split(/\s+/)
     .map((part) => part[0])
@@ -425,15 +428,24 @@ function TestimonialCard({
       <figcaption className="mt-auto flex items-center gap-3 border-t border-white/5 pt-5">
         <span
           aria-hidden
-          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-orange-400/70 to-rose-500/40 text-xs font-semibold text-white/80 ring-1 ring-white/10"
+          className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-orange-400/70 to-rose-500/40 text-xs font-semibold text-white/80 ring-1 ring-white/10"
         >
           {initials}
+          {!avatarFailed && (
+            <Image
+              src={avatar}
+              alt=""
+              width={40}
+              height={40}
+              draggable={false}
+              onError={() => setAvatarFailed(true)}
+              className="absolute inset-0 size-full object-cover"
+            />
+          )}
         </span>
         <div className="min-w-0">
           <p className="text-sm font-medium text-white">{name}</p>
-          <p className="truncate text-sm text-zinc-500">
-            {role} · {company}
-          </p>
+          <p className="truncate text-sm text-zinc-500">{role}</p>
         </div>
       </figcaption>
     </figure>
