@@ -42,12 +42,12 @@ const TESTIMONIALS: Testimonial[] = [
     avatar: "/images/testimonials/1.jpg",
   },
   {
-    id: "a2",
+    id: "a8",
     quote:
-      "From the very first meeting, he was so warm and friendly that it didn’t feel like we were meeting for the first time. Amir had a great way of injecting humor and positive energy into the team while never crossing work boundaries. His work is exceptionally clean, precise, and high-quality — the kind you rarely see. He knows his craft very well, constantly seeks feedback, and has a strong self-improving mindset. He’s smart, multi-talented, and simply enjoyable to work with.",
-    name: "Mohammad Mohagheghian",
-    role: "Frontend Engineer",
-    avatar: "/images/testimonials/2.jpg",
+      "A very young Designer, but has great passions in his career. I see he always uses his free time to improve his skills. I wish I was his age when starting my work.",
+    name: "Hamid Mansouri",
+    role: "Unreal Engine Developer",
+    avatar: "/images/testimonials/8.jpg",
   },
   {
     id: "a3",
@@ -90,12 +90,12 @@ const TESTIMONIALS: Testimonial[] = [
     avatar: "/images/testimonials/7.jpg",
   },
   {
-    id: "a8",
+    id: "a2",
     quote:
-      "A very young Designer, but has great passions in his career. I see he always uses his free time to improve his skills. I wish I was his age when starting my work.",
-    name: "Hamid Mansouri",
-    role: "Unreal Engine Developer",
-    avatar: "/images/testimonials/8.jpg",
+      "From the very first meeting, he was so warm and friendly that it didn’t feel like we were meeting for the first time. Amir had a great way of injecting humor and positive energy into the team while never crossing work boundaries. His work is exceptionally clean, precise, and high-quality — the kind you rarely see. He knows his craft very well, constantly seeks feedback, and has a strong self-improving mindset. He’s smart, multi-talented, and simply enjoyable to work with.",
+    name: "Mohammad Mohagheghian",
+    role: "Frontend Engineer",
+    avatar: "/images/testimonials/2.jpg",
   },
   {
     id: "a9",
