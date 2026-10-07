@@ -20,7 +20,6 @@ export type Testimonial = {
   quote: string;
   name: string;
   role: string;
-  company: string;
   year: number;
   /** Photo in /public; the initials show if it is missing or fails to load. */
   avatar: string;
@@ -37,7 +36,6 @@ export const TESTIMONIALS: Testimonial[] = [
       "I had the pleasure of working with Amir at NobarCloud, and he is one of the most patient, approachable, and supportive colleagues I've had the opportunity to work with. As a Product Manager, Amir was always willing to make time for product discussions, even with his busy schedule. Whenever I had questions, he took the time to explain things clearly. What I appreciated most was his honesty—if he wasn't completely sure, he would investigate and follow up. His calm attitude, sense of humor, and genuine care create an environment where collaboration feels effortless.",
     name: "Sina Shah Oveisi",
     role: "Software Engineer",
-    company: "Company",
     year: 2026,
     avatar: "/images/testimonials/1.jpg",
   },
@@ -47,7 +45,6 @@ export const TESTIMONIALS: Testimonial[] = [
       "From the very first meeting, he was so warm and friendly that it didn’t feel like we were meeting for the first time. Amir had a great way of injecting humor and positive energy into the team while never crossing work boundaries. His work is exceptionally clean, precise, and high-quality — the kind you rarely see. He knows his craft very well, constantly seeks feedback, and has a strong self-improving mindset. He’s smart, multi-talented, and simply enjoyable to work with.",
     name: "Mohammad Mohagheghian",
     role: "Frontend Engineer",
-    company: "Company",
     year: 2025,
     avatar: "/images/testimonials/2.jpg",
   },
@@ -57,7 +54,6 @@ export const TESTIMONIALS: Testimonial[] = [
       "I worked with Amir at NobarCloud and found him to be a reliable and skilled Product Designer. He has a great approach to design systems and, importantly, he understands technical constraints well, which made our collaboration between the product and engineering sides very smooth. He is a supportive teammate, pays good attention to detail, and is easy to work with.",
     name: "Amirhossein Jafari",
     role: "DevOps & Cloud Infrastructure Engineer",
-    company: "Company",
     year: 2024,
     avatar: "/images/testimonials/3.jpg",
   },
@@ -67,7 +63,6 @@ export const TESTIMONIALS: Testimonial[] = [
       "Working with Amir has been a pleasure. As a developer, I have had no issues working on Amir's Figma as he works in a clean and organized manner. Amir is patient, polite, and passionate, which makes collaboration stress-free and easy.",
     name: "Alireza Mohseni",
     role: "Front-End Developer",
-    company: "Company",
     year: 2023,
     avatar: "/images/testimonials/4.jpg",
   },
@@ -77,7 +72,6 @@ export const TESTIMONIALS: Testimonial[] = [
       "As a UI/UX Designer, Amir works well outside conventional frameworks and always strives to challenge his past self. That's why you can see such variety and quality improvement throughout his work. He is highly observant, detail-oriented, and keeps himself updated with the latest trends. Working with Amir is effortless and frictionless for me because he truly knows his craft.",
     name: "Human Rahmani",
     role: "Art Director",
-    company: "Company",
     year: 2022,
     avatar: "/images/testimonials/5.jpg",
   },
@@ -87,7 +81,6 @@ export const TESTIMONIALS: Testimonial[] = [
       "One of the most important things I noticed while working on various projects with Amir was his documentation skills. Beyond that, his attention to detail and user-centric approach to design are among his greatest strengths. Apart from these, staying constantly updated in his field has had a massive positive impact on his output.",
     name: "Pouya Mohammadi",
     role: "SEO Expert",
-    company: "Company",
     year: 2022,
     avatar: "/images/testimonials/6.jpg",
   },
@@ -293,7 +286,7 @@ export function Testimonials() {
               {" / "}
               {String(total).padStart(2, "0")}
               <span className="sr-only">
-                : {byId.get(order[0])!.role}, {byId.get(order[0])!.company}
+                : {byId.get(order[0])!.name}, {byId.get(order[0])!.role}
               </span>
             </p>
           </div>
@@ -310,7 +303,7 @@ export function Testimonials() {
 /* ───────────────────────── card ───────────────────────── */
 
 function TestimonialCard({
-  testimonial: { quote, name, role, company, year, avatar },
+  testimonial: { quote, name, role, year, avatar },
   front,
 }: {
   testimonial: Testimonial;
@@ -370,9 +363,7 @@ function TestimonialCard({
         </span>
         <div className="min-w-0">
           <p className="text-sm font-medium text-white">{name}</p>
-          <p className="truncate text-sm text-zinc-500">
-            {role} · {company}
-          </p>
+          <p className="truncate text-sm text-zinc-500">{role}</p>
         </div>
       </figcaption>
     </figure>
