@@ -170,12 +170,6 @@
   @apply py-section;
 }
 
-/* Scrollable but with no visible scrollbar (horizontal sliders) */
-@utility hide-scrollbar {
-  scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
-}
-
 /* ─────────────────────────────────────────────
    Accessibility — respect reduced motion
    ───────────────────────────────────────────── */

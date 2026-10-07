@@ -2,7 +2,7 @@ import { BentoSnapshot } from "@/components/sections/BentoSnapshot";
 import { ExperienceJourney } from "@/components/sections/ExperienceJourney";
 import { FinalCTA } from "@/components/sections/FinalCTA";
 import { Hero } from "@/components/sections/Hero";
-import { TestimonialsSlider } from "@/components/sections/home/TestimonialsSlider";
+import { Testimonials } from "@/components/sections/Testimonials";
 
 export default function HomePage() {
   return (
@@ -10,21 +10,7 @@ export default function HomePage() {
       <Hero />
       <BentoSnapshot />
       <ExperienceJourney />
-      <section
-        id="testimonials"
-        aria-labelledby="testimonials-title"
-        className="mx-auto w-full max-w-6xl px-6"
-      >
-        <div className="mb-16 text-center">
-          <p className="text-xs font-medium tracking-widest text-zinc-500 uppercase">
-            What others say
-          </p>
-          <h2 id="testimonials-title" className="mt-3 text-3xl font-bold text-white md:text-5xl">
-            Trusted by teams I&apos;ve worked with.
-          </h2>
-        </div>
-        <TestimonialsSlider />
-      </section>
+      <Testimonials />
       <FinalCTA />
     </div>
   );

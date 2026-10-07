@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { AboutHero } from "@/components/sections/about/AboutHero";
+import { AboutTestimonials } from "@/components/sections/about/AboutTestimonials";
 import { FAQ } from "@/components/sections/about/FAQ";
 import { ManifestoScroll } from "@/components/sections/about/ManifestoScroll";
-import { TestimonialsMasonry } from "@/components/sections/about/TestimonialsMasonry";
 import { WhyMeBento } from "@/components/sections/about/WhyMeBento";
 
 export const metadata: Metadata = {
@@ -29,7 +29,7 @@ export default function AboutPage() {
         >
           Trusted by the best.
         </h2>
-        <TestimonialsMasonry />
+        <AboutTestimonials />
       </section>
       <div className="py-24 md:py-32">
         <FAQ />
