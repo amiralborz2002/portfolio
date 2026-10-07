@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 
 export default function NotFound() {
   return (
@@ -32,18 +32,12 @@ export default function NotFound() {
           </p>
 
           <div className="border-t border-zinc-800/50 pt-6 flex flex-col sm:flex-row items-center gap-4">
-            <Link
-              href="/"
-              className="bg-orange-500 hover:bg-orange-600 text-black px-6 py-2.5 rounded text-xs uppercase tracking-wider font-bold transition-colors w-full sm:w-auto text-center"
-            >
+            <Button href="/" variant="primary" className="w-full uppercase tracking-wider sm:w-auto">
               Reboot to Home
-            </Link>
-            <Link
-              href="/work"
-              className="text-zinc-400 hover:text-white px-6 py-2.5 rounded border border-zinc-800/50 hover:border-zinc-700 text-xs uppercase tracking-wider transition-colors w-full sm:w-auto text-center"
-            >
+            </Button>
+            <Button href="/work" variant="secondary" className="w-full uppercase tracking-wider sm:w-auto">
               View Systems
-            </Link>
+            </Button>
           </div>
         </div>
       </div>

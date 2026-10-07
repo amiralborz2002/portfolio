@@ -54,7 +54,6 @@ export function Header() {
             href="/contact"
             size="sm"
             aria-current={isActive("/contact") ? "page" : undefined}
-            className="shadow-glow"
           >
             Get in touch
           </Button>

@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { buttonVariants } from "@/components/ui/Button";
 import {
   Fragment,
   useEffect,
@@ -234,7 +235,7 @@ function EditorCard({ reduceMotion }: { reduceMotion: boolean }) {
               </p>
               {/* Phones get a plain mailto link, so the native mail app opens with no JS
                   in the way; md+ gets a button that opens the email client menu. */}
-              <a href={MAILTO} className={`flex md:hidden ${sayHelloButton}`}>
+              <a href={MAILTO} className={`${sayHelloButton} md:hidden`}>
                 <SayHelloLabel />
               </a>
               <div ref={menuRef} className="relative hidden md:block">
@@ -243,7 +244,7 @@ function EditorCard({ reduceMotion }: { reduceMotion: boolean }) {
                   onClick={handleDesktopClick}
                   aria-haspopup="menu"
                   aria-expanded={showEmailMenu}
-                  className={`hidden md:flex ${sayHelloButton}`}
+                  className={sayHelloButton}
                 >
                   <SayHelloLabel />
                 </button>
@@ -258,8 +259,12 @@ function EditorCard({ reduceMotion }: { reduceMotion: boolean }) {
   );
 }
 
-const sayHelloButton =
-  "group/btn h-8 items-center gap-1.5 rounded-full bg-accent px-3.5 text-xs font-medium whitespace-nowrap text-accent-foreground shadow-glow transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 sm:h-9 sm:px-4 sm:text-sm";
+// The bar is compact, so this overrides only the size; colour, shape and hover stay standard.
+const sayHelloButton = buttonVariants({
+  variant: "primary",
+  size: "none",
+  className: "group/btn h-8 gap-1.5 px-3.5 text-xs focus-visible:ring-offset-zinc-900 sm:h-9 sm:px-4 sm:text-sm",
+});
 
 function SayHelloLabel() {
   return (

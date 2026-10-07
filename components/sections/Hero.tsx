@@ -63,7 +63,7 @@ export function Hero() {
           <Button href="/contact" variant="primary" size="lg" className="w-full sm:w-auto">
             Let&apos;s Talk
           </Button>
-          <Button href="/work" variant="outline" size="lg" className="w-full sm:w-auto">
+          <Button href="/work" variant="secondary" size="lg" className="w-full sm:w-auto">
             View Works
           </Button>
         </motion.div>

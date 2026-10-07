@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/Button";
 
 type ArchiveLinkType = "internal" | "external" | "nda" | "offline";
 
@@ -76,8 +77,11 @@ function ArchiveRowContent({ item, clickable }: { item: ArchiveEntry; clickable:
 
 const rowClass = "group block outline-none focus-visible:ring-2 focus-visible:ring-orange-400/70 rounded-sm";
 
-const paginationButton =
-  "font-mono text-sm uppercase text-zinc-500 transition-colors hover:text-white focus-visible:text-white";
+const paginationButton = buttonVariants({
+  variant: "ghost",
+  size: "none",
+  className: "font-mono text-sm uppercase focus-visible:text-orange-400",
+});
 
 function ArchiveRow({ item }: { item: ArchiveEntry }) {
   switch (item.linkType) {

@@ -62,7 +62,7 @@ export function FinalCTA() {
         <Button href={`mailto:${EMAIL}`} variant="primary" size="lg" className="w-full sm:w-auto">
           Book a Strategy Call
         </Button>
-        <Button href={`mailto:${EMAIL}`} variant="outline" size="lg" className="w-full sm:w-auto">
+        <Button href={`mailto:${EMAIL}`} variant="secondary" size="lg" className="w-full sm:w-auto">
           Send an Email
         </Button>
       </motion.div>

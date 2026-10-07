@@ -1,57 +1,58 @@
-"use client";
-
 import Link from "next/link";
-import { motion, type HTMLMotionProps } from "framer-motion";
 import type { ComponentProps } from "react";
+import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "outline" | "ghost";
-type Size = "sm" | "md" | "lg";
+/**
+ * The one button standard for the whole app. Use <Button> where you can; when the
+ * element has to stay custom (a raw <a>, a menu trigger), apply `buttonVariants()`.
+ *
+ * No "use client" and no motion: the press feedback is plain CSS, so this module
+ * works from Server Components (e.g. app/not-found.tsx) as well as client ones.
+ */
+
+export type ButtonVariant = "primary" | "secondary" | "ghost";
+export type ButtonSize = "sm" | "md" | "lg" | "none";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-medium whitespace-nowrap select-none " +
-  "transition-colors duration-200 " +
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent " +
+  "inline-flex items-center justify-center gap-2 rounded-full whitespace-nowrap select-none " +
+  "transition-all duration-300 ease-in-out active:scale-[0.98] " +
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 " +
   "focus-visible:ring-offset-2 focus-visible:ring-offset-background " +
   "disabled:pointer-events-none disabled:opacity-50";
 
-const variants: Record<Variant, string> = {
-  primary: "bg-accent text-black hover:brightness-110",
-  outline:
-    "border border-white/10 bg-white/5 text-white backdrop-blur-md " +
-    "hover:border-white/20 hover:bg-white/10",
-  ghost: "text-zinc-300 hover:bg-white/5 hover:text-white",
+const variants: Record<ButtonVariant, string> = {
+  primary:
+    "bg-orange-500 text-black font-medium " +
+    "hover:bg-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.3)]",
+  secondary:
+    "bg-transparent border border-zinc-700 text-zinc-300 " +
+    "hover:bg-zinc-800 hover:text-white hover:border-zinc-500",
+  ghost: "text-zinc-400 bg-transparent hover:text-orange-400",
 };
 
-const sizes: Record<Size, string> = {
+const sizes: Record<ButtonSize, string> = {
   sm: "h-9 px-4 text-sm",
   md: "h-11 px-6 text-sm",
   lg: "h-12 px-8 text-base",
+  // Text-only buttons (e.g. ghost pagination) that sit flush with surrounding content.
+  none: "",
 };
 
-const tap = { scale: 0.98 };
-
-// Renders a Next.js <Link> with motion props, so internal navigation
-// stays client-side and we never nest <a> inside <button>.
-const MotionLink = motion.create(Link);
+export function buttonVariants({
+  variant = "primary",
+  size = "md",
+  className,
+}: { variant?: ButtonVariant; size?: ButtonSize; className?: string } = {}) {
+  return cn(base, variants[variant], sizes[size], className);
+}
 
 type BaseProps = {
-  variant?: Variant;
-  size?: Size;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
 };
 
-type ButtonProps = BaseProps &
-  HTMLMotionProps<"button"> & {
-    href?: undefined;
-  };
-
-type LinkProps = BaseProps &
-  Omit<ComponentProps<typeof MotionLink>, "href"> & {
-    href: string;
-  };
-
-function styles(variant: Variant = "primary", size: Size = "md", className = "") {
-  return [base, variants[variant], sizes[size], className].filter(Boolean).join(" ");
-}
+type ButtonProps = BaseProps & ComponentProps<"button"> & { href?: undefined };
+type LinkProps = BaseProps & Omit<ComponentProps<typeof Link>, "href"> & { href: string };
 
 function isLink(props: ButtonProps | LinkProps): props is LinkProps {
   return typeof props.href === "string";
@@ -60,16 +61,9 @@ function isLink(props: ButtonProps | LinkProps): props is LinkProps {
 export function Button(props: ButtonProps | LinkProps) {
   if (isLink(props)) {
     const { variant, size, className, ...rest } = props;
-    return <MotionLink whileTap={tap} className={styles(variant, size, className)} {...rest} />;
+    return <Link className={buttonVariants({ variant, size, className })} {...rest} />;
   }
 
-  const { variant, size, className, ...rest } = props;
-  return (
-    <motion.button
-      type="button"
-      whileTap={tap}
-      className={styles(variant, size, className)}
-      {...rest}
-    />
-  );
+  const { variant, size, className, type = "button", ...rest } = props;
+  return <button type={type} className={buttonVariants({ variant, size, className })} {...rest} />;
 }
