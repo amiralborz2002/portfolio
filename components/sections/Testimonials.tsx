@@ -45,7 +45,7 @@ export const TESTIMONIALS: Testimonial[] = [
       "From the very first meeting, he was so warm and friendly that it didn’t feel like we were meeting for the first time. Amir had a great way of injecting humor and positive energy into the team while never crossing work boundaries. His work is exceptionally clean, precise, and high-quality — the kind you rarely see. He knows his craft very well, constantly seeks feedback, and has a strong self-improving mindset. He’s smart, multi-talented, and simply enjoyable to work with.",
     name: "Mohammad Mohagheghian",
     role: "Frontend Engineer",
-    year: 2025,
+    year: 2026,
     avatar: "/images/testimonials/2.jpg",
   },
   {
@@ -54,7 +54,7 @@ export const TESTIMONIALS: Testimonial[] = [
       "I worked with Amir at NobarCloud and found him to be a reliable and skilled Product Designer. He has a great approach to design systems and, importantly, he understands technical constraints well, which made our collaboration between the product and engineering sides very smooth. He is a supportive teammate, pays good attention to detail, and is easy to work with.",
     name: "Amirhossein Jafari",
     role: "DevOps & Cloud Infrastructure Engineer",
-    year: 2024,
+    year: 2026,
     avatar: "/images/testimonials/3.jpg",
   },
   {
