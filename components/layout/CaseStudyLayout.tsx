@@ -47,7 +47,7 @@ export function CaseStudyLayout({
                 Work
               </Link>
             </li>
-            <li aria-hidden className="text-zinc-600">
+            <li aria-hidden className="text-zinc-500">
               /
             </li>
             <li>
@@ -106,7 +106,7 @@ export function CaseStudyLayout({
               </span>
               <span
                 aria-hidden
-                className="text-4xl text-zinc-600 transition-all duration-500 group-hover:-translate-y-2 group-hover:translate-x-2 group-hover:text-orange-400 md:text-6xl"
+                className="text-4xl text-zinc-500 transition-all duration-500 group-hover:-translate-y-2 group-hover:translate-x-2 group-hover:text-orange-400 md:text-6xl"
               >
                 ↗
               </span>

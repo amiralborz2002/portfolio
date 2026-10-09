@@ -5,12 +5,12 @@ import {
   useInView,
   useMotionTemplate,
   useMotionValue,
-  useReducedMotion,
   useSpring,
   useTransform,
   type MotionValue,
   type Variants,
 } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import {
   useEffect,
   useRef,

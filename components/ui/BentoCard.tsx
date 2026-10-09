@@ -5,9 +5,9 @@ import {
   m,
   useMotionTemplate,
   useMotionValue,
-  useReducedMotion,
   type HTMLMotionProps,
 } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
 
 const paddings = {

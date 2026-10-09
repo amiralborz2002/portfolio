@@ -1,6 +1,6 @@
 "use client";
 
-import { domAnimation, LazyMotion } from "framer-motion";
+import { domAnimation, LazyMotion, MotionConfig } from "framer-motion";
 import type { ReactNode } from "react";
 
 /**
@@ -10,5 +10,10 @@ import type { ReactNode } from "react";
  * which the few components that use them add through <MaxFeatures>.
  */
 export function MotionProvider({ children }: { children: ReactNode }) {
-  return <LazyMotion features={domAnimation}>{children}</LazyMotion>;
+  return (
+    <LazyMotion features={domAnimation}>
+      {/* Reduced-motion users get opacity changes only: transforms and layout snap instantly. */}
+      <MotionConfig reducedMotion="user">{children}</MotionConfig>
+    </LazyMotion>
+  );
 }

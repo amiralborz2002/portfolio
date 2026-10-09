@@ -37,6 +37,11 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // Don't advertise the framework/version in an `X-Powered-By` header.
   poweredByHeader: false,
+  experimental: {
+    // Ship the (small, Tailwind-generated) stylesheet inside the HTML instead of as a
+    // render-blocking request, so first-time visitors paint one round trip sooner.
+    inlineCss: true,
+  },
   images: {
     // AVIF first (smallest), WebP as the fallback; both well below the original JPEGs.
     formats: ["image/avif", "image/webp"],

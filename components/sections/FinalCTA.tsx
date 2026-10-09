@@ -1,13 +1,14 @@
 "use client";
 
-import { m, useReducedMotion } from "framer-motion";
+import { m } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 import { Button } from "../ui/Button";
 
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
 
-// TODO: replace with the real address (also used in components/layout/Footer.tsx)
-const EMAIL = "your@email.com";
+// Same address as components/layout/Footer.tsx and the contact page.
+const EMAIL = "amiralborz2002@gmail.com";
 
 export function FinalCTA() {
   const reduceMotion = !!useReducedMotion();

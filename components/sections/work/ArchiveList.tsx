@@ -65,7 +65,7 @@ function ArchiveRowContent({ item, clickable }: { item: ArchiveEntry; clickable:
         <span className="min-w-0 truncate pr-4 text-sm text-zinc-500">{item.type}</span>
         <div className="shrink-0">
           <span
-            className={`whitespace-nowrap font-mono text-xs uppercase tracking-wider ${clickable ? `text-zinc-300 ${hover}` : "text-zinc-600"}`}
+            className={`whitespace-nowrap font-mono text-xs uppercase tracking-wider ${clickable ? `text-zinc-300 ${hover}` : "text-zinc-500"}`}
           >
             {ACTION_LABEL[item.linkType]}
           </span>

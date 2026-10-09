@@ -15,7 +15,10 @@
   --color-surface-raised: #27272a;    /* zinc-800 */
   --color-foreground: #fafafa;        /* zinc-50  — headings */
   --color-muted: #a1a1aa;             /* zinc-400 — paragraphs */
-  --color-subtle: #71717a;            /* zinc-500 — meta / captions only */
+  --color-subtle: #85858e;            /* zinc-500 — meta / captions only */
+  /* Tailwind's zinc-500 (#71717a) is 4.1:1 on the page background, under the WCAG AA 4.5:1
+     minimum for small text. Lifted just enough to clear 4.5:1 on zinc-950 and zinc-900. */
+  --color-zinc-500: #85858e;
   --color-hairline: #ffffff;          /* use at /10 – /20 */
   --color-accent: #f97316;            /* orange-500 */
   --color-accent-hover: #fb923c;      /* orange-400 */
@@ -168,6 +171,22 @@
 /* Vertical rhythm between page sections */
 @utility section {
   @apply py-section;
+}
+
+/* Hero entrance: fade + rise. Plain CSS rather than Framer Motion so it starts with the first
+   paint instead of after hydration, which would otherwise hold back LCP by seconds on mobile.
+   Tune per element with --rise-delay / --rise-y / --rise-duration. `backwards` holds the
+   hidden start state during the delay and leaves no styles behind once finished.
+   Starts at 1% opacity, not 0: Chrome ignores opacity-0 text as an LCP candidate until the
+   fade has finished, which would push LCP back by delay + duration. 1% is indistinguishable. */
+@keyframes rise-in {
+  from {
+    opacity: 0.01;
+    transform: translateY(var(--rise-y, 24px));
+  }
+}
+@utility animate-rise {
+  animation: rise-in var(--rise-duration, 0.9s) var(--ease-apple) var(--rise-delay, 0s) backwards;
 }
 
 /* ─────────────────────────────────────────────

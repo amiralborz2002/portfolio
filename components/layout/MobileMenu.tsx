@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, m, useReducedMotion, type Variants } from "framer-motion";
+import { AnimatePresence, m, type Variants } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 const LINKS = [
   { num: "01", label: "Home", href: "/" },
@@ -131,7 +132,7 @@ export function MobileMenu() {
                         >
                           <span
                             className={`mr-4 font-mono text-sm transition-transform group-hover:-translate-x-2 md:text-base ${
-                              active ? "text-orange-400" : "text-zinc-700"
+                              active ? "text-orange-400" : "text-zinc-500"
                             }`}
                           >
                             {"// "}
@@ -139,7 +140,7 @@ export function MobileMenu() {
                           </span>
                           <span
                             className={`text-4xl font-bold transition-colors min-[400px]:text-5xl ${
-                              active ? "text-white" : "text-zinc-600 group-hover:text-zinc-300"
+                              active ? "text-white" : "text-zinc-500 group-hover:text-zinc-300"
                             }`}
                           >
                             {link.label}

@@ -3,10 +3,10 @@
 import {
   AnimatePresence,
   m,
-  useReducedMotion,
   type PanInfo,
   type TargetAndTransition,
 } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
@@ -245,10 +245,13 @@ function TestimonialDeck() {
                         }
                       : undefined
                   }
-                  role={front ? "button" : undefined}
+                  // A labelled slide rather than a button, so screen readers read the quote
+                  // (a button's content is presentational). Enter/Space still advance the deck.
+                  role={front ? "group" : undefined}
+                  aria-roledescription={front ? "slide" : undefined}
                   tabIndex={front ? 0 : -1}
                   aria-hidden={!front}
-                  aria-label={front ? "Show next testimonial" : undefined}
+                  aria-label={front ? `${activeIndex + 1} of ${total}` : undefined}
                   className={cn(
                     // Solid base under the glass so stacked cards never show through each other;
                     // origin-bottom so scaled-down cards peek out below the front one.
@@ -270,7 +273,8 @@ function TestimonialDeck() {
           </ControlButton>
 
           <div className="flex flex-col items-center gap-3">
-            <div className="flex items-center gap-1.5">
+            {/* Each dot sits in a 24px-wide hit area (WCAG 2.2 target size), so no extra gap. */}
+            <div className="flex items-center">
               {TESTIMONIALS.map((t, i) => (
                 <button
                   key={t.id}
@@ -278,7 +282,7 @@ function TestimonialDeck() {
                   onClick={() => goTo(i)}
                   aria-label={`Show testimonial ${i + 1} of ${total}`}
                   aria-current={i === activeIndex ? "true" : undefined}
-                  className="group flex h-6 items-center"
+                  className="group flex h-6 min-w-6 items-center justify-center"
                 >
                   <span
                     className={cn(

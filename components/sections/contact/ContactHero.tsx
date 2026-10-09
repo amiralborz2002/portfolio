@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence, m, useReducedMotion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { ArrowUpRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/Button";
 import {
@@ -9,6 +10,7 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  type CSSProperties,
   type MouseEvent,
   type ReactNode,
 } from "react";
@@ -20,13 +22,9 @@ const MAILTO = `mailto:${EMAIL}`;
 const PHONE_DISPLAY = "+98 938 816 3359";
 const PHONE_HREF = "tel:+989388163359";
 
-/** Shared entrance: fade + rise, or fade only when motion is reduced. */
-function rise(delay: number, reduceMotion: boolean) {
-  return {
-    initial: reduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.8, delay, ease },
-  };
+/** Entrance: fade + rise in CSS (`animate-rise`), so the heading paints before hydration. */
+function rise(delay: number) {
+  return { "--rise-delay": `${delay}s`, "--rise-y": "20px", "--rise-duration": "0.8s" } as CSSProperties;
 }
 
 // True on devices with a real hover (mouse / trackpad). Server snapshot assumes
@@ -57,29 +55,29 @@ export function ContactHero() {
     >
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 px-6 sm:gap-12 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-5">
-          <m.h1
+          <h1
             id="contact-title"
-            {...rise(0, reduceMotion)}
-            className="mb-4 text-4xl font-bold tracking-tight text-balance text-white sm:mb-6 sm:text-5xl md:text-6xl"
+            style={rise(0)}
+            className="animate-rise mb-4 text-4xl font-bold tracking-tight text-balance text-white sm:mb-6 sm:text-5xl md:text-6xl"
           >
             Let&apos;s build <span className="text-accent">systems</span> that work.
-          </m.h1>
-          <m.p
-            {...rise(0.1, reduceMotion)}
-            className="max-w-md text-base text-pretty text-zinc-400 sm:text-lg"
+          </h1>
+          <p
+            style={rise(0.1)}
+            className="animate-rise max-w-md text-base text-pretty text-zinc-400 sm:text-lg"
           >
             Skip the forms. Reach out directly for project inquiries, system architecture
             consulting, or just a virtual coffee.
-          </m.p>
+          </p>
         </div>
 
         <div className="flex min-w-0 flex-col gap-4 sm:gap-6 lg:col-span-7">
-          <m.div {...rise(0.2, reduceMotion)}>
+          <div className="animate-rise" style={rise(0.2)}>
             <EditorCard reduceMotion={reduceMotion} />
-          </m.div>
-          <m.div {...rise(0.3, reduceMotion)}>
+          </div>
+          <div className="animate-rise" style={rise(0.3)}>
             <TerminalCard reduceMotion={reduceMotion} />
-          </m.div>
+          </div>
         </div>
       </div>
     </section>
@@ -107,7 +105,7 @@ function TitleBar({ title, meta }: { title: ReactNode; meta?: ReactNode }) {
       <div className="absolute inset-x-0 flex justify-center font-mono text-xs text-zinc-400 pointer-events-none">
         {title}
       </div>
-      {meta && <div className="ml-auto font-mono text-[10px] text-zinc-600">{meta}</div>}
+      {meta && <div className="ml-auto font-mono text-[10px] text-zinc-500">{meta}</div>}
     </div>
   );
 }
@@ -372,15 +370,18 @@ function TerminalCard({ reduceMotion }: { reduceMotion: boolean }) {
   return (
     <m.a
       href={PHONE_HREF}
-      aria-label={`Call ${PHONE_DISPLAY}`}
       whileHover={reduceMotion ? undefined : { scale: 1.015 }}
       whileTap={reduceMotion ? undefined : { scale: 0.99 }}
       transition={{ duration: 0.3, ease }}
       className={`group block ${windowFrame} hover:border-zinc-700 focus-visible:border-green-400/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400/40`}
     >
-      <TitleBar title="zsh — connection" meta="80×24" />
+      {/* The link's name; the terminal transcript is decoration for sighted users. */}
+      <span className="sr-only">Call {PHONE_DISPLAY}</span>
+      <div aria-hidden>
+        <TitleBar title="zsh — connection" meta="80×24" />
+      </div>
 
-      <div className="overflow-x-auto px-4 py-3 font-mono text-[11px] leading-[1.7] sm:px-5 sm:py-4 sm:text-sm">
+      <div aria-hidden className="overflow-x-auto px-4 py-3 font-mono text-[11px] leading-[1.7] sm:px-5 sm:py-4 sm:text-sm">
         {lines.map((line, i) => (
           <m.div
             key={i}
@@ -405,7 +406,7 @@ function TerminalCard({ reduceMotion }: { reduceMotion: boolean }) {
               reduceMotion ? "" : "animate-caret-blink"
             }`}
           />
-          <span className="text-zinc-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+          <span className="text-zinc-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
             ↵ press to dial
           </span>
         </m.div>

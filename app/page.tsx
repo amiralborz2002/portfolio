@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { BentoSnapshot } from "@/components/sections/BentoSnapshot";
 import { ExperienceJourney } from "@/components/sections/ExperienceJourney";
 import { FinalCTA } from "@/components/sections/FinalCTA";
@@ -8,10 +9,20 @@ export default function HomePage() {
   return (
     <div className="relative flex w-full flex-col gap-24 overflow-x-hidden pb-16 md:gap-32">
       <Hero />
-      <BentoSnapshot />
-      <ExperienceJourney />
-      <Testimonials />
-      <FinalCTA />
+      {/* Nothing here suspends: each boundary only lets React hydrate the below-the-fold
+          sections as separate, interruptible chunks instead of one long main-thread task. */}
+      <Suspense>
+        <BentoSnapshot />
+      </Suspense>
+      <Suspense>
+        <ExperienceJourney />
+      </Suspense>
+      <Suspense>
+        <Testimonials />
+      </Suspense>
+      <Suspense>
+        <FinalCTA />
+      </Suspense>
     </div>
   );
 }

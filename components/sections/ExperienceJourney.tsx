@@ -3,11 +3,11 @@
 import {
   m,
   useInView,
-  useReducedMotion,
   useScroll,
   useSpring,
   type MotionValue,
 } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import {
   ChartColumn,
   Cloud,
@@ -239,7 +239,7 @@ function Node({
             : {
                 backgroundColor: "rgb(9 9 11)",
                 borderColor: "rgb(255 255 255 / 0.15)",
-                color: "rgb(113 113 122)",
+                color: "rgb(133 133 142)", // zinc-500 token (lifted for contrast)
                 boxShadow: "0 0 0 0px rgb(249 115 22 / 0), 0 0 0px rgb(249 115 22 / 0)",
                 scale: reduceMotion ? 1 : 0.85,
               }

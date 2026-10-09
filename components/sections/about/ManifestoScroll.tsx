@@ -3,12 +3,12 @@
 import {
   m,
   useMotionValue,
-  useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
   type MotionValue,
 } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { useEffect, useRef } from "react";
 
 const MANIFESTO =
@@ -113,10 +113,14 @@ function Word({ children, progress, range }: WordProps) {
 
   return (
     <>
-      {/* Opacity only, so the browser composites it without layout or paint */}
-      <m.span className="inline-block will-change-[opacity]" style={{ opacity }}>
-        {children}
-      </m.span>{" "}
+      {/* Opacity only, so the browser composites it without layout or paint. The word is
+          drawn by ::before: this copy is decorative (screen readers get the sr-only sentence),
+          and its intentionally dim, unrevealed state would otherwise fail contrast audits. */}
+      <m.span
+        data-word={children}
+        className="inline-block will-change-[opacity] before:content-[attr(data-word)]"
+        style={{ opacity }}
+      />{" "}
     </>
   );
 }

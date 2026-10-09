@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { AboutHero } from "@/components/sections/about/AboutHero";
 import { AboutTestimonials } from "@/components/sections/about/AboutTestimonials";
 import { FAQ } from "@/components/sections/about/FAQ";
@@ -15,9 +16,15 @@ export default function AboutPage() {
   return (
     <div className="flex flex-col gap-24 pb-16 md:gap-32">
       <AboutHero />
-      <ManifestoScroll />
+      {/* Nothing here suspends: each boundary only lets React hydrate the below-the-fold
+          sections as separate, interruptible chunks instead of one long main-thread task. */}
+      <Suspense>
+        <ManifestoScroll />
+      </Suspense>
       <div className="mx-auto w-full max-w-7xl px-6 py-32">
-        <WhyMeBento />
+        <Suspense>
+          <WhyMeBento />
+        </Suspense>
       </div>
       <section
         aria-labelledby="about-testimonials-title"
@@ -29,10 +36,14 @@ export default function AboutPage() {
         >
           Trusted by the best.
         </h2>
-        <AboutTestimonials />
+        <Suspense>
+          <AboutTestimonials />
+        </Suspense>
       </section>
       <div className="py-24 md:py-32">
-        <FAQ />
+        <Suspense>
+          <FAQ />
+        </Suspense>
       </div>
     </div>
   );

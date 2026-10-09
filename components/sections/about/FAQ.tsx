@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence, m, useReducedMotion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { useId, useState } from "react";
 
 import { cn } from "@/lib/utils";

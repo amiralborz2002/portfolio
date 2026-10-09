@@ -7,9 +7,9 @@ import {
   AnimatePresence,
   m,
   useDragControls,
-  useReducedMotion,
   type PanInfo,
 } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { X } from "lucide-react";
 import { MaxFeatures } from "@/components/motion/MaxFeatures";
 import type { Experiment } from "./data";
@@ -189,7 +189,7 @@ function LabModalWindow({ selectedItem, onClose }: LabModalProps) {
                       controls
                     />
                   ) : (
-                    <span className="px-4 text-center font-mono text-sm text-zinc-600">
+                    <span className="px-4 text-center font-mono text-sm text-zinc-500">
                       [ Media Render: Image / MP4 / GIF ]
                     </span>
                   )}

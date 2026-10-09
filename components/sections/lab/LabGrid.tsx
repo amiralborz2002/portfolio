@@ -50,12 +50,13 @@ export function LabGrid() {
             role="button"
             tabIndex={0}
             aria-haspopup="dialog"
-            aria-label={`Inspect ${item.filename}`}
             onClick={() => setSelectedItem(item)}
             onKeyDown={(event) => onKeyDown(event, item)}
             className="flex h-64 cursor-pointer flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 transition-colors hover:border-zinc-600 focus-visible:border-zinc-500 focus-visible:outline-none"
           >
-            <div className="relative flex shrink-0 items-center border-b border-zinc-800 bg-zinc-900 px-4 py-2">
+            {/* The button's name; the visible code preview is decoration for sighted users. */}
+            <span className="sr-only">Inspect {item.filename}</span>
+            <div aria-hidden className="relative flex shrink-0 items-center border-b border-zinc-800 bg-zinc-900 px-4 py-2">
               <div className="flex gap-1.5" aria-hidden="true">
                 <span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
                 <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
@@ -66,7 +67,7 @@ export function LabGrid() {
               </span>
             </div>
 
-            <div className="flex min-h-0 flex-1 flex-col p-5">
+            <div aria-hidden className="flex min-h-0 flex-1 flex-col p-5">
               <pre className="min-h-0 flex-1 overflow-hidden font-mono text-sm leading-relaxed text-zinc-300">
                 <code>
                   {item.codeSnippet.split("\n").map((line, index) => (

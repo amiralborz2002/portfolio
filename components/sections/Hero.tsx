@@ -1,12 +1,16 @@
 "use client";
 
-import { m, useReducedMotion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { m } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { useEffect, useState, type CSSProperties } from "react";
 import { Button } from "../ui/Button";
 
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
 
 const words = ["Systems.", "Mechanisms.", "Architectures.", "Logic."] as const;
+
+// The entrance runs in CSS (`animate-rise`) so the headline paints before hydration.
+const riseDelay = (seconds: number) => ({ "--rise-delay": `${seconds}s` }) as CSSProperties;
 
 const TYPE_MS = 90; // per character typed
 const DELETE_MS = 45; // per character erased
@@ -16,12 +20,6 @@ const GAP_MS = 400; // pause on the empty line before the next word
 export function Hero() {
   const reduceMotion = !!useReducedMotion();
 
-  const rise = (delay: number) => ({
-    initial: reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.9, delay, ease },
-  });
-
   return (
     <section
       aria-labelledby="hero-title"
@@ -29,7 +27,7 @@ export function Hero() {
     >
       {/* Sits above true center so the scroll indicator always has room below */}
       <div className="mb-10 flex w-full flex-col items-center md:mb-[8svh]">
-        <m.div {...rise(0)}>
+        <div className="animate-rise">
           <span className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] px-4 py-1.5 text-xs font-medium tracking-widest text-zinc-400 uppercase backdrop-blur-md">
             <span aria-hidden className="relative flex size-2">
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75 motion-reduce:animate-none" />
@@ -37,28 +35,28 @@ export function Hero() {
             </span>
             Available for projects
           </span>
-        </m.div>
+        </div>
 
-        <m.h1
+        <h1
           id="hero-title"
-          {...rise(0.1)}
-          className="mt-6 text-[clamp(2.25rem,min(10vw,12svh),7.5rem)] leading-[0.95] font-bold tracking-tighter text-white md:mt-8"
+          style={riseDelay(0.1)}
+          className="animate-rise mt-6 text-[clamp(2.25rem,min(10vw,12svh),7.5rem)] leading-[0.95] font-bold tracking-tighter text-white md:mt-8"
         >
           I design complex
           <RotatingWord reduceMotion={reduceMotion} />
-        </m.h1>
+        </h1>
 
-        <m.p
-          {...rise(0.2)}
-          className="mt-6 max-w-2xl text-lg text-balance text-zinc-400 md:mt-8 md:text-xl"
+        <p
+          style={riseDelay(0.2)}
+          className="animate-rise mt-6 max-w-2xl text-lg text-balance text-zinc-400 md:mt-8 md:text-xl"
         >
           I&apos;m Amir Alborz, a Senior UX Designer &amp; Information Architect blending
           behavioral economics, system thinking, and technical logic.
-        </m.p>
+        </p>
 
-        <m.div
-          {...rise(0.3)}
-          className="mt-8 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row md:mt-10"
+        <div
+          style={riseDelay(0.3)}
+          className="animate-rise mt-8 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row md:mt-10"
         >
           <Button href="/contact" variant="primary" size="lg" className="w-full sm:w-auto">
             Let&apos;s Talk
@@ -66,7 +64,7 @@ export function Hero() {
           <Button href="/work" variant="secondary" size="lg" className="w-full sm:w-auto">
             View Works
           </Button>
-        </m.div>
+        </div>
       </div>
 
       <ScrollIndicator reduceMotion={reduceMotion} />

@@ -1,14 +1,11 @@
 "use client";
 
-import { m, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties, type FocusEvent } from "react";
 import { cn } from "@/lib/utils";
 // Static import: the URL carries a content hash, so a replaced photo is
 // never served from a stale browser or CDN cache.
 import portrait from "@/public/images/about/Full.jpg";
-
-const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
 
 type Side = "left" | "right";
 
@@ -33,13 +30,9 @@ const HAIRLINE = "rgba(255,255,255,0.03)";
 
 const FADE = "transition-all duration-500 ease-in-out";
 
-/** Shared entrance: fade + rise, or fade only when motion is reduced. */
-function rise(delay: number, reduceMotion: boolean) {
-  return {
-    initial: reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.9, delay, ease },
-  };
+/** Entrance: fade + rise in CSS (`animate-rise`), so the portrait (the LCP) paints before hydration. */
+function rise(delay: number): CSSProperties {
+  return { "--rise-delay": `${delay}s` } as CSSProperties;
 }
 
 /** Touch-first devices get tap-to-toggle; hover-capable ones use enter/leave. */
@@ -48,7 +41,6 @@ function canHover() {
 }
 
 export function AboutHero() {
-  const reduceMotion = !!useReducedMotion();
   const [activeSide, setActiveSide] = useState<Side | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const demoTimers = useRef<number[]>([]);
@@ -117,16 +109,16 @@ export function AboutHero() {
 
       <ThemeBackdrops activeSide={activeSide} />
 
-      <Portrait activeSide={activeSide} triggerProps={triggerProps} reduceMotion={reduceMotion} />
+      <Portrait activeSide={activeSide} triggerProps={triggerProps} />
 
       {/* Personas flank the portrait: on top below lg, at face height on lg+ */}
       <div className="pointer-events-none relative z-30 mx-auto grid w-full max-w-7xl grid-cols-2 gap-x-5 px-6 pt-6 lg:-mt-[12vh] lg:grid-cols-[1fr_450px_1fr] lg:gap-x-10 lg:pt-0">
-        <m.div {...rise(0.2, reduceMotion)} className="pointer-events-auto lg:col-start-1">
+        <div style={rise(0.2)} className="animate-rise pointer-events-auto lg:col-start-1">
           <Persona side="left" activeSide={activeSide} {...triggerProps("left")} />
-        </m.div>
-        <m.div {...rise(0.3, reduceMotion)} className="pointer-events-auto lg:col-start-3">
+        </div>
+        <div style={rise(0.3)} className="animate-rise pointer-events-auto lg:col-start-3">
           <Persona side="right" activeSide={activeSide} {...triggerProps("right")} />
-        </m.div>
+        </div>
       </div>
     </section>
   );
@@ -271,18 +263,16 @@ const PHOTO_MASK: CSSProperties = {
 function Portrait({
   activeSide,
   triggerProps,
-  reduceMotion,
 }: {
   activeSide: Side | null;
   triggerProps: (side: Side) => TriggerProps;
-  reduceMotion: boolean;
 }) {
   const leftOn = activeSide === "left";
   const rightOn = activeSide === "right";
 
   return (
     <div className="absolute bottom-0 left-1/2 z-10 h-[75vh] w-full max-w-[450px] -translate-x-1/2 md:h-[85vh]">
-      <m.div {...rise(0, reduceMotion)} className="@container relative h-full w-full">
+      <div style={rise(0)} className="animate-rise @container relative h-full w-full">
         {/* One photo of the whole face, so there is no seam to align. The
             per-side effects below simply cover its left or right half. */}
         <div className="absolute inset-0 isolate" style={PHOTO_MASK}>
@@ -290,7 +280,10 @@ function Portrait({
             src={portrait}
             alt="Amir Alborz"
             fill
-            preload
+            // LCP image: fetch it eagerly at high priority (Next 16's `preload` adds a <link>
+            // without fetchpriority, which Lighthouse flags).
+            loading="eager"
+            fetchPriority="high"
             placeholder="blur"
             // The photo is ~square and fills the portrait height
             sizes="(min-width: 768px) 85vh, 75vh"
@@ -417,7 +410,7 @@ function Portrait({
             )}
           />
         ))}
-      </m.div>
+      </div>
     </div>
   );
 }

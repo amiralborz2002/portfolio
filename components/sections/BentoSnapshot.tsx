@@ -4,9 +4,9 @@ import {
   animate,
   m,
   useInView,
-  useReducedMotion,
   type Variants,
 } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Flame, SquareTerminal } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
