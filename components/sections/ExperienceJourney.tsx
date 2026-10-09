@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   motion,
   useInView,
@@ -11,7 +10,6 @@ import {
 } from "framer-motion";
 import {
   ChartColumn,
-  ChevronRight,
   Cloud,
   Factory,
   GraduationCap,
@@ -25,7 +23,7 @@ import { cn } from "@/lib/utils";
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
 
 export type Experience = {
-  /** URL-safe id; also the default detail page: /work/<slug> */
+  /** Unique, URL-safe id */
   slug: string;
   title: string;
   /** Discipline shown in the pill */
@@ -33,13 +31,11 @@ export type Experience = {
   description: string;
   /** Any lucide-react icon */
   Icon: LucideIcon;
-  /** Override the "View Details" target (defaults to /work/<slug>) */
-  href?: string;
 };
 
 /*
  * Work history, most recent first. To add an entry, append an object here —
- * the timeline, step numbers ("01 / 05"), progress pips and left/right
+ * the timeline, step numbers ("01 / 05") and left/right
  * alternation all derive from this array.
  */
 export const EXPERIENCES: Experience[] = [
@@ -66,7 +62,6 @@ export const EXPERIENCES: Experience[] = [
     description:
       "Scaled user experiences across complex, multi-layered enterprise products, balancing high-level stakeholder requirements with modular design principles.",
     Icon: Layers,
-    href: "/work",
   },
   {
     slug: "maad-group",
@@ -75,7 +70,6 @@ export const EXPERIENCES: Experience[] = [
     description:
       "Transformed traditional industrial processes into streamlined digital back-office systems and centralized e-commerce portals for multiple B2B sectors.",
     Icon: Factory,
-    href: "/work",
   },
   {
     slug: "rahnema-college",
@@ -84,7 +78,6 @@ export const EXPERIENCES: Experience[] = [
     description:
       "Where the system-thinking journey began. Built a strong foundation in UX research, usability testing, and core digital product design methodologies.",
     Icon: GraduationCap,
-    href: "/work",
   },
 ];
 
@@ -262,7 +255,7 @@ function Node({
 /* ───────────────────────── card ───────────────────────── */
 
 function ExperienceCard({
-  experience: { slug, title, tag, description, Icon, href },
+  experience: { title, tag, description, Icon },
   active,
   step,
   total,
@@ -328,38 +321,6 @@ function ExperienceCard({
 
       <h3 className="mt-5 text-title">{title}</h3>
       <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base">{description}</p>
-
-      <div className="mt-6 flex items-center justify-between border-t border-white/5 pt-5">
-        <Link
-          href={href ?? `/work/${slug}`}
-          className="inline-flex items-center gap-1.5 rounded-full px-1 text-sm font-medium text-zinc-300 hover:text-white"
-        >
-          View Details
-          <span className="sr-only">: {title}</span>
-          <ChevronRight
-            aria-hidden
-            className="size-4 transition-transform duration-300 ease-apple group-hover:translate-x-1"
-          />
-        </Link>
-        <ProgressPips filled={Number(step)} total={total} />
-      </div>
     </motion.article>
-  );
-}
-
-/** Tiny "level" meter: how far along the journey this stop is. */
-function ProgressPips({ filled, total }: { filled: number; total: number }) {
-  return (
-    <span aria-hidden className="flex gap-1">
-      {Array.from({ length: total }, (_, i) => (
-        <span
-          key={i}
-          className={cn(
-            "h-1 w-4 rounded-full transition-colors duration-500",
-            i < filled ? "bg-accent/70 group-hover:bg-accent" : "bg-white/10",
-          )}
-        />
-      ))}
-    </span>
   );
 }
