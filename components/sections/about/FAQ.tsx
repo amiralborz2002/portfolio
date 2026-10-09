@@ -11,15 +11,15 @@ const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
 const FAQS = [
   {
     q: "What's your current availability?",
-    a: "I'm open to freelance projects, contract roles, and select full-time opportunities that align with my expertise in system design.",
+    a: "Freelance and contract work, right now. I’ll consider full-time only if the role is a strong fit.",
   },
   {
     q: "Where are you based and what timezones do you work with?",
-    a: "I'm based in Haarlem, Netherlands. I comfortably overlap with European and most global timezones for synchronous collaboration.",
+    a: "Tehran, Iran, with enough daytime overlap with Europe for live collaboration, and full flexibility for async work with teams further out.",
   },
   {
     q: "Do you actually write production code?",
-    a: "No. While I build prototypes in Python or Next.js to test logic, my core focus is delivering architecture, UI/UX, and business rules for your engineering team to implement seamlessly.",
+    a: "No. I prototype logic quickly to pressure-test an idea before committing to it, but what I deliver is architecture, UI/UX, and business rules your engineers can build from directly.",
   },
 ] as const;
 

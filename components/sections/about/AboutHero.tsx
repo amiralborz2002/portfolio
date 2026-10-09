@@ -12,11 +12,11 @@ type Side = "left" | "right";
 const PERSONAS = {
   left: {
     title: ["Product", "Designer"],
-    body: "Crafting intuitive, user-centric interfaces and seamless digital experiences.",
+    body: "I turn confusing screens into interfaces people stop thinking about.",
   },
   right: {
     title: ["System", "Thinker"],
-    body: "Architecting scalable logic, bridging business goals with technical constraints.",
+    body: "I build the logic behind the screen, strong enough to survive scale.",
   },
 } as const satisfies Record<Side, { title: readonly string[]; body: string }>;
 

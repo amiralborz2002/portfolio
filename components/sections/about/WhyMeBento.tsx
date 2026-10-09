@@ -74,7 +74,7 @@ export function WhyMeBento() {
               <CardCopy
                 className="max-w-md"
                 title="Business Logic & Viability"
-                body="Balancing user needs with scalable business models, market realities, and holistic product strategies."
+                body="I check if an idea survives contact with the budget and the market, not just Figma."
               />
             </div>
           )}
@@ -91,7 +91,7 @@ export function WhyMeBento() {
               <CardCopy
                 className="mt-auto"
                 title="Psychology & Behavior"
-                body="Merging cognitive psychology, emotional design, and behavioral principles to craft intuitive habits."
+                body="I design for why people hesitate, not just what they click or skip."
               />
             </div>
           )}
@@ -103,7 +103,7 @@ export function WhyMeBento() {
               <CardCopy
                 className="md:max-w-sm"
                 title="Bridging the Gap"
-                body="I explore various tech stacks not to write production code, but to deeply understand engineering constraints and build feasible architectures."
+                body="I dig into different tech stacks, not to write code, but to know exactly what I am asking engineers to build."
               />
               <Terminal active={active} reduceMotion={reduceMotion} />
             </div>
@@ -115,8 +115,8 @@ export function WhyMeBento() {
             <div className="flex h-full flex-col-reverse gap-4 lg:flex-row lg:items-center lg:gap-8">
               <CardCopy
                 className="lg:max-w-xs"
-                title="Stakeholder Synergy"
-                body="Great products live at the exact intersection of Design, Engineering, and Business. I facilitate that handshake."
+                title="Keeping Everyone Aligned"
+                body="Design, engineering, and business rarely agree. I am the one who catches the conflict before it reaches production."
               />
               <VennDiagram active={active} reduceMotion={reduceMotion} />
             </div>
@@ -129,8 +129,8 @@ export function WhyMeBento() {
               <AiSpark active={active} reduceMotion={reduceMotion} />
               <CardCopy
                 className="mt-auto"
-                title="AI-Augmented"
-                body="Leveraging AI for rapid prototyping, generating architectures, and iterating concepts at the speed of thought."
+                title="Works with AI, Not Just Around It"
+                body="I use AI to test five directions before lunch, then choose the one that solves it."
               />
             </div>
           )}
@@ -455,7 +455,7 @@ function ChaosToOrder({ reduceMotion }: { reduceMotion: boolean }) {
     <div className="flex h-full flex-col">
       <CardCopy
         title="Battle-Tested by Failure"
-        body="Real business acumen isn't learned in courses. Building and pivoting my own startups taught me how to balance pixel-perfection with time-to-market and harsh market realities."
+        body="I built and launched my own startup. It failed, but it taught me when to stop polishing and ship, and when good enough beats perfect."
       />
 
       <div aria-hidden className="relative my-4 min-h-32 flex-1">
