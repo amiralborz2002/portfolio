@@ -84,8 +84,8 @@ export function FeaturedWorks() {
           Selected Works.
         </h1>
         <p className="mb-16 max-w-2xl text-xl text-zinc-400">
-          Architecting systems, scaling platforms, and designing experiences that drive
-          business logic.
+          A selection of systems I&apos;ve built, platforms I&apos;ve scaled, and experiences
+          people actually use.
         </p>
       </header>
 
