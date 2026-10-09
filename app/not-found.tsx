@@ -36,7 +36,7 @@ export default function NotFound() {
               Reboot to Home
             </Button>
             <Button href="/work" variant="secondary" className="w-full uppercase tracking-wider sm:w-auto">
-              View Systems
+              View Work
             </Button>
           </div>
         </div>

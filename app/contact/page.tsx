@@ -3,7 +3,7 @@ import { ContactHero } from "@/components/sections/contact/ContactHero";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Skip the forms. Reach Amir Alborz directly by email or phone.",
+  description: "Reach Amir Alborz directly by email or phone.",
 };
 
 export default function ContactPage() {
