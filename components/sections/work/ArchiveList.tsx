@@ -28,7 +28,7 @@ const archiveData: ArchiveEntry[] = [
   { id: 8, year: "2023", title: "Excoino Referral Gateway", type: "FinTech Landing Page", linkType: "offline", href: "" },
   { id: 9, year: "2023", title: "Traders' Copilot", type: "Chrome Extension", linkType: "offline", href: "" },
   { id: 10, year: "2023", title: "Enterprise Internal CMS", type: "Back-office Tool", linkType: "offline", href: "" },
-  { id: 11, year: "2022", title: "Harchi Online", type: "B2B E-Commerce", linkType: "nda", href: "" },
+  { id: 11, year: "2022", title: "Harchi Online", type: "B2C E-Commerce", linkType: "nda", href: "" },
   { id: 12, year: "2022", title: "Maad Talaei", type: "Guarantee Portal", linkType: "offline", href: "" },
   { id: 13, year: "2022", title: "Simi Nasr Maad", type: "Industrial Distributor Hub", linkType: "offline", href: "" },
   { id: 14, year: "2021", title: "Bavar Task Manager", type: "Mobile Application", linkType: "offline", href: "" },

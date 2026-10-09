@@ -63,7 +63,7 @@ export const caseStudies: CaseStudy[] = [
     slug: "nubar-cloud",
     title: "NobarCloud",
     category: "IaaS Platform",
-    tags: ["IaaS Platform", "B2B Ecosystem"],
+    tags: ["Cloud Platform", "B2B Ecosystem"],
     summary: "Turning a sprawling cloud control panel into a console engineers actually trust.",
     tlDr: {
       role: "Senior UX Designer",
