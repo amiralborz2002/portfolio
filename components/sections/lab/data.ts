@@ -22,8 +22,8 @@ export type Experiment = {
 export const EXPERIMENTS: Experiment[] = [
   {
     id: 1,
-    filename: "jira-rice-automation.py",
-    codeSnippet: "function optimize() {\n  const tasks = getJiraBacklog();\n  return applyRICE(tasks);\n}",
+    filename: "jira-rice-automation.json",
+    codeSnippet: '{\n  "trigger": "issue.updated",\n  "action": "set RICE = R*I*C/E"\n}',
     sections: [
       { title: "THE BOTTLENECK", content: "Teams prioritized the backlog by hand, and it was slow." },
       { title: "THE FIX", content: "Built a RICE scoring rule directly inside Jira Automation." },
@@ -36,7 +36,7 @@ export const EXPERIMENTS: Experiment[] = [
     codeSnippet: "function publish(draft) {\n  const article = cleanUp(draft);\n  return sendToCMS(article);\n}",
     sections: [
       { title: "THE BOTTLENECK", content: "An SEO client needed content outsourced, but drafts were slow and inconsistent." },
-      { title: "THE FIX", content: "Built a pipeline that drafts, formats, and link building." },
+      { title: "THE FIX", content: "Built a pipeline that drafts, formats, and builds links." },
       { title: "THE OUTCOME", content: "Content shipped faster, with far less manual cleanup." },
     ],
   },
