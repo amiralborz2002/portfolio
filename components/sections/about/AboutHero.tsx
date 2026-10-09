@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useRef, useState, type FocusEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type FocusEvent, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
@@ -22,6 +22,13 @@ const PERSONAS = {
 
 // Mobile intro: left → right → rest, once, when the hero first scrolls into view.
 const DEMO_STEP_MS = 800;
+
+// Muted, desaturated palette — warm for the designer, cool for the thinker.
+const WARM = "#E87A3E";
+const COOL = "#94A3B8"; // slate-400
+const HAIRLINE = "rgba(255,255,255,0.03)";
+
+const FADE = "transition-all duration-500 ease-in-out";
 
 /** Shared entrance: fade + rise, or fade only when motion is reduced. */
 function rise(delay: number, reduceMotion: boolean) {
@@ -82,9 +89,7 @@ export function AboutHero() {
     activate(activeSide === side ? null : side);
   };
 
-  const personaProps = (side: Side) => ({
-    side,
-    activeSide,
+  const triggerProps = (side: Side) => ({
     onMouseEnter: () => activate(side),
     onMouseLeave: () => activate(null),
     // Taps also focus; only keyboard focus should drive the effect.
@@ -99,35 +104,32 @@ export function AboutHero() {
     <section
       ref={sectionRef}
       aria-labelledby="about-hero-title"
-      // Below lg: both personas side by side on top, portrait centred beneath,
-      // so the whole split persona reads in one screen. lg+: the 3-column stage.
-      className="relative mx-auto grid min-h-[calc(100svh-4rem)] w-full max-w-6xl grid-cols-2 content-center items-start gap-x-5 gap-y-10 px-6 pt-6 pb-12 lg:min-h-[90vh] lg:grid-cols-[1fr_auto_1fr] lg:content-normal lg:items-center lg:gap-16 lg:py-16"
+      // The portrait is pinned to the bottom edge and bleeds off it. Below lg the
+      // personas sit above it, so the section reserves the portrait's height.
+      className="relative isolate min-h-[calc(100svh-4rem)] w-full overflow-hidden pb-[75vh] md:pb-[85vh] lg:flex lg:items-center lg:pb-0"
     >
       <h1 id="about-hero-title" className="sr-only">
         About Amir Alborz — Product Designer and System Thinker
       </h1>
 
-      <motion.div {...rise(0.2, reduceMotion)} className="col-start-1 row-start-1">
-        <Persona {...personaProps("left")} />
-      </motion.div>
+      <ThemeBackdrops activeSide={activeSide} />
 
-      <motion.div
-        {...rise(0, reduceMotion)}
-        className="col-span-2 row-start-2 justify-self-center lg:col-span-1 lg:col-start-2 lg:row-start-1"
-      >
-        <Portrait activeSide={activeSide} onToggle={toggle} />
-      </motion.div>
+      <Portrait activeSide={activeSide} triggerProps={triggerProps} reduceMotion={reduceMotion} />
 
-      <motion.div {...rise(0.3, reduceMotion)} className="col-start-2 row-start-1 lg:col-start-3">
-        <Persona {...personaProps("right")} />
-      </motion.div>
+      {/* Personas flank the portrait: on top below lg, at face height on lg+ */}
+      <div className="pointer-events-none relative z-30 mx-auto grid w-full max-w-7xl grid-cols-2 gap-x-5 px-6 pt-6 lg:-mt-[12vh] lg:grid-cols-[1fr_450px_1fr] lg:gap-x-10 lg:pt-0">
+        <motion.div {...rise(0.2, reduceMotion)} className="pointer-events-auto lg:col-start-1">
+          <Persona side="left" activeSide={activeSide} {...triggerProps("left")} />
+        </motion.div>
+        <motion.div {...rise(0.3, reduceMotion)} className="pointer-events-auto lg:col-start-3">
+          <Persona side="right" activeSide={activeSide} {...triggerProps("right")} />
+        </motion.div>
+      </div>
     </section>
   );
 }
 
-type PersonaProps = {
-  side: Side;
-  activeSide: Side | null;
+type TriggerProps = {
   onMouseEnter: () => void;
   onMouseLeave: () => void;
   onFocus: (event: FocusEvent<HTMLElement>) => void;
@@ -135,7 +137,11 @@ type PersonaProps = {
   onClick: () => void;
 };
 
-function Persona({ side, activeSide, ...handlers }: PersonaProps) {
+function Persona({
+  side,
+  activeSide,
+  ...handlers
+}: { side: Side; activeSide: Side | null } & TriggerProps) {
   const { title, body } = PERSONAS[side];
   const isActive = activeSide === side;
   const isDimmed = activeSide !== null && !isActive;
@@ -146,10 +152,11 @@ function Persona({ side, activeSide, ...handlers }: PersonaProps) {
       tabIndex={0}
       {...handlers}
       className={cn(
-        "cursor-default rounded-2xl outline-none transition-[opacity,transform] duration-500 ease-apple select-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-8 focus-visible:ring-offset-background motion-reduce:transform-none",
+        "cursor-default rounded-2xl outline-none select-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-8 focus-visible:ring-offset-background motion-reduce:transform-none",
+        FADE,
         // Each persona hugs its own outer edge, on mobile and desktop alike.
         isLeft ? "text-left" : "text-right",
-        isDimmed && "opacity-30",
+        isDimmed && "opacity-20",
         isActive && (isLeft ? "translate-x-2" : "-translate-x-2"),
       )}
     >
@@ -157,10 +164,8 @@ function Persona({ side, activeSide, ...handlers }: PersonaProps) {
         {title.map((line, i) => (
           <span
             key={line}
-            className={cn(
-              "block transition-colors duration-500",
-              i === 1 && isActive && (isLeft ? "text-accent" : "text-slate-300"),
-            )}
+            className={cn("block", FADE)}
+            style={i === 1 && isActive ? { color: WARM } : undefined}
           >
             {line}
           </span>
@@ -178,172 +183,243 @@ function Persona({ side, activeSide, ...handlers }: PersonaProps) {
   );
 }
 
+/** Full-bleed thematic textures behind everything, one per half of the hero. */
+function ThemeBackdrops({ activeSide }: { activeSide: Side | null }) {
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+      {/* Designer: a Figma-style layout grid */}
+      <div
+        className={cn(
+          "absolute inset-y-0 left-0 w-1/2",
+          FADE,
+          activeSide === "left" ? "opacity-100" : "opacity-0",
+        )}
+        style={{
+          backgroundImage: `linear-gradient(${HAIRLINE} 1px, transparent 1px), linear-gradient(90deg, ${HAIRLINE} 1px, transparent 1px)`,
+          backgroundSize: "40px 40px",
+          maskImage: "linear-gradient(to right, #000 40%, transparent)",
+        }}
+      />
+      {/* Thinker: an abstract node pipeline */}
+      <svg
+        className={cn(
+          "absolute inset-y-0 right-0 h-full w-1/2",
+          FADE,
+          activeSide === "right" ? "opacity-100" : "opacity-0",
+        )}
+        style={{ maskImage: "linear-gradient(to left, #000 40%, transparent)" }}
+      >
+        <defs>
+          <pattern id="about-pipeline" width="160" height="120" patternUnits="userSpaceOnUse">
+            <path
+              d="M0 30h50l20 20h50l20-20h20M70 50v40h60M30 30v60h40M130 90l30 30"
+              fill="none"
+              stroke={HAIRLINE}
+              strokeWidth="1"
+            />
+            {[
+              [50, 30],
+              [70, 50],
+              [120, 50],
+              [30, 90],
+              [70, 90],
+              [130, 90],
+            ].map(([cx, cy]) => (
+              <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="3" fill="none" stroke={HAIRLINE} />
+            ))}
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#about-pipeline)" />
+      </svg>
+    </div>
+  );
+}
+
 /*
- * Landmarks live in a 320×400 viewBox — the portrait's md size. The container
- * is always 4:5, so the same coordinates line up at every breakpoint.
- * Each photo half is 1:2 and `object-cover`ed into a 2:5 slot anchored on the
- * seam, so a photo point at (fx, fy) lands at x = 160 ∓ 200·(1 − fx), y = 400·fy.
+ * Landmarks are placed in photo space. Each photo is 1:2 and fills the full
+ * portrait height (the slot is always taller than wide), anchored on the
+ * seam — so a box the height of the portrait, square and centred on the seam,
+ * holds both photos exactly. Its 400×400 viewBox maps Right.jpg to x 0–200 and
+ * Left.jpg to x 200–400, independent of the viewport.
  */
 const LEFT_POINTS = {
-  brow: [106, 133],
-  eye: [127, 146],
-  mouth: [129, 206],
-  jaw: [106, 222],
+  brow: [146, 133],
+  eye: [167, 146],
+  mouth: [169, 206],
+  jaw: [146, 222],
 } as const;
 
 const RIGHT_POINTS = {
-  bridge: [160, 146],
-  eye: [188, 143],
-  ear: [229, 167],
-  shoulder: [288, 300],
+  bridge: [200, 146],
+  eye: [228, 143],
+  ear: [269, 167],
+  shoulder: [292, 318],
 } as const;
 
-const LANDMARK_FADE = "transition-opacity duration-500 ease-apple";
+// Feathers the photo's black backdrop into the page on every edge.
+const PHOTO_MASK_IMAGE =
+  "linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 82%, transparent)";
+const PHOTO_MASK: CSSProperties = {
+  maskImage: PHOTO_MASK_IMAGE,
+  maskComposite: "intersect",
+  WebkitMaskImage: PHOTO_MASK_IMAGE,
+  WebkitMaskComposite: "source-in",
+};
 
 function Portrait({
   activeSide,
-  onToggle,
+  triggerProps,
+  reduceMotion,
 }: {
   activeSide: Side | null;
-  onToggle: (side: Side) => void;
+  triggerProps: (side: Side) => TriggerProps;
+  reduceMotion: boolean;
 }) {
   const leftOn = activeSide === "left";
   const rightOn = activeSide === "right";
 
   return (
-    // Outer frame is unclipped so guide lines and labels can reach past the photo.
-    <div className="relative h-80 w-64 md:h-[400px] md:w-80">
-      <div className="group relative mx-auto flex h-full w-full overflow-hidden rounded-2xl bg-black shadow-ambient-lg">
-        {/* Base photos — each half keeps the face seam at the centre line */}
-        <button
-          type="button"
-          aria-label="Focus Product Designer"
-          aria-pressed={leftOn}
-          onClick={() => onToggle("left")}
-          className="relative h-full w-1/2 cursor-default"
+    <div className="absolute bottom-0 left-1/2 z-10 h-[75vh] w-full max-w-[450px] -translate-x-1/2 md:h-[85vh]">
+      <motion.div {...rise(0, reduceMotion)} className="relative h-full w-full">
+        {/* Photos and their tint layers, feathered into the page */}
+        <div className="absolute inset-0 flex" style={PHOTO_MASK}>
+          <div className="relative h-full w-1/2">
+            <Image
+              src="/images/about/Right.jpg"
+              alt="Amir Alborz"
+              fill
+              preload
+              sizes="(min-width: 768px) 225px, 50vw"
+              className="object-cover object-right"
+            />
+          </div>
+          <div className="relative h-full w-1/2">
+            <Image
+              src="/images/about/Left.jpg"
+              alt=""
+              fill
+              preload
+              sizes="(min-width: 768px) 225px, 50vw"
+              className="object-cover object-left"
+            />
+          </div>
+
+          {/* Desaturated duotone on the active half, dim on the other */}
+          <div
+            aria-hidden
+            className={cn(
+              "absolute inset-y-0 left-0 w-1/2 bg-amber-700/20 mix-blend-color",
+              FADE,
+              leftOn ? "opacity-100" : "opacity-0",
+            )}
+          />
+          <div
+            aria-hidden
+            className={cn(
+              "absolute inset-y-0 left-1/2 w-1/2 bg-slate-500/20 mix-blend-color",
+              FADE,
+              rightOn ? "opacity-100" : "opacity-0",
+            )}
+          />
+          <div
+            aria-hidden
+            className={cn(
+              "absolute inset-y-0 left-0 w-1/2 bg-black/50",
+              FADE,
+              rightOn ? "opacity-100" : "opacity-0",
+            )}
+          />
+          <div
+            aria-hidden
+            className={cn(
+              "absolute inset-y-0 left-1/2 w-1/2 bg-black/50",
+              FADE,
+              leftOn ? "opacity-100" : "opacity-0",
+            )}
+          />
+        </div>
+
+        {/* Face landmarks, guide lines and spec labels, in photo space */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute top-0 left-1/2 aspect-square h-full -translate-x-1/2"
         >
-          <Image
-            src="/images/about/Right.jpg"
-            alt=""
-            fill
-            preload
-            sizes="(min-width: 768px) 160px, 128px"
-            className="object-cover object-right"
-          />
-        </button>
-        <button
-          type="button"
-          aria-label="Focus System Thinker"
-          aria-pressed={rightOn}
-          onClick={() => onToggle("right")}
-          className="relative h-full w-1/2 cursor-default"
-        >
-          <Image
-            src="/images/about/Left.jpg"
-            alt=""
-            fill
-            preload
-            sizes="(min-width: 768px) 160px, 128px"
-            className="object-cover object-left"
-          />
-        </button>
-        <span className="sr-only">Portrait of Amir Alborz</span>
+          <svg viewBox="0 0 400 400" className="absolute inset-0 h-full w-full overflow-visible">
+            <g className={cn(FADE, leftOn ? "opacity-100" : "opacity-0")}>
+              <Mesh
+                points={LEFT_POINTS}
+                edges={[
+                  ["brow", "eye"],
+                  ["eye", "mouth"],
+                  ["mouth", "jaw"],
+                  ["jaw", "brow"],
+                ]}
+                color={WARM}
+              />
+              {/* Labels tuck closer to the face on phones so they stay on screen */}
+              <g className="md:hidden">
+                <Guide from={LEFT_POINTS.brow} to={[132, 122]} />
+                <Guide from={LEFT_POINTS.jaw} to={[132, 238]} />
+              </g>
+              <g className="max-md:hidden">
+                <Guide from={LEFT_POINTS.brow} to={[112, 122]} />
+                <Guide from={LEFT_POINTS.jaw} to={[112, 238]} />
+              </g>
+            </g>
+            <g className={cn(FADE, rightOn ? "opacity-100" : "opacity-0")}>
+              <Mesh
+                points={RIGHT_POINTS}
+                edges={[
+                  ["bridge", "eye"],
+                  ["eye", "ear"],
+                  ["ear", "shoulder"],
+                ]}
+                color={COOL}
+              />
+              <g className="md:hidden">
+                <Guide from={RIGHT_POINTS.ear} to={[268, 162]} />
+                <Guide from={RIGHT_POINTS.shoulder} to={[280, 352]} />
+              </g>
+              <g className="max-md:hidden">
+                <Guide from={RIGHT_POINTS.ear} to={[288, 162]} />
+                <Guide from={RIGHT_POINTS.shoulder} to={[304, 352]} />
+              </g>
+            </g>
+          </svg>
 
-        {/* Layer 1 — background motifs, screened onto the dark backdrop and
-            masked away from the face so it always stays clean */}
-        <DotGrid
-          className={cn(
-            "pointer-events-none absolute inset-y-0 left-0 w-1/2 mix-blend-screen",
-            LANDMARK_FADE,
-            leftOn ? "opacity-60" : "opacity-10",
-          )}
-        />
-        <CircuitNodes
-          className={cn(
-            "pointer-events-none absolute inset-y-0 right-0 w-1/2 mix-blend-screen",
-            LANDMARK_FADE,
-            rightOn ? "opacity-60" : "opacity-10",
-          )}
-        />
+          <div className={cn("absolute inset-0", FADE, leftOn ? "opacity-100" : "opacity-0")}>
+            <Label className="top-[30.5%] right-[67%] md:right-[72%]" color={WARM}>
+              24px, {WARM}
+            </Label>
+            <Label className="top-[59.5%] right-[67%] md:right-[72%]" color={WARM}>
+              r16 · 8pt grid
+            </Label>
+          </div>
+          <div className={cn("absolute inset-0", FADE, rightOn ? "opacity-100" : "opacity-0")}>
+            <Label className="top-[40.5%] left-[67%] md:left-[72%]" color={COOL}>
+              iris · 0x2F
+            </Label>
+            <Label className="top-[88%] left-[70%] md:left-[76%]" color={COOL}>
+              render()
+            </Label>
+          </div>
+        </div>
 
-        {/* Layer 2 — duotone tint on the active half, dim on the other */}
-        <div
-          aria-hidden
-          className={cn(
-            "pointer-events-none absolute inset-y-0 left-0 w-1/2 bg-accent/25 mix-blend-color",
-            LANDMARK_FADE,
-            leftOn ? "opacity-100" : "opacity-20",
-          )}
-        />
-        <div
-          aria-hidden
-          className={cn(
-            "pointer-events-none absolute inset-y-0 left-1/2 w-1/2 bg-slate-400/20 mix-blend-color",
-            LANDMARK_FADE,
-            rightOn ? "opacity-100" : "opacity-0",
-          )}
-        />
-        <div
-          aria-hidden
-          className={cn(
-            "pointer-events-none absolute inset-y-0 left-0 w-1/2 bg-black/50",
-            LANDMARK_FADE,
-            rightOn ? "opacity-100" : "opacity-0",
-          )}
-        />
-        <div
-          aria-hidden
-          className={cn(
-            "pointer-events-none absolute inset-y-0 left-1/2 w-1/2 bg-black/50",
-            LANDMARK_FADE,
-            leftOn ? "opacity-100" : "opacity-0",
-          )}
-        />
-      </div>
-
-      {/* Layer 3 — face landmarks, guide lines and spec labels */}
-      <svg
-        aria-hidden
-        viewBox="0 0 320 400"
-        className="pointer-events-none absolute inset-0 z-10 h-full w-full overflow-visible"
-      >
-        <g className={cn(LANDMARK_FADE, leftOn ? "opacity-100" : "opacity-0")}>
-          <Mesh
-            points={LEFT_POINTS}
-            edges={[
-              ["brow", "eye"],
-              ["eye", "mouth"],
-              ["mouth", "jaw"],
-              ["jaw", "brow"],
-            ]}
-            dot="var(--color-accent)"
+        {/* Invisible hit areas: one per half of the face */}
+        {(["left", "right"] as const).map((side) => (
+          <button
+            key={side}
+            type="button"
+            aria-label={`Focus ${PERSONAS[side].title.join(" ")}`}
+            aria-pressed={activeSide === side}
+            {...triggerProps(side)}
+            className={cn(
+              "absolute inset-y-0 z-20 w-1/2 cursor-crosshair outline-none",
+              side === "left" ? "left-0" : "right-0",
+            )}
           />
-          <Guide from={LEFT_POINTS.brow} to={[-2, 128]} />
-          <Guide from={LEFT_POINTS.jaw} to={[-2, 240]} />
-        </g>
-        <g className={cn(LANDMARK_FADE, rightOn ? "opacity-100" : "opacity-0")}>
-          <Mesh
-            points={RIGHT_POINTS}
-            edges={[
-              ["bridge", "eye"],
-              ["eye", "ear"],
-              ["ear", "shoulder"],
-            ]}
-            dot="#cbd5e1"
-          />
-          <Guide from={RIGHT_POINTS.ear} to={[322, 168]} />
-          <Guide from={RIGHT_POINTS.shoulder} to={[322, 352]} />
-        </g>
-      </svg>
-
-      <div aria-hidden className={cn("pointer-events-none absolute inset-0 z-20", LANDMARK_FADE, leftOn ? "opacity-100" : "opacity-0")}>
-        <Label className="top-[30%] -left-8 text-accent">24px, #F97316</Label>
-        <Label className="top-[58%] -left-8 text-accent">r16 · 8pt grid</Label>
-      </div>
-      <div aria-hidden className={cn("pointer-events-none absolute inset-0 z-20", LANDMARK_FADE, rightOn ? "opacity-100" : "opacity-0")}>
-        <Label className="top-[40%] -right-8 text-slate-300">iris · 0x2F</Label>
-        <Label className="top-[86%] -right-8 text-slate-300">render()</Label>
-      </div>
+        ))}
+      </motion.div>
     </div>
   );
 }
@@ -353,11 +429,11 @@ type Point = readonly [number, number];
 function Mesh<K extends string>({
   points,
   edges,
-  dot,
+  color,
 }: {
   points: Record<K, Point>;
   edges: [K, K][];
-  dot: string;
+  color: string;
 }) {
   return (
     <>
@@ -369,13 +445,13 @@ function Mesh<K extends string>({
           x2={points[b][0]}
           y2={points[b][1]}
           stroke="rgba(255,255,255,0.4)"
-          strokeWidth="1"
+          strokeWidth="0.6"
         />
       ))}
       {(Object.values(points) as Point[]).map(([x, y]) => (
         <g key={`${x}-${y}`}>
-          <circle cx={x} cy={y} r="5" fill="none" stroke={dot} strokeOpacity="0.5" strokeWidth="1" />
-          <circle cx={x} cy={y} r="2" fill={dot} />
+          <circle cx={x} cy={y} r="3" fill="none" stroke={color} strokeOpacity="0.5" strokeWidth="0.6" />
+          <circle cx={x} cy={y} r="1.2" fill={color} />
         </g>
       ))}
     </>
@@ -390,64 +466,31 @@ function Guide({ from, to }: { from: Point; to: Point }) {
       x2={to[0]}
       y2={to[1]}
       stroke="rgba(255,255,255,0.4)"
-      strokeWidth="1"
-      strokeDasharray="2 3"
+      strokeWidth="0.6"
+      strokeDasharray="1.5 2"
     />
   );
 }
 
-function Label({ className, children }: { className: string; children: string }) {
+/** Spec label; `className` places it (its edge facing the face, vertical centre). */
+function Label({
+  className,
+  color,
+  children,
+}: {
+  className: string;
+  color: string;
+  children: ReactNode;
+}) {
   return (
     <div
       className={cn(
-        "absolute border border-zinc-800 bg-zinc-900/80 px-1 font-mono text-[10px] leading-4 whitespace-nowrap",
+        "absolute -translate-y-1/2 border border-zinc-800 bg-zinc-900/80 px-1 font-mono text-[9px] leading-4 whitespace-nowrap md:text-[10px]",
         className,
       )}
+      style={{ color }}
     >
       {children}
     </div>
-  );
-}
-
-function DotGrid({ className }: { className: string }) {
-  return (
-    <svg
-      aria-hidden
-      className={className}
-      style={{ maskImage: "linear-gradient(to right, #000 15%, transparent 70%)" }}
-    >
-      <defs>
-        <pattern id="about-dot-grid" width="12" height="12" patternUnits="userSpaceOnUse">
-          <circle cx="1" cy="1" r="1" fill="var(--color-accent)" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#about-dot-grid)" />
-    </svg>
-  );
-}
-
-function CircuitNodes({ className }: { className: string }) {
-  return (
-    <svg
-      aria-hidden
-      className={className}
-      style={{ maskImage: "linear-gradient(to left, #000 15%, transparent 70%)" }}
-    >
-      <defs>
-        <pattern id="about-circuit" width="48" height="48" patternUnits="userSpaceOnUse">
-          <path
-            d="M0 12h16l8 8v28M24 20h24M36 0v8l-6 6M8 36h10"
-            fill="none"
-            stroke="#cbd5e1"
-            strokeWidth="0.75"
-          />
-          <circle cx="16" cy="12" r="1.75" fill="#cbd5e1" />
-          <circle cx="24" cy="20" r="1.75" fill="#cbd5e1" />
-          <circle cx="30" cy="14" r="1.75" fill="#cbd5e1" />
-          <circle cx="18" cy="36" r="1.75" fill="#cbd5e1" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#about-circuit)" />
-    </svg>
   );
 }
