@@ -4,6 +4,9 @@ import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties, type FocusEvent } from "react";
 import { cn } from "@/lib/utils";
+// Static import: the URL carries a content hash, so a replaced photo is
+// never served from a stale browser or CDN cache.
+import portrait from "@/public/images/about/Full.jpg";
 
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
 
@@ -236,23 +239,22 @@ function ThemeBackdrops({ activeSide }: { activeSide: Side | null }) {
 }
 
 /*
- * Landmarks are placed in photo space. Each photo is 1:2 and fills the full
- * portrait height (the slot is always taller than wide), anchored on the
- * seam — so a box the height of the portrait, square and centred on the seam,
- * holds both photos exactly. Its 400×400 viewBox maps Right.jpg to x 0–200 and
- * Left.jpg to x 200–400, independent of the viewport.
+ * Landmarks are placed in photo space. Full.jpg (2048×2058) fills the portrait
+ * height and is centred, so a box of the photo's aspect ratio, the height of
+ * the portrait and centred on it, holds the photo exactly. Its 400×402 viewBox
+ * maps the photo independently of the viewport; x 200 is the centre line.
  */
 const LEFT_POINTS = {
-  brow: [146, 133],
-  eye: [167, 146],
-  mouth: [169, 206],
+  brow: [151, 132],
+  eye: [171, 146],
+  mouth: [174, 206],
   jaw: [146, 222],
 } as const;
 
 const RIGHT_POINTS = {
   bridge: [200, 146],
   eye: [228, 143],
-  ear: [269, 167],
+  ear: [264, 166],
   shoulder: [292, 318],
 } as const;
 
@@ -281,36 +283,19 @@ function Portrait({
   return (
     <div className="absolute bottom-0 left-1/2 z-10 h-[75vh] w-full max-w-[450px] -translate-x-1/2 md:h-[85vh]">
       <motion.div {...rise(0, reduceMotion)} className="@container relative h-full w-full">
-        {/* Photos and their tint layers, feathered into the page */}
-        {/* `isolate` keeps the photos' z-indices below the landmark layer */}
+        {/* One photo of the whole face, so there is no seam to align. The
+            per-side effects below simply cover its left or right half. */}
         <div className="absolute inset-0 isolate" style={PHOTO_MASK}>
-          {/* Both wrappers run 0.5% past the centre so their edges overlap
-              instead of meeting on a sub-pixel boundary. The photos are then
-              offset back by that 0.5% (cqw = portrait width) so each face half
-              still ends exactly on the centre line, with the right half
-              tucked 1px over the left to hide any anti-aliased seam. Both
-              share a top anchor so they line up vertically. */}
-          <div className="absolute inset-y-0 left-0 z-10 w-[50.5%]">
-            <Image
-              src="/images/about/Right.jpg"
-              alt="Amir Alborz"
-              fill
-              preload
-              // Each photo renders at half the portrait height (it is 1:2)
-              sizes="(min-width: 768px) 43vh, 38vh"
-              className="object-cover [object-position:right_0.5cqw_top_0]"
-            />
-          </div>
-          <div className="absolute inset-y-0 right-0 z-10 w-[50.5%]">
-            <Image
-              src="/images/about/Left.jpg"
-              alt=""
-              fill
-              preload
-              sizes="(min-width: 768px) 43vh, 38vh"
-              className="object-cover [object-position:left_calc(0.5cqw-1px)_top_0]"
-            />
-          </div>
+          <Image
+            src={portrait}
+            alt="Amir Alborz"
+            fill
+            preload
+            placeholder="blur"
+            // The photo is ~square and fills the portrait height
+            sizes="(min-width: 768px) 85vh, 75vh"
+            className="object-cover object-top"
+          />
 
           {/* Desaturated duotone on the active half, dim on the other */}
           <div
@@ -350,9 +335,9 @@ function Portrait({
         {/* Face landmarks, guide lines and spec labels, in photo space */}
         <div
           aria-hidden
-          className="pointer-events-none absolute top-0 left-1/2 aspect-square h-full -translate-x-1/2"
+          className="pointer-events-none absolute top-0 left-1/2 aspect-[2048/2058] h-full -translate-x-1/2"
         >
-          <svg viewBox="0 0 400 400" className="absolute inset-0 h-full w-full overflow-visible">
+          <svg viewBox="0 0 400 402" className="absolute inset-0 h-full w-full overflow-visible">
             <g className={cn(FADE, leftOn ? "opacity-100" : "opacity-0")}>
               <Mesh
                 points={LEFT_POINTS}
