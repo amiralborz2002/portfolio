@@ -18,20 +18,17 @@ type ArchiveEntry = {
 
 // Newest first. The header's index count and timeline are derived from this list.
 const archiveData: ArchiveEntry[] = [
-  { id: 1, year: "2025", title: "E-Commerce Redesign", type: "E-Commerce", linkType: "internal", href: "/work/ecommerce-redesign" },
-  { id: 2, year: "2025", title: "Tab Organizer", type: "Chrome Extension", linkType: "external", href: "https://example.com" },
-  { id: 3, year: "2025", title: "Subscription Billing Portal", type: "SaaS Dashboard", linkType: "nda", href: "" },
-  { id: 4, year: "2024", title: "Fintech Dashboard", type: "SaaS Dashboard", linkType: "nda", href: "" },
-  { id: 5, year: "2024", title: "Editorial Platform", type: "CMS", linkType: "nda", href: "" },
-  { id: 6, year: "2024", title: "Price Tracker", type: "Chrome Extension", linkType: "external", href: "https://example.com" },
-  { id: 7, year: "2023", title: "Corporate Landing", type: "Marketing Site", linkType: "external", href: "https://example.com" },
-  { id: 8, year: "2023", title: "Analytics Workspace", type: "SaaS Dashboard", linkType: "internal", href: "/work/analytics-workspace" },
-  { id: 9, year: "2023", title: "Fashion Storefront", type: "E-Commerce", linkType: "offline", href: "" },
-  { id: 10, year: "2022", title: "Restaurant Ordering App", type: "E-Commerce", linkType: "offline", href: "" },
-  { id: 11, year: "2022", title: "Internal CRM", type: "SaaS Dashboard", linkType: "nda", href: "" },
-  { id: 12, year: "2022", title: "University Portal", type: "CMS", linkType: "offline", href: "" },
-  { id: 13, year: "2021", title: "Headless Blog", type: "CMS", linkType: "offline", href: "" },
-  { id: 14, year: "2021", title: "Grocery Delivery Web App", type: "E-Commerce", linkType: "offline", href: "" },
+  { id: 1, year: "2024", title: "Logestica Redesign", type: "Corporate Website", linkType: "offline", href: "" },
+  { id: 2, year: "2024", title: "Nikaro EdTech", type: "Platform Redesign", linkType: "offline", href: "" },
+  { id: 3, year: "2024", title: "Insurance Exhibition Kiosk", type: "Landing Page", linkType: "offline", href: "" },
+  { id: 4, year: "2023", title: "Escape Room Marketplace", type: "Web Application", linkType: "offline", href: "" },
+  { id: 5, year: "2023", title: "Excoino Referral Gateway", type: "FinTech Landing Page", linkType: "offline", href: "" },
+  { id: 6, year: "2023", title: "Traders' Copilot", type: "Chrome Extension", linkType: "offline", href: "" },
+  { id: 7, year: "2023", title: "Enterprise Internal CMS", type: "Back-office Tool", linkType: "offline", href: "" },
+  { id: 8, year: "2022", title: "Harchi Online", type: "B2B E-Commerce", linkType: "nda", href: "" },
+  { id: 9, year: "2022", title: "Maad Talaei", type: "Guarantee Portal", linkType: "offline", href: "" },
+  { id: 10, year: "2022", title: "Simi Nasr Maad", type: "Industrial Distributor Hub", linkType: "offline", href: "" },
+  { id: 11, year: "2021", title: "Bavar Task Manager", type: "Mobile Application", linkType: "offline", href: "" },
 ];
 
 const PAGE_SIZE = 10;

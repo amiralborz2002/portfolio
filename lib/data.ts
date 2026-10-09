@@ -21,9 +21,9 @@ export type CaseStudy = {
 export const caseStudies: CaseStudy[] = [
   {
     slug: "design-system",
-    title: "The Design System",
-    category: "System Architecture · B2B",
-    tags: ["System Architecture", "Design Tokens", "B2B"],
+    title: "Enterprise Design System",
+    category: "Design Infrastructure",
+    tags: ["Design Infrastructure", "2025"],
     summary:
       "How a token-driven design system unified six product teams and cut UI delivery time in half.",
     tlDr: {
@@ -61,13 +61,13 @@ export const caseStudies: CaseStudy[] = [
   },
   {
     slug: "nubar-cloud",
-    title: "Nubar Cloud Console",
-    category: "Cloud Infrastructure · Dashboard",
-    tags: ["Cloud Infrastructure", "Dashboard"],
+    title: "NobarCloud",
+    category: "IaaS Platform",
+    tags: ["IaaS Platform", "2025"],
     summary: "Turning a sprawling cloud control panel into a console engineers actually trust.",
     tlDr: {
       role: "Senior UX Designer",
-      timeline: "10 months · 2024–2025",
+      timeline: "10 months · 2025",
       context: "IaaS console, 40+ services",
       impact: "−35% support tickets",
     },
@@ -100,12 +100,12 @@ export const caseStudies: CaseStudy[] = [
   {
     slug: "digi-express",
     title: "Digi Express Annual Report",
-    category: "Data Storytelling · Web",
-    tags: ["Data Storytelling", "Web"],
+    category: "Data Storytelling Landing",
+    tags: ["Data Storytelling Landing", "2025"],
     summary: "An interactive annual report that turns a year of logistics data into a narrative.",
     tlDr: {
       role: "Product Designer",
-      timeline: "3 months · 2024",
+      timeline: "3 months · 2025",
       context: "Public annual report",
       impact: "4× avg. time on page",
     },
@@ -135,13 +135,13 @@ export const caseStudies: CaseStudy[] = [
   },
   {
     slug: "fragrance-spa",
-    title: "Fragrance B2B SPA",
-    category: "E-commerce · B2B",
-    tags: ["E-commerce", "B2B"],
+    title: "ODO Perfume",
+    category: "Single Page Application",
+    tags: ["Single Page Application", "2026"],
     summary: "A wholesale ordering experience built for buyers who reorder hundreds of SKUs.",
     tlDr: {
       role: "UX Architect",
-      timeline: "6 months · 2024",
+      timeline: "6 months · 2026",
       context: "Wholesale, 2,000+ SKUs",
       impact: "+27% repeat orders",
     },
@@ -170,14 +170,14 @@ export const caseStudies: CaseStudy[] = [
     ],
   },
   {
-    slug: "escape-room",
-    title: "Escape Room Marketplace",
-    category: "Marketplace · Booking",
-    tags: ["Marketplace", "Booking"],
+    slug: "parv-online",
+    title: "Parv Online",
+    category: "E-Commerce Platform",
+    tags: ["E-Commerce Platform", "2024"],
     summary: "A two-sided marketplace that makes discovering and booking escape rooms effortless.",
     tlDr: {
       role: "Product Designer",
-      timeline: "5 months · 2023",
+      timeline: "5 months · 2024",
       context: "Two-sided marketplace",
       impact: "+41% booking conversion",
     },

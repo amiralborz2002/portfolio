@@ -16,7 +16,7 @@ const CARD_LAYOUT: Record<string, CardLayout> = {
   "nubar-cloud": { span: "md:col-span-5 md:row-span-2", height: "h-[400px] md:h-[640px]" },
   "digi-express": { span: "md:col-span-4", height: "h-[300px] md:h-[400px]" },
   "fragrance-spa": { span: "md:col-span-4", height: "h-[300px] md:h-[400px]" },
-  "escape-room": { span: "md:col-span-4", height: "h-[300px] md:h-[400px]" },
+  "parv-online": { span: "md:col-span-4", height: "h-[300px] md:h-[400px]" },
 };
 
 const FEATURED = Object.entries(CARD_LAYOUT).flatMap(([slug, layout]) => {
