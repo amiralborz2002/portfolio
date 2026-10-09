@@ -1,6 +1,6 @@
 # Amir Alborz — Portfolio
 
-Personal portfolio of Amir Hossein Talebi Alborz, Senior UX Designer and Information Architect.
+Personal portfolio of Amir Hossein Talebi Alborz, Product Designer and Information Architect.
 
 Built with Next.js 16 (App Router), React 19, Tailwind CSS v4 and Framer Motion.
 

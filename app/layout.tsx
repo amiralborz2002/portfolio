@@ -21,11 +21,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Amir Hossein Talebi Alborz — Senior UX Designer",
+    default: "Amir Hossein Talebi Alborz — Product Designer",
     template: "%s — Amir Hossein Talebi",
   },
   description:
-    "Senior UX Designer and Information Architect crafting clear, structured, human-centred digital products.",
+    "Product Designer and Information Architect crafting clear, structured, human-centred digital products.",
 };
 
 export const viewport: Viewport = {
