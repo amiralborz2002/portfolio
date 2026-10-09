@@ -17,8 +17,8 @@ export default function LabPage() {
           &gt;&nbsp;/lab/<wbr />experiments<span className="animate-pulse">_</span>
         </h1>
         <p className="max-w-2xl font-mono text-lg leading-relaxed text-zinc-400">
-          This is not my design portfolio. This is a workbench for automations, internal tools,
-          Python scripts, and system teardowns. Dirty code, but highly functional multipliers.
+          This is not my design portfolio. This is where I build fast and break things on
+          purpose: automations, internal tools, Python scripts, system teardowns that actually ship.
         </p>
       </section>
       <LabGrid />

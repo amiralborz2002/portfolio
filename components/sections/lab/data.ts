@@ -25,8 +25,8 @@ export const EXPERIMENTS: Experiment[] = [
     filename: "jira-rice-automation.py",
     codeSnippet: "function optimize() {\n  const tasks = getJiraBacklog();\n  return applyRICE(tasks);\n}",
     sections: [
-      { title: "THE BOTTLENECK", content: "Product teams were slow at prioritizing manually." },
-      { title: "THE FIX", content: "Integrated RICE formula with Jira API." },
+      { title: "THE BOTTLENECK", content: "Teams prioritized the backlog by hand, and it was slow." },
+      { title: "THE FIX", content: "Built a RICE scoring rule directly inside Jira Automation." },
       { title: "THE OUTCOME", content: "Saved 5 hours per sprint in planning meetings." },
     ],
   },
@@ -35,9 +35,9 @@ export const EXPERIMENTS: Experiment[] = [
     filename: "article-content-pipeline.ts",
     codeSnippet: "function publish(draft) {\n  const article = cleanUp(draft);\n  return sendToCMS(article);\n}",
     sections: [
-      { title: "THE BOTTLENECK", content: "Content team had a fragmented workflow for drafting and publishing." },
-      { title: "THE FIX", content: "Built an end-to-end automation pipeline connecting docs to the CMS." },
-      { title: "THE OUTCOME", content: "Reduced publishing friction by 60%." },
+      { title: "THE BOTTLENECK", content: "An SEO client needed content outsourced, but drafts were slow and inconsistent." },
+      { title: "THE FIX", content: "Built a pipeline that drafts, formats, and link building." },
+      { title: "THE OUTCOME", content: "Content shipped faster, with far less manual cleanup." },
     ],
   },
   {
@@ -45,9 +45,9 @@ export const EXPERIMENTS: Experiment[] = [
     filename: "prompt-generator-engine.gs",
     codeSnippet: "function onDropdownChange() {\n  const choices = readSheet();\n  return buildMasterPrompt(choices);\n}",
     sections: [
-      { title: "THE BOTTLENECK", content: "Designers were writing inconsistent AI prompts for product photography." },
-      { title: "THE FIX", content: "Created a Google Sheet with a dynamic script that compiles master prompts based on UI dropdowns." },
-      { title: "THE OUTCOME", content: "Standardized AI outputs across the design team." },
+      { title: "THE BOTTLENECK", content: "A team needed product photos but had no studio or budget for shoots." },
+      { title: "THE FIX", content: "Built a system that turns dropdown choices into prompts for natural-looking product shots." },
+      { title: "THE OUTCOME", content: "The team now produces consistent studio-quality photos without a studio." },
     ],
   },
   {
@@ -55,9 +55,9 @@ export const EXPERIMENTS: Experiment[] = [
     filename: "blender-physics-sim.py",
     codeSnippet: "import { curiosity } from 'mind';\nimport { physics } from 'blender';\n\ncuriosity.render(physics);",
     sections: [
-      { title: "THE CURIOSITY", content: "I wanted to explain complex physical dispatching mechanisms visually." },
-      { title: "THE EXPERIMENT", content: "Combined Python scripting with Blender/Manim." },
-      { title: "THE RESULT", content: "Created reusable code-driven animation assets." },
+      { title: "THE CURIOSITY", content: "I’ve always liked turning complicated ideas, like how an elevator works, into something anyone can follow at a glance. Manual animation felt slow and one-off, so I got curious whether code could make the process systematic and reusable instead." },
+      { title: "THE EXPERIMENT", content: "Combined Python for the physics logic, JavaScript for interactive previews, and Blender for the final render." },
+      { title: "THE RESULT", content: "Built a repeatable pipeline, not just one animation, so any concept can become a short explainer." },
     ],
   },
 ];
