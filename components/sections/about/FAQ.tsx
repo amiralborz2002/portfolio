@@ -11,7 +11,7 @@ const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
 const FAQS = [
   {
     q: "What's your current availability?",
-    a: "Freelance and contract work, right now. I’ll consider full-time only if the role is a strong fit.",
+    a: "Freelance and contract work, for now. I’d be open to full-time if the right opportunity comes along.",
   },
   {
     q: "Where are you based and what timezones do you work with?",

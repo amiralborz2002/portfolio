@@ -12,7 +12,7 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { useEffect, useRef } from "react";
 
 const MANIFESTO =
-  "Most people see interfaces. I see what runs underneath: the logic, the constraints, the decisions nobody notices until they break. Five years building platforms, including my own startup, taught me this. A polished screen cannot save a broken system. My job starts before the UI, and it doesn’t end when the screen looks finished.";
+  "Most people see interfaces. I see what runs underneath: the logic, the constraints, the decisions nobody notices until they break. 5 years building platforms, including my own startup, taught me this. A polished screen cannot save a broken system. My job starts before the UI, and it doesn’t end when the screen looks finished.";
 
 const WORDS = MANIFESTO.split(" ");
 
