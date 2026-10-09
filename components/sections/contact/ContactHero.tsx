@@ -66,8 +66,7 @@ export function ContactHero() {
             style={rise(0.1)}
             className="animate-rise max-w-md text-base text-pretty text-zinc-400 sm:text-lg"
           >
-            Skip the forms. Reach out directly for project inquiries, system architecture
-            consulting, or just a virtual coffee.
+            Tell me what&apos;s on your mind, a project, a question, or just hello.
           </p>
         </div>
 
@@ -360,7 +359,7 @@ function TerminalCard({ reduceMotion }: { reduceMotion: boolean }) {
     </Fragment>,
     <Fragment key="wait">
       <span className="text-zinc-500">&gt; </span>
-      <span className="text-zinc-400">establishing secure line...</span>
+      <span className="text-zinc-400">opening line...</span>
     </Fragment>,
     <span key="ok" className="text-green-400">
       ✓ Status: Ready to connect
