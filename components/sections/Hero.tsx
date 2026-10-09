@@ -7,7 +7,7 @@ import { Button } from "../ui/Button";
 
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
 
-const words = ["Systems.", "Mechanisms.", "Architectures.", "Logic."] as const;
+const words = ["Logic.", "Patterns.", "Systems.", "Behavior.", "Mechanisms."] as const;
 
 // The entrance runs in CSS (`animate-rise`) so the headline paints before hydration.
 const riseDelay = (seconds: number) => ({ "--rise-delay": `${seconds}s` }) as CSSProperties;
@@ -50,8 +50,8 @@ export function Hero() {
           style={riseDelay(0.2)}
           className="animate-rise mt-6 max-w-2xl text-lg text-balance text-zinc-400 md:mt-8 md:text-xl"
         >
-          I&apos;m Amir Alborz, a Senior UX Designer &amp; Information Architect blending
-          behavioral economics, system thinking, and technical logic.
+          I&apos;m Amir Alborz, a Product Designer and Information Architect who blends
+          behavioral economics, systems thinking, and technical logic.
         </p>
 
         <div
@@ -62,7 +62,7 @@ export function Hero() {
             Let&apos;s Talk
           </Button>
           <Button href="/work" variant="secondary" size="lg" className="w-full sm:w-auto">
-            View Works
+            View Work
           </Button>
         </div>
       </div>

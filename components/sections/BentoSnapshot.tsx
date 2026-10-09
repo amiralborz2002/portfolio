@@ -74,7 +74,7 @@ export function BentoSnapshot() {
             <p className="eyebrow">Core capability</p>
             <h3 className="mt-2 text-title">Complex System Architecture</h3>
             <p className="mt-1.5 max-w-sm text-sm text-muted">
-              Structuring chaos into scalable, navigable digital products.
+              Turning chaos into systems people can actually navigate.
             </p>
           </div>
         </BentoCard>
@@ -106,7 +106,7 @@ export function BentoSnapshot() {
           <div className="mt-auto">
             <h3 className="text-base font-semibold">Information Architecture</h3>
             <p className="mt-1 text-xs leading-relaxed text-muted">
-              Structuring complex databases and dynamic logic into intuitive flows.
+              Turning complex databases and logic into flows people don&apos;t get lost in.
             </p>
           </div>
         </BentoCard>
@@ -160,8 +160,8 @@ export function BentoSnapshot() {
             <p className="eyebrow">Strategy</p>
             <h3 className="mt-2 text-lg font-semibold sm:text-xl">Business Logic &amp; Strategy</h3>
             <p className="mt-1.5 text-sm text-muted">
-              Aligning technical constraints, dynamic pricing architectures, and multi-channel
-              market strategies.
+              Checking pricing logic and market strategy actually hold up before a feature
+              ships.
             </p>
           </div>
           <PricingSheet />

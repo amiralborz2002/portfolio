@@ -44,7 +44,7 @@ export const EXPERIENCES: Experience[] = [
     title: "NobarCloud",
     tag: "IaaS & Product Leadership",
     description:
-      "Architecting cloud infrastructure products. Aligning complex technical constraints with enterprise business logic and driving a scalable design system.",
+      "Built cloud infrastructure products from the ground up, and the design system that let engineering and business logic actually agree.",
     Icon: Cloud,
   },
   {
@@ -52,7 +52,7 @@ export const EXPERIENCES: Experience[] = [
     title: "Digi Express",
     tag: "Data Storytelling",
     description:
-      "Designed data-heavy landing experiences and reports, translating massive logistical data points into digestible, user-centric visual narratives.",
+      "Turned massive logistics datasets into landing pages and reports people could actually read.",
     Icon: ChartColumn,
   },
   {
@@ -60,7 +60,7 @@ export const EXPERIENCES: Experience[] = [
     title: "Ernyka Group",
     tag: "Enterprise Ecosystems",
     description:
-      "Scaled user experiences across complex, multi-layered enterprise products, balancing high-level stakeholder requirements with modular design principles.",
+      "Scaled one design system across several enterprise products, each with stakeholders pulling in different directions.",
     Icon: Layers,
   },
   {
@@ -68,7 +68,7 @@ export const EXPERIENCES: Experience[] = [
     title: "Maad Group",
     tag: "B2B & Back-Office Architecture",
     description:
-      "Transformed traditional industrial processes into streamlined digital back-office systems and centralized e-commerce portals for multiple B2B sectors.",
+      "Moved industrial back-office processes online, and built the e-commerce portals that now run several B2B sectors from one system.",
     Icon: Factory,
   },
   {
@@ -76,7 +76,7 @@ export const EXPERIENCES: Experience[] = [
     title: "Rahnema College",
     tag: "The Foundation",
     description:
-      "Where the system-thinking journey began. Built a strong foundation in UX research, usability testing, and core digital product design methodologies.",
+      "Where the system-thinking journey began: UX research, usability testing, and the fundamentals of product design.",
     Icon: GraduationCap,
   },
 ];
