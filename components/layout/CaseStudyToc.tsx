@@ -1,14 +1,24 @@
 "use client";
 
-import { motion, MotionConfig } from "framer-motion";
+import { m, MotionConfig } from "framer-motion";
 import { useEffect, useState } from "react";
+import { MaxFeatures } from "@/components/motion/MaxFeatures";
 
 export type TocSection = { id: string; label: string };
 
 // A section becomes active once its heading crosses this fraction of the viewport.
 const ACTIVATION_LINE = 0.35;
 
+// The sliding active dot is a shared-layout (layoutId) animation.
 export function CaseStudyToc({ sections }: { sections: TocSection[] }) {
+  return (
+    <MaxFeatures>
+      <TocNav sections={sections} />
+    </MaxFeatures>
+  );
+}
+
+function TocNav({ sections }: { sections: TocSection[] }) {
   const [activeId, setActiveId] = useState<string | undefined>(sections[0]?.id);
 
   useEffect(() => {
@@ -58,7 +68,7 @@ export function CaseStudyToc({ sections }: { sections: TocSection[] }) {
                 >
                   <span className="relative flex size-2 shrink-0 items-center justify-center">
                     {active && (
-                      <motion.span
+                      <m.span
                         layoutId="toc-active-dot"
                         className="absolute inset-0 rounded-full bg-orange-500 shadow-[0_0_10px_rgb(249_115_22/0.7)]"
                         transition={{ type: "spring", stiffness: 420, damping: 34 }}

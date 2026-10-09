@@ -5,12 +5,13 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import {
   AnimatePresence,
-  motion,
+  m,
   useDragControls,
   useReducedMotion,
   type PanInfo,
 } from "framer-motion";
 import { X } from "lucide-react";
+import { MaxFeatures } from "@/components/motion/MaxFeatures";
 import type { Experiment } from "./data";
 
 type LabModalProps = {
@@ -31,7 +32,16 @@ function useIsMobile() {
   return isMobile;
 }
 
-export function LabModal({ selectedItem, onClose }: LabModalProps) {
+// The mobile bottom sheet's swipe-to-dismiss needs the drag feature.
+export function LabModal(props: LabModalProps) {
+  return (
+    <MaxFeatures>
+      <LabModalWindow {...props} />
+    </MaxFeatures>
+  );
+}
+
+function LabModalWindow({ selectedItem, onClose }: LabModalProps) {
   const reduceMotion = useReducedMotion();
   const isMobile = useIsMobile();
   const dragControls = useDragControls();
@@ -77,7 +87,7 @@ export function LabModal({ selectedItem, onClose }: LabModalProps) {
   return createPortal(
     <AnimatePresence>
       {selectedItem && (
-        <motion.div
+        <m.div
           key="lab-modal"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -86,7 +96,7 @@ export function LabModal({ selectedItem, onClose }: LabModalProps) {
           onClick={onClose}
           className="fixed inset-0 z-[110] flex items-end justify-center bg-black/80 backdrop-blur-sm md:items-center md:p-8"
         >
-          <motion.div
+          <m.div
             ref={dialogRef}
             role="dialog"
             tabIndex={-1}
@@ -186,8 +196,8 @@ export function LabModal({ selectedItem, onClose }: LabModalProps) {
                 </div>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>,
     document.body,

@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, m, useReducedMotion } from "framer-motion";
 import { useId, useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -97,7 +97,7 @@ function AccordionItem({
 
       <AnimatePresence initial={false}>
         {isOpen && (
-          <motion.div
+          <m.div
             id={panelId}
             role="region"
             aria-labelledby={buttonId}
@@ -114,7 +114,7 @@ function AccordionItem({
           >
             {/* Padding lives inside the measured box so height animates cleanly */}
             <p className="max-w-2xl pr-12 pb-7 text-base leading-relaxed text-zinc-400">{answer}</p>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>
@@ -134,7 +134,7 @@ function PlusMinus({ open }: { open: boolean }) {
       )}
     >
       <span className="absolute h-px w-3.5 rounded-full bg-current" />
-      <motion.span
+      <m.span
         className="absolute h-3.5 w-px rounded-full bg-current"
         initial={false}
         animate={{ rotate: open ? 90 : 0 }}

@@ -1,8 +1,12 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useState, type KeyboardEvent, type ReactNode } from "react";
 import { EXPERIMENTS, type Experiment } from "./data";
-import { LabModal } from "./LabModal";
+
+// The modal (and the drag feature it needs) only matters once a card is opened, so it stays
+// out of the page's initial bundle. It renders nothing on the server anyway.
+const LabModal = dynamic(() => import("./LabModal").then((mod) => mod.LabModal), { ssr: false });
 
 // Just enough colour for the pseudo-code to read as code: keywords, strings and calls.
 const TOKEN = /(\b(?:function|const|return|import|from)\b)|('[^']*'|"[^"]*")|([A-Za-z_]\w*)(?=\()/g;

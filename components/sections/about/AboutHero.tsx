@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState, type CSSProperties, type FocusEvent } from "react";
 import { cn } from "@/lib/utils";
@@ -121,12 +121,12 @@ export function AboutHero() {
 
       {/* Personas flank the portrait: on top below lg, at face height on lg+ */}
       <div className="pointer-events-none relative z-30 mx-auto grid w-full max-w-7xl grid-cols-2 gap-x-5 px-6 pt-6 lg:-mt-[12vh] lg:grid-cols-[1fr_450px_1fr] lg:gap-x-10 lg:pt-0">
-        <motion.div {...rise(0.2, reduceMotion)} className="pointer-events-auto lg:col-start-1">
+        <m.div {...rise(0.2, reduceMotion)} className="pointer-events-auto lg:col-start-1">
           <Persona side="left" activeSide={activeSide} {...triggerProps("left")} />
-        </motion.div>
-        <motion.div {...rise(0.3, reduceMotion)} className="pointer-events-auto lg:col-start-3">
+        </m.div>
+        <m.div {...rise(0.3, reduceMotion)} className="pointer-events-auto lg:col-start-3">
           <Persona side="right" activeSide={activeSide} {...triggerProps("right")} />
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );
@@ -282,7 +282,7 @@ function Portrait({
 
   return (
     <div className="absolute bottom-0 left-1/2 z-10 h-[75vh] w-full max-w-[450px] -translate-x-1/2 md:h-[85vh]">
-      <motion.div {...rise(0, reduceMotion)} className="@container relative h-full w-full">
+      <m.div {...rise(0, reduceMotion)} className="@container relative h-full w-full">
         {/* One photo of the whole face, so there is no seam to align. The
             per-side effects below simply cover its left or right half. */}
         <div className="absolute inset-0 isolate" style={PHOTO_MASK}>
@@ -417,7 +417,7 @@ function Portrait({
             )}
           />
         ))}
-      </motion.div>
+      </m.div>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { forwardRef, type ReactNode } from "react";
 import {
-  motion,
+  m,
   useMotionTemplate,
   useMotionValue,
   useReducedMotion,
@@ -54,7 +54,7 @@ export const BentoCard = forwardRef<HTMLDivElement, BentoCardProps>(function Ben
   const spotlight = useMotionTemplate`radial-gradient(420px circle at ${mouseX}px ${mouseY}px, color-mix(in oklab, var(--color-accent) 12%, transparent), transparent 70%)`;
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       onPointerMove={(event) => {
         // Touch has no hover, so a tap would otherwise leave the glow stuck where the finger landed.
@@ -85,7 +85,7 @@ export const BentoCard = forwardRef<HTMLDivElement, BentoCardProps>(function Ben
       />
 
       {interactive && (
-        <motion.span
+        <m.span
           aria-hidden
           style={{ background: spotlight }}
           className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 ease-apple group-hover:opacity-100 pointer-coarse:hidden"
@@ -93,6 +93,6 @@ export const BentoCard = forwardRef<HTMLDivElement, BentoCardProps>(function Ben
       )}
 
       <div className={cn("relative h-full", paddings[padding], contentClassName)}>{children}</div>
-    </motion.div>
+    </m.div>
   );
 });

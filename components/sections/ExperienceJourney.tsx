@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  motion,
+  m,
   useInView,
   useReducedMotion,
   useScroll,
@@ -121,10 +121,10 @@ export function ExperienceJourney() {
         <TimelineLine progress={fill} />
 
         <ol ref={listRef} className="relative flex flex-col gap-10 md:gap-16">
-          {EXPERIENCES.map((m, i) => (
+          {EXPERIENCES.map((experience, i) => (
             <ExperienceRow
-              key={m.slug}
-              experience={m}
+              key={experience.slug}
+              experience={experience}
               index={i}
               total={EXPERIENCES.length}
               reduceMotion={reduceMotion}
@@ -145,7 +145,7 @@ function TimelineLine({ progress }: { progress: MotionValue<number> }) {
   return (
     <div aria-hidden className={cn("pointer-events-none absolute inset-y-0 w-px", lineX)}>
       <div className="absolute inset-0 bg-gradient-to-b from-white/0 via-white/10 to-white/0" />
-      <motion.div
+      <m.div
         style={{ scaleY: progress }}
         className="absolute inset-0 origin-top bg-gradient-to-b from-accent via-accent to-accent/0 shadow-[0_0_12px_rgb(249_115_22/0.6)]"
       />
@@ -179,7 +179,7 @@ function ExperienceRow({
       </div>
 
       {/* Card */}
-      <motion.div
+      <m.div
         initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: left ? -32 : 32, y: 16 }}
         whileInView={{ opacity: 1, x: 0, y: 0 }}
         viewport={{ once: true, amount: 0.4 }}
@@ -197,7 +197,7 @@ function ExperienceRow({
           side={left ? "left" : "right"}
           reduceMotion={reduceMotion}
         />
-      </motion.div>
+      </m.div>
     </li>
   );
 }
@@ -218,14 +218,14 @@ function Node({
   return (
     <span ref={ref} aria-hidden className="relative flex size-10 items-center justify-center">
       {active && !reduceMotion && (
-        <motion.span
+        <m.span
           className="absolute inset-0 rounded-full border border-accent"
           initial={{ scale: 0.8, opacity: 0.8 }}
           animate={{ scale: 1.9, opacity: 0 }}
           transition={{ duration: 1.8, ease: "easeOut", repeat: Infinity }}
         />
       )}
-      <motion.span
+      <m.span
         className="relative flex size-10 items-center justify-center rounded-full border font-mono text-[11px] font-medium"
         animate={
           active
@@ -247,7 +247,7 @@ function Node({
         transition={{ duration: 0.5, ease }}
       >
         {step}
-      </motion.span>
+      </m.span>
     </span>
   );
 }
@@ -270,7 +270,7 @@ function ExperienceCard({
   reduceMotion: boolean;
 }) {
   return (
-    <motion.article
+    <m.article
       whileHover={reduceMotion ? undefined : { scale: 1.015, y: -2 }}
       transition={{ type: "spring", stiffness: 260, damping: 26 }}
       className={cn(
@@ -321,6 +321,6 @@ function ExperienceCard({
 
       <h3 className="mt-5 text-title">{title}</h3>
       <p className="mt-3 text-sm leading-relaxed text-muted sm:text-base">{description}</p>
-    </motion.article>
+    </m.article>
   );
 }

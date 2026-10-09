@@ -2,7 +2,7 @@
 
 import {
   animate,
-  motion,
+  m,
   useInView,
   useReducedMotion,
   type Variants,
@@ -59,7 +59,7 @@ export function BentoSnapshot() {
         </div>
       </div>
 
-      <motion.div
+      <m.div
         variants={grid}
         initial="hidden"
         whileInView="show"
@@ -166,7 +166,7 @@ export function BentoSnapshot() {
           </div>
           <PricingSheet />
         </BentoCard>
-      </motion.div>
+      </m.div>
     </section>
   );
 }
@@ -222,7 +222,7 @@ function SystemGraph({ reduceMotion }: { reduceMotion: boolean }) {
       </defs>
 
       {EDGES.map(([a, b], i) => (
-        <motion.path
+        <m.path
           key={`e${i}`}
           d={edgePath(a, b)}
           fill="none"
@@ -326,7 +326,7 @@ function CodeMockup({ reduceMotion }: { reduceMotion: boolean }) {
           {"\n"}
           <span className={k}>{">"}</span>
           {"\n  Let's Talk"}
-          <motion.span
+          <m.span
             className="ml-px inline-block h-3 w-1.5 translate-y-0.5 bg-accent/80"
             animate={reduceMotion ? undefined : { opacity: [1, 1, 0, 0] }}
             transition={{ duration: 1, times: [0, 0.5, 0.5, 1], repeat: Infinity, ease: "linear" }}
@@ -427,7 +427,7 @@ function SchemaDiagram({ reduceMotion }: { reduceMotion: boolean }) {
           ))}
         </g>
       ))}
-      <motion.path
+      <m.path
         d={link}
         fill="none"
         stroke="#c084fc"

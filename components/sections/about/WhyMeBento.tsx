@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  motion,
+  m,
   useInView,
   useMotionTemplate,
   useMotionValue,
@@ -58,7 +58,7 @@ export function WhyMeBento() {
         </h2>
       </div>
 
-      <motion.div
+      <m.div
         variants={grid}
         initial="hidden"
         whileInView="show"
@@ -135,7 +135,7 @@ export function WhyMeBento() {
             </div>
           )}
         </SpotlightCard>
-      </motion.div>
+      </m.div>
     </section>
   );
 }
@@ -210,12 +210,12 @@ function SpotlightCard({ className, tilt = false, reduceMotion, children }: Spot
   const tilting = tilt && !reduceMotion;
 
   return (
-    <motion.div
+    <m.div
       variants={card}
       className={cn("relative", className)}
       style={tilting ? { perspective: 900 } : undefined}
     >
-      <motion.div
+      <m.div
         ref={ref}
         onPointerEnter={(event) => {
           if (event.pointerType === "touch") return;
@@ -239,7 +239,7 @@ function SpotlightCard({ className, tilt = false, reduceMotion, children }: Spot
           aria-hidden
           className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
         />
-        <motion.span
+        <m.span
           aria-hidden
           style={{ background: spotlight }}
           animate={{ opacity: hovered ? 1 : 0 }}
@@ -247,8 +247,8 @@ function SpotlightCard({ className, tilt = false, reduceMotion, children }: Spot
           className="pointer-events-none absolute inset-0 -z-10"
         />
         <div className="relative h-full p-6">{children(active)}</div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }
 
@@ -306,7 +306,7 @@ function BusinessNetwork({ active, reduceMotion }: { active: boolean; reduceMoti
           const a = at(i);
           const b = at((i + 1) % VARIABLES.length);
           return (
-            <motion.line
+            <m.line
               key={`ring-${i}`}
               initial={false}
               animate={{ x1: a.x, y1: a.y, x2: b.x, y2: b.y, opacity: active ? 0.45 : 0 }}
@@ -321,7 +321,7 @@ function BusinessNetwork({ active, reduceMotion }: { active: boolean; reduceMoti
         {VARIABLES.map((_, i) => {
           const p = at(i);
           return (
-            <motion.line
+            <m.line
               key={`spoke-${i}`}
               x1={HUB.x}
               y1={HUB.y}
@@ -339,7 +339,7 @@ function BusinessNetwork({ active, reduceMotion }: { active: boolean; reduceMoti
         {active &&
           !reduceMotion &&
           VARIABLES.map((v, i) => (
-            <motion.circle
+            <m.circle
               key={`pulse-${v.label}`}
               r="2.5"
               fill="rgb(253 186 116)"
@@ -352,7 +352,7 @@ function BusinessNetwork({ active, reduceMotion }: { active: boolean; reduceMoti
         {VARIABLES.map((v, i) => {
           const p = at(i);
           return (
-            <motion.g key={v.label} initial={false} animate={{ x: p.x, y: p.y }} transition={move}>
+            <m.g key={v.label} initial={false} animate={{ x: p.x, y: p.y }} transition={move}>
               <circle
                 r="6"
                 className={cn("transition-colors duration-500", active ? "fill-accent" : "fill-zinc-600")}
@@ -360,7 +360,7 @@ function BusinessNetwork({ active, reduceMotion }: { active: boolean; reduceMoti
               <text y="-12" textAnchor="middle" className="fill-zinc-500 font-mono text-[10px]">
                 {v.label}
               </text>
-            </motion.g>
+            </m.g>
           );
         })}
 
@@ -368,7 +368,7 @@ function BusinessNetwork({ active, reduceMotion }: { active: boolean; reduceMoti
             plus a ring that ripples out on every beat */}
         <circle cx={HUB.x} cy={HUB.y} r="40" fill="url(#hub-glow)" />
         {!reduceMotion && (
-          <motion.circle
+          <m.circle
             cx={HUB.x}
             cy={HUB.y}
             r="14"
@@ -379,7 +379,7 @@ function BusinessNetwork({ active, reduceMotion }: { active: boolean; reduceMoti
             style={{ transformBox: "fill-box", transformOrigin: "center" }}
           />
         )}
-        <motion.circle
+        <m.circle
           cx={HUB.x}
           cy={HUB.y}
           r="11"
@@ -508,7 +508,7 @@ function Dot({ dot, order }: { dot: (typeof DOTS)[number]; order: MotionValue<nu
   const r = useTransform(order, [0, 1], [dot.chaos.r, 3.5]);
   const fill = useTransform(order, [0, 1], ["rgb(161 161 170)", "rgb(249 115 22)"]);
   const opacity = useTransform(order, [0, 1], [0.45, 1]);
-  return <motion.circle cx={cx} cy={cy} r={r} style={{ fill, opacity }} />;
+  return <m.circle cx={cx} cy={cy} r={r} style={{ fill, opacity }} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -540,14 +540,14 @@ function ConvergingWaves({ active, reduceMotion }: { active: boolean; reduceMoti
     <div aria-hidden className="relative h-16 shrink-0 overflow-hidden">
       <svg viewBox="0 0 240 100" preserveAspectRatio="none" className="absolute inset-0 size-full">
         {/* Continuous drift by exactly one wavelength, so the loop is seamless */}
-        <motion.g
+        <m.g
           animate={reduceMotion ? undefined : { x: [0, -WAVELENGTH] }}
           transition={{ duration: active ? 2.4 : 5, repeat: Infinity, ease: "linear" }}
         >
           {WAVES.map((wave, i) => {
             const shape = active ? wave.focus : wave.rest;
             return (
-              <motion.path
+              <m.path
                 key={i}
                 initial={false}
                 animate={{
@@ -568,7 +568,7 @@ function ConvergingWaves({ active, reduceMotion }: { active: boolean; reduceMoti
               />
             );
           })}
-        </motion.g>
+        </m.g>
       </svg>
     </div>
   );
@@ -650,7 +650,7 @@ function Terminal({ active, reduceMotion }: { active: boolean; reduceMotion: boo
 
 function Caret() {
   return (
-    <motion.span
+    <m.span
       className="ml-px inline-block h-3.5 w-1.5 translate-y-0.5 bg-accent"
       animate={{ opacity: [1, 1, 0, 0] }}
       transition={{ duration: 1.1, times: [0, 0.5, 0.5, 1], repeat: Infinity, ease: "linear" }}
@@ -691,7 +691,7 @@ function VennDiagram({ active, reduceMotion }: { active: boolean; reduceMotion: 
         {/* Additive fills: overlaps brighten on their own, the triple overlap most */}
         <g style={{ mixBlendMode: "screen" }}>
           {VENN.map((c) => (
-            <motion.circle
+            <m.circle
               key={c.label}
               r={VENN_R}
               initial={false}
@@ -708,7 +708,7 @@ function VennDiagram({ active, reduceMotion }: { active: boolean; reduceMotion: 
           ))}
         </g>
 
-        <motion.circle
+        <m.circle
           cx={VENN_CENTER.x}
           cy={VENN_CENTER.y}
           r="34"
@@ -761,7 +761,7 @@ function AiSpark({ active, reduceMotion }: { active: boolean; reduceMotion: bool
     <div aria-hidden className="relative h-12 shrink-0">
       <svg viewBox="0 0 320 64" preserveAspectRatio="xMidYMid meet" className="absolute inset-0 size-full overflow-visible">
         {RAYS.map((ray, i) => (
-          <motion.line
+          <m.line
             key={`ray-${i}`}
             x1={ray.from.x}
             y1={ray.from.y}
@@ -785,7 +785,7 @@ function AiSpark({ active, reduceMotion }: { active: boolean; reduceMotion: bool
         ))}
         {radiate &&
           RAYS.map((ray, i) => (
-            <motion.circle
+            <m.circle
               key={`particle-${i}`}
               r="1.6"
               fill="rgb(253 186 116)"
@@ -798,7 +798,7 @@ function AiSpark({ active, reduceMotion }: { active: boolean; reduceMotion: bool
 
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         {/* Soft halo that breathes continuously and swells on hover */}
-        <motion.span
+        <m.span
           className="absolute inset-0 -m-3 rounded-full bg-accent blur-xl"
           animate={
             reduceMotion
@@ -807,13 +807,13 @@ function AiSpark({ active, reduceMotion }: { active: boolean; reduceMotion: bool
           }
           transition={{ duration: active ? 1.6 : 3, repeat: Infinity, ease: "easeInOut" }}
         />
-        <motion.span
+        <m.span
           className="relative flex size-9 items-center justify-center rounded-full border border-accent/40 bg-zinc-950/80"
           animate={reduceMotion ? undefined : { scale: active ? [1, 1.08, 1] : [1, 1.03, 1] }}
           transition={{ duration: active ? 1.6 : 3, repeat: Infinity, ease: "easeInOut" }}
         >
           <Sparkles className="size-4.5 text-accent" strokeWidth={1.75} />
-        </motion.span>
+        </m.span>
       </div>
     </div>
   );

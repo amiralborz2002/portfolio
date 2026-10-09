@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Button } from "../ui/Button";
 
@@ -29,7 +29,7 @@ export function Hero() {
     >
       {/* Sits above true center so the scroll indicator always has room below */}
       <div className="mb-10 flex w-full flex-col items-center md:mb-[8svh]">
-        <motion.div {...rise(0)}>
+        <m.div {...rise(0)}>
           <span className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] px-4 py-1.5 text-xs font-medium tracking-widest text-zinc-400 uppercase backdrop-blur-md">
             <span aria-hidden className="relative flex size-2">
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75 motion-reduce:animate-none" />
@@ -37,26 +37,26 @@ export function Hero() {
             </span>
             Available for projects
           </span>
-        </motion.div>
+        </m.div>
 
-        <motion.h1
+        <m.h1
           id="hero-title"
           {...rise(0.1)}
           className="mt-6 text-[clamp(2.25rem,min(10vw,12svh),7.5rem)] leading-[0.95] font-bold tracking-tighter text-white md:mt-8"
         >
           I design complex
           <RotatingWord reduceMotion={reduceMotion} />
-        </motion.h1>
+        </m.h1>
 
-        <motion.p
+        <m.p
           {...rise(0.2)}
           className="mt-6 max-w-2xl text-lg text-balance text-zinc-400 md:mt-8 md:text-xl"
         >
           I&apos;m Amir Alborz, a Senior UX Designer &amp; Information Architect blending
           behavioral economics, system thinking, and technical logic.
-        </motion.p>
+        </m.p>
 
-        <motion.div
+        <m.div
           {...rise(0.3)}
           className="mt-8 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row md:mt-10"
         >
@@ -66,7 +66,7 @@ export function Hero() {
           <Button href="/work" variant="secondary" size="lg" className="w-full sm:w-auto">
             View Works
           </Button>
-        </motion.div>
+        </m.div>
       </div>
 
       <ScrollIndicator reduceMotion={reduceMotion} />
@@ -122,7 +122,7 @@ function RotatingWord({ reduceMotion }: { reduceMotion: boolean }) {
       <span className="sr-only">{words.join(" ")}</span>
       <span aria-hidden className="inline-flex items-center text-accent">
         <span className="whitespace-pre">{visible}</span>
-        <motion.span
+        <m.span
           className="ml-[0.06em] inline-block h-[0.8em] w-[0.06em] translate-y-[0.04em] rounded-full bg-accent"
           animate={reduceMotion ? undefined : { opacity: [1, 1, 0, 0] }}
           transition={{ duration: 1, times: [0, 0.5, 0.5, 1], repeat: Infinity, ease: "linear" }}
@@ -134,7 +134,7 @@ function RotatingWord({ reduceMotion }: { reduceMotion: boolean }) {
 
 function ScrollIndicator({ reduceMotion }: { reduceMotion: boolean }) {
   return (
-    <motion.a
+    <m.a
       href="#at-a-glance"
       aria-label="Scroll to the next section"
       onClick={(event) => {
@@ -150,13 +150,13 @@ function ScrollIndicator({ reduceMotion }: { reduceMotion: boolean }) {
     >
       <span className="text-eyebrow uppercase">Scroll</span>
       <span className="flex h-10 w-6 justify-center rounded-full border border-hairline/20 pt-2 transition-colors duration-300 group-hover:border-hairline/40">
-        <motion.span
+        <m.span
           aria-hidden
           className="block h-2 w-1 rounded-full bg-current"
           animate={reduceMotion ? undefined : { y: [0, 10, 0], opacity: [1, 0.2, 1] }}
           transition={{ duration: 1.8, ease: "easeInOut", repeat: Infinity }}
         />
       </span>
-    </motion.a>
+    </m.a>
   );
 }

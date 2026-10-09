@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  motion,
+  m,
   useMotionValue,
   useReducedMotion,
   useScroll,
@@ -114,9 +114,9 @@ function Word({ children, progress, range }: WordProps) {
   return (
     <>
       {/* Opacity only, so the browser composites it without layout or paint */}
-      <motion.span className="inline-block will-change-[opacity]" style={{ opacity }}>
+      <m.span className="inline-block will-change-[opacity]" style={{ opacity }}>
         {children}
-      </motion.span>{" "}
+      </m.span>{" "}
     </>
   );
 }

@@ -2,7 +2,7 @@
 
 import {
   AnimatePresence,
-  motion,
+  m,
   useReducedMotion,
   useScroll,
   useSpring,
@@ -15,6 +15,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
+import { MaxFeatures } from "@/components/motion/MaxFeatures";
 import { cn } from "@/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
@@ -109,10 +110,11 @@ const TESTIMONIALS: Testimonial[] = [
 
 export function AboutTestimonials() {
   return (
-    <>
+    // The mobile deck's swipe gesture needs the drag feature.
+    <MaxFeatures>
       <ParallaxColumns />
       <MobileDeck />
-    </>
+    </MaxFeatures>
   );
 }
 
@@ -169,11 +171,11 @@ function ParallaxColumns() {
 
 function Column({ items, y }: { items: Testimonial[]; y?: MotionValue<number> }) {
   return (
-    <motion.div style={{ y }} className={cn("flex flex-col gap-6", y && "will-change-transform")}>
+    <m.div style={{ y }} className={cn("flex flex-col gap-6", y && "will-change-transform")}>
       {items.map((t) => (
         <TestimonialCard key={t.id} testimonial={t} />
       ))}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -281,7 +283,7 @@ function MobileDeck() {
             const t = byId.get(id)!;
             const front = position === 0;
             return (
-              <motion.div
+              <m.div
                 key={id}
                 custom={direction}
                 variants={variants}
@@ -332,7 +334,7 @@ function MobileDeck() {
                 )}
               >
                 <TestimonialCard testimonial={t} className="h-[380px] select-none" clamp />
-              </motion.div>
+              </m.div>
             );
           })}
         </AnimatePresence>
@@ -462,7 +464,7 @@ function ControlButton({
   children: ReactNode;
 }) {
   return (
-    <motion.button
+    <m.button
       type="button"
       onClick={(e) => {
         e.preventDefault();
@@ -473,6 +475,6 @@ function ControlButton({
       className="flex size-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-zinc-300 backdrop-blur-md transition-colors duration-300 hover:border-white/20 hover:bg-white/10 hover:text-white"
     >
       {children}
-    </motion.button>
+    </m.button>
   );
 }

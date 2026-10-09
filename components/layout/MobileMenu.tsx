@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
+import { AnimatePresence, m, useReducedMotion, type Variants } from "framer-motion";
 
 const LINKS = [
   { num: "01", label: "Home", href: "/" },
@@ -77,13 +77,13 @@ export function MobileMenu() {
         className="relative z-[60] inline-flex size-10 items-center justify-center rounded-full border border-white/10 text-white transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent md:hidden"
       >
         <span className="relative block h-3 w-5" aria-hidden="true">
-          <motion.span
+          <m.span
             className="absolute left-0 top-0 h-px w-full origin-center bg-current"
             initial={false}
             animate={isOpen ? { top: "50%", rotate: 45 } : { top: "0%", rotate: 0 }}
             transition={lineTransition}
           />
-          <motion.span
+          <m.span
             className="absolute bottom-0 right-0 h-px origin-center bg-current"
             initial={false}
             animate={
@@ -102,7 +102,7 @@ export function MobileMenu() {
         createPortal(
           <AnimatePresence>
             {isOpen && (
-              <motion.div
+              <m.div
                 id="mobile-menu"
                 key="mobile-menu"
                 initial={{ opacity: 0 }}
@@ -111,7 +111,7 @@ export function MobileMenu() {
                 transition={{ duration: reduceMotion ? 0 : 0.3, ease: "easeOut" }}
                 className="fixed inset-0 z-50 flex h-[100dvh] flex-col overflow-y-auto bg-zinc-950/95 px-8 pt-16 backdrop-blur-2xl md:hidden"
               >
-                <motion.nav
+                <m.nav
                   aria-label="Mobile"
                   variants={listVariants}
                   initial="hidden"
@@ -122,7 +122,7 @@ export function MobileMenu() {
                   {LINKS.map((link) => {
                     const active = isActive(link.href);
                     return (
-                      <motion.div key={link.href} variants={itemVariants}>
+                      <m.div key={link.href} variants={itemVariants}>
                         <Link
                           href={link.href}
                           onClick={() => setIsOpen(false)}
@@ -145,12 +145,12 @@ export function MobileMenu() {
                             {link.label}
                           </span>
                         </Link>
-                      </motion.div>
+                      </m.div>
                     );
                   })}
-                </motion.nav>
+                </m.nav>
 
-                <motion.div
+                <m.div
                   variants={footerVariants}
                   initial="hidden"
                   animate="visible"
@@ -159,8 +159,8 @@ export function MobileMenu() {
                 >
                   <span>STATUS: ONLINE</span>
                   <span>SYS_V1.0</span>
-                </motion.div>
-              </motion.div>
+                </m.div>
+              </m.div>
             )}
           </AnimatePresence>,
           document.body,

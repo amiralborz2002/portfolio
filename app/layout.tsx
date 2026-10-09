@@ -5,6 +5,7 @@ import "./globals.css";
 // ایمپورت کردن هدر و فوتر ساخته شده
 import { Header } from "../components/layout/Header";
 import { Footer } from "../components/layout/Footer";
+import { MotionProvider } from "../components/motion/MotionProvider";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -59,13 +60,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* ساختار فلکس برای چسباندن فوتر به پایین صفحه */}
         {/* overflow-x-clip (not hidden) trims stray horizontal overflow without creating a
             scroll container, so position: sticky keeps working for the header and case studies. */}
-        <div className="relative flex min-h-dvh w-full flex-col overflow-x-clip">
-          <Header />
-          <main id="content" className="w-full min-w-0 flex-1 overflow-x-clip">
-            {children}
-          </main>
-          <Footer />
-        </div>
+        <MotionProvider>
+          <div className="relative flex min-h-dvh w-full flex-col overflow-x-clip">
+            <Header />
+            <main id="content" className="w-full min-w-0 flex-1 overflow-x-clip">
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </MotionProvider>
       </body>
     </html>
   );

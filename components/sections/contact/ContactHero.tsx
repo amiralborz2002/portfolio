@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, m, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/Button";
 import {
@@ -57,29 +57,29 @@ export function ContactHero() {
     >
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-8 px-6 sm:gap-12 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-5">
-          <motion.h1
+          <m.h1
             id="contact-title"
             {...rise(0, reduceMotion)}
             className="mb-4 text-4xl font-bold tracking-tight text-balance text-white sm:mb-6 sm:text-5xl md:text-6xl"
           >
             Let&apos;s build <span className="text-accent">systems</span> that work.
-          </motion.h1>
-          <motion.p
+          </m.h1>
+          <m.p
             {...rise(0.1, reduceMotion)}
             className="max-w-md text-base text-pretty text-zinc-400 sm:text-lg"
           >
             Skip the forms. Reach out directly for project inquiries, system architecture
             consulting, or just a virtual coffee.
-          </motion.p>
+          </m.p>
         </div>
 
         <div className="flex min-w-0 flex-col gap-4 sm:gap-6 lg:col-span-7">
-          <motion.div {...rise(0.2, reduceMotion)}>
+          <m.div {...rise(0.2, reduceMotion)}>
             <EditorCard reduceMotion={reduceMotion} />
-          </motion.div>
-          <motion.div {...rise(0.3, reduceMotion)}>
+          </m.div>
+          <m.div {...rise(0.3, reduceMotion)}>
             <TerminalCard reduceMotion={reduceMotion} />
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </section>
@@ -223,7 +223,7 @@ function EditorCard({ reduceMotion }: { reduceMotion: boolean }) {
         {/* Live preview of the snippet, floating over the editor. */}
         <AnimatePresence>
           {showPreview && (
-            <motion.div
+            <m.div
               initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
@@ -251,7 +251,7 @@ function EditorCard({ reduceMotion }: { reduceMotion: boolean }) {
 
                 {showEmailMenu && <EmailMenu onSelect={() => setShowEmailMenu(false)} />}
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>
@@ -370,7 +370,7 @@ function TerminalCard({ reduceMotion }: { reduceMotion: boolean }) {
   ];
 
   return (
-    <motion.a
+    <m.a
       href={PHONE_HREF}
       aria-label={`Call ${PHONE_DISPLAY}`}
       whileHover={reduceMotion ? undefined : { scale: 1.015 }}
@@ -382,7 +382,7 @@ function TerminalCard({ reduceMotion }: { reduceMotion: boolean }) {
 
       <div className="overflow-x-auto px-4 py-3 font-mono text-[11px] leading-[1.7] sm:px-5 sm:py-4 sm:text-sm">
         {lines.map((line, i) => (
-          <motion.div
+          <m.div
             key={i}
             className="whitespace-pre"
             initial={{ opacity: 0 }}
@@ -390,9 +390,9 @@ function TerminalCard({ reduceMotion }: { reduceMotion: boolean }) {
             transition={{ duration: 0.01, delay: reduceMotion ? 0 : 0.7 + i * 0.35 }}
           >
             {line}
-          </motion.div>
+          </m.div>
         ))}
-        <motion.div
+        <m.div
           aria-hidden
           className="flex items-center gap-2 whitespace-pre text-zinc-500"
           initial={{ opacity: 0 }}
@@ -408,8 +408,8 @@ function TerminalCard({ reduceMotion }: { reduceMotion: boolean }) {
           <span className="text-zinc-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
             ↵ press to dial
           </span>
-        </motion.div>
+        </m.div>
       </div>
-    </motion.a>
+    </m.a>
   );
 }
