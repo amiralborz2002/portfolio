@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useRef, useState, type CSSProperties, type FocusEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type FocusEvent } from "react";
 import { cn } from "@/lib/utils";
 
 const ease = [0.22, 1, 0.36, 1] as const; // matches --ease-apple
@@ -280,27 +280,35 @@ function Portrait({
 
   return (
     <div className="absolute bottom-0 left-1/2 z-10 h-[75vh] w-full max-w-[450px] -translate-x-1/2 md:h-[85vh]">
-      <motion.div {...rise(0, reduceMotion)} className="relative h-full w-full">
+      <motion.div {...rise(0, reduceMotion)} className="@container relative h-full w-full">
         {/* Photos and their tint layers, feathered into the page */}
-        <div className="absolute inset-0 flex" style={PHOTO_MASK}>
-          <div className="relative h-full w-1/2">
+        {/* `isolate` keeps the photos' z-indices below the landmark layer */}
+        <div className="absolute inset-0 isolate" style={PHOTO_MASK}>
+          {/* Both wrappers run 0.5% past the centre so their edges overlap
+              instead of meeting on a sub-pixel boundary. The photos are then
+              offset back by that 0.5% (cqw = portrait width) so each face half
+              still ends exactly on the centre line, with the right half
+              tucked 1px over the left to hide any anti-aliased seam. Both
+              share a top anchor so they line up vertically. */}
+          <div className="absolute inset-y-0 left-0 z-10 w-[50.5%]">
             <Image
               src="/images/about/Right.jpg"
               alt="Amir Alborz"
               fill
               preload
-              sizes="(min-width: 768px) 225px, 50vw"
-              className="object-cover object-right"
+              // Each photo renders at half the portrait height (it is 1:2)
+              sizes="(min-width: 768px) 43vh, 38vh"
+              className="object-cover [object-position:right_0.5cqw_top_0]"
             />
           </div>
-          <div className="relative h-full w-1/2">
+          <div className="absolute inset-y-0 right-0 z-10 w-[50.5%]">
             <Image
               src="/images/about/Left.jpg"
               alt=""
               fill
               preload
-              sizes="(min-width: 768px) 225px, 50vw"
-              className="object-cover object-left"
+              sizes="(min-width: 768px) 43vh, 38vh"
+              className="object-cover [object-position:left_calc(0.5cqw-1px)_top_0]"
             />
           </div>
 
@@ -308,7 +316,7 @@ function Portrait({
           <div
             aria-hidden
             className={cn(
-              "absolute inset-y-0 left-0 w-1/2 bg-amber-700/20 mix-blend-color",
+              "absolute inset-y-0 left-0 z-20 w-1/2 bg-amber-700/20 mix-blend-color",
               FADE,
               leftOn ? "opacity-100" : "opacity-0",
             )}
@@ -316,7 +324,7 @@ function Portrait({
           <div
             aria-hidden
             className={cn(
-              "absolute inset-y-0 left-1/2 w-1/2 bg-slate-500/20 mix-blend-color",
+              "absolute inset-y-0 left-1/2 z-20 w-1/2 bg-slate-500/20 mix-blend-color",
               FADE,
               rightOn ? "opacity-100" : "opacity-0",
             )}
@@ -324,7 +332,7 @@ function Portrait({
           <div
             aria-hidden
             className={cn(
-              "absolute inset-y-0 left-0 w-1/2 bg-black/50",
+              "absolute inset-y-0 left-0 z-20 w-1/2 bg-black/50",
               FADE,
               rightOn ? "opacity-100" : "opacity-0",
             )}
@@ -332,7 +340,7 @@ function Portrait({
           <div
             aria-hidden
             className={cn(
-              "absolute inset-y-0 left-1/2 w-1/2 bg-black/50",
+              "absolute inset-y-0 left-1/2 z-20 w-1/2 bg-black/50",
               FADE,
               leftOn ? "opacity-100" : "opacity-0",
             )}
@@ -378,7 +386,7 @@ function Portrait({
               />
               <g className="md:hidden">
                 <Guide from={RIGHT_POINTS.ear} to={[268, 162]} />
-                <Guide from={RIGHT_POINTS.shoulder} to={[280, 352]} />
+                <Guide from={RIGHT_POINTS.shoulder} to={[256, 352]} />
               </g>
               <g className="max-md:hidden">
                 <Guide from={RIGHT_POINTS.ear} to={[288, 162]} />
@@ -388,20 +396,25 @@ function Portrait({
           </svg>
 
           <div className={cn("absolute inset-0", FADE, leftOn ? "opacity-100" : "opacity-0")}>
-            <Label className="top-[30.5%] right-[67%] md:right-[72%]" color={WARM}>
-              24px, {WARM}
-            </Label>
-            <Label className="top-[59.5%] right-[67%] md:right-[72%]" color={WARM}>
-              r16 · 8pt grid
-            </Label>
+            <Label
+              className="top-[30.5%] right-[67%] text-amber-400 md:right-[72%]"
+              parts={["24px", WARM]}
+              sep=", "
+            />
+            <Label
+              className="top-[59.5%] right-[67%] text-amber-400 md:right-[72%]"
+              parts={["r16", "8pt grid"]}
+            />
           </div>
           <div className={cn("absolute inset-0", FADE, rightOn ? "opacity-100" : "opacity-0")}>
-            <Label className="top-[40.5%] left-[67%] md:left-[72%]" color={COOL}>
-              iris · 0x2F
-            </Label>
-            <Label className="top-[88%] left-[70%] md:left-[76%]" color={COOL}>
-              render()
-            </Label>
+            <Label
+              className="top-[40.5%] left-[67%] text-slate-300 md:left-[72%]"
+              parts={["iris", "0x2F"]}
+            />
+            <Label
+              className="top-[88%] left-[64%] text-slate-300 md:left-[76%]"
+              parts={["render()"]}
+            />
           </div>
         </div>
 
@@ -472,25 +485,33 @@ function Guide({ from, to }: { from: Point; to: Point }) {
   );
 }
 
-/** Spec label; `className` places it (its edge facing the face, vertical centre). */
+/**
+ * Spec label; `className` places and colours it (its edge facing the face,
+ * vertical centre). On phones each part gets its own line so the label stays
+ * narrow enough to remain on screen.
+ */
 function Label({
   className,
-  color,
-  children,
+  parts,
+  sep = " · ",
 }: {
   className: string;
-  color: string;
-  children: ReactNode;
+  parts: string[];
+  sep?: string;
 }) {
   return (
     <div
       className={cn(
-        "absolute -translate-y-1/2 border border-zinc-800 bg-zinc-900/80 px-1 font-mono text-[9px] leading-4 whitespace-nowrap md:text-[10px]",
+        "absolute -translate-y-1/2 rounded-sm border border-zinc-700 bg-zinc-950/90 px-2 py-1 font-mono text-xs leading-tight font-medium whitespace-nowrap shadow-xl backdrop-blur-sm md:text-sm",
         className,
       )}
-      style={{ color }}
     >
-      {children}
+      {parts.map((part, i) => (
+        <span key={part} className="max-md:block">
+          {i > 0 && <span className="max-md:hidden">{sep}</span>}
+          {part}
+        </span>
+      ))}
     </div>
   );
 }
