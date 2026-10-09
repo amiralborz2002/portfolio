@@ -9,7 +9,15 @@ import {
   useSpring,
   type MotionValue,
 } from "framer-motion";
-import { Calculator, ChevronRight, Cog, Network, type LucideIcon } from "lucide-react";
+import {
+  ChartColumn,
+  ChevronRight,
+  Cloud,
+  Factory,
+  GraduationCap,
+  Layers,
+  type LucideIcon,
+} from "lucide-react";
 import { useRef, type Ref } from "react";
 
 import { cn } from "@/lib/utils";
@@ -31,33 +39,52 @@ export type Experience = {
 
 /*
  * Work history, most recent first. To add an entry, append an object here —
- * the timeline, step numbers ("01 / 04"), progress pips and left/right
+ * the timeline, step numbers ("01 / 05"), progress pips and left/right
  * alternation all derive from this array.
  */
 export const EXPERIENCES: Experience[] = [
   {
-    slug: "karo-platform",
-    title: "Karo Platform",
-    tag: "Information Architecture",
+    slug: "nubar-cloud",
+    title: "NobarCloud",
+    tag: "IaaS & Product Leadership",
     description:
-      "Structured complex databases, categorized service trees, and designed technician profile logic for a seamless home appliance repair ecosystem.",
-    Icon: Network,
+      "Architecting cloud infrastructure products. Aligning complex technical constraints with enterprise business logic and driving a scalable design system.",
+    Icon: Cloud,
   },
   {
-    slug: "retail-architecture",
-    title: "Retail Architecture",
-    tag: "System Design & Business Logic",
+    slug: "digi-express",
+    title: "Digi Express",
+    tag: "Data Storytelling",
     description:
-      "Engineered a dynamic architecture for dynamic pricing, automated currency conversions, and multi-channel inventory calculations.",
-    Icon: Calculator,
+      "Designed data-heavy landing experiences and reports, translating massive logistical data points into digestible, user-centric visual narratives.",
+    Icon: ChartColumn,
   },
   {
-    slug: "physical-systems-analysis",
-    title: "Physical Systems Analysis",
-    tag: "Technical Storytelling",
+    slug: "ernyka-group",
+    title: "Ernyka Group",
+    tag: "Enterprise Ecosystems",
     description:
-      "Analyzed and visually broke down complex engineering mechanisms and infrastructure logic into digestible, user-centric flows.",
-    Icon: Cog,
+      "Scaled user experiences across complex, multi-layered enterprise products, balancing high-level stakeholder requirements with modular design principles.",
+    Icon: Layers,
+    href: "/work",
+  },
+  {
+    slug: "maad-group",
+    title: "Maad Group",
+    tag: "B2B & Back-Office Architecture",
+    description:
+      "Transformed traditional industrial processes into streamlined digital back-office systems and centralized e-commerce portals for multiple B2B sectors.",
+    Icon: Factory,
+    href: "/work",
+  },
+  {
+    slug: "rahnema-college",
+    title: "Rahnema College",
+    tag: "The Foundation",
+    description:
+      "Where the system-thinking journey began. Built a strong foundation in UX research, usability testing, and core digital product design methodologies.",
+    Icon: GraduationCap,
+    href: "/work",
   },
 ];
 
