@@ -159,7 +159,7 @@ function Persona({ side, activeSide, ...handlers }: PersonaProps) {
             key={line}
             className={cn(
               "block transition-colors duration-500",
-              i === 1 && isActive && (isLeft ? "text-amber-400" : "text-slate-300"),
+              i === 1 && isActive && (isLeft ? "text-accent" : "text-slate-300"),
             )}
           >
             {line}
@@ -270,7 +270,7 @@ function Portrait({
         <div
           aria-hidden
           className={cn(
-            "pointer-events-none absolute inset-y-0 left-0 w-1/2 bg-amber-500/25 mix-blend-color",
+            "pointer-events-none absolute inset-y-0 left-0 w-1/2 bg-accent/25 mix-blend-color",
             LANDMARK_FADE,
             leftOn ? "opacity-100" : "opacity-20",
           )}
@@ -316,7 +316,7 @@ function Portrait({
               ["mouth", "jaw"],
               ["jaw", "brow"],
             ]}
-            dot="#fbbf24"
+            dot="var(--color-accent)"
           />
           <Guide from={LEFT_POINTS.brow} to={[-2, 128]} />
           <Guide from={LEFT_POINTS.jaw} to={[-2, 240]} />
@@ -337,8 +337,8 @@ function Portrait({
       </svg>
 
       <div aria-hidden className={cn("pointer-events-none absolute inset-0 z-20", LANDMARK_FADE, leftOn ? "opacity-100" : "opacity-0")}>
-        <Label className="top-[30%] -left-8 text-amber-400">24px, #F59E0B</Label>
-        <Label className="top-[58%] -left-8 text-amber-400">r16 · 8pt grid</Label>
+        <Label className="top-[30%] -left-8 text-accent">24px, #F97316</Label>
+        <Label className="top-[58%] -left-8 text-accent">r16 · 8pt grid</Label>
       </div>
       <div aria-hidden className={cn("pointer-events-none absolute inset-0 z-20", LANDMARK_FADE, rightOn ? "opacity-100" : "opacity-0")}>
         <Label className="top-[40%] -right-8 text-slate-300">iris · 0x2F</Label>
@@ -418,7 +418,7 @@ function DotGrid({ className }: { className: string }) {
     >
       <defs>
         <pattern id="about-dot-grid" width="12" height="12" patternUnits="userSpaceOnUse">
-          <circle cx="1" cy="1" r="1" fill="#fbbf24" />
+          <circle cx="1" cy="1" r="1" fill="var(--color-accent)" />
         </pattern>
       </defs>
       <rect width="100%" height="100%" fill="url(#about-dot-grid)" />
