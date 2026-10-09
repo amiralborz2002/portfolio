@@ -18,17 +18,20 @@ type ArchiveEntry = {
 
 // Newest first. The header's index count and timeline are derived from this list.
 const archiveData: ArchiveEntry[] = [
-  { id: 1, year: "2024", title: "Logestica Redesign", type: "Corporate Website", linkType: "offline", href: "" },
+  { id: 1, year: "2025", title: "Philanthropic Campaign", type: "Donation Landing Page", linkType: "offline", href: "" },
   { id: 2, year: "2024", title: "Nikaro EdTech", type: "Platform Redesign", linkType: "offline", href: "" },
-  { id: 3, year: "2024", title: "Insurance Exhibition Kiosk", type: "Landing Page", linkType: "offline", href: "" },
-  { id: 4, year: "2023", title: "Escape Room Marketplace", type: "Web Application", linkType: "offline", href: "" },
-  { id: 5, year: "2023", title: "Excoino Referral Gateway", type: "FinTech Landing Page", linkType: "offline", href: "" },
-  { id: 6, year: "2023", title: "Traders' Copilot", type: "Chrome Extension", linkType: "offline", href: "" },
-  { id: 7, year: "2023", title: "Enterprise Internal CMS", type: "Back-office Tool", linkType: "offline", href: "" },
-  { id: 8, year: "2022", title: "Harchi Online", type: "B2B E-Commerce", linkType: "nda", href: "" },
-  { id: 9, year: "2022", title: "Maad Talaei", type: "Guarantee Portal", linkType: "offline", href: "" },
-  { id: 10, year: "2022", title: "Simi Nasr Maad", type: "Industrial Distributor Hub", linkType: "offline", href: "" },
-  { id: 11, year: "2021", title: "Bavar Task Manager", type: "Mobile Application", linkType: "offline", href: "" },
+  { id: 3, year: "2024", title: "Insurance Exhibition Kiosk", type: "InsurTech Landing", linkType: "offline", href: "" },
+  { id: 4, year: "2024", title: "Healthcare Logistics App", type: "Delivery Flow Redesign", linkType: "offline", href: "" },
+  { id: 5, year: "2023", title: "Logestica", type: "Corporate Website Redesign", linkType: "offline", href: "" },
+  { id: 6, year: "2023", title: "Enterprise ERP", type: "Interface Redesign", linkType: "offline", href: "" },
+  { id: 7, year: "2023", title: "Escape Room Marketplace", type: "Web Application", linkType: "offline", href: "" },
+  { id: 8, year: "2023", title: "Excoino Referral Gateway", type: "FinTech Landing Page", linkType: "offline", href: "" },
+  { id: 9, year: "2023", title: "Traders' Copilot", type: "Chrome Extension", linkType: "offline", href: "" },
+  { id: 10, year: "2023", title: "Enterprise Internal CMS", type: "Back-office Tool", linkType: "offline", href: "" },
+  { id: 11, year: "2022", title: "Harchi Online", type: "B2B E-Commerce", linkType: "nda", href: "" },
+  { id: 12, year: "2022", title: "Maad Talaei", type: "Guarantee Portal", linkType: "offline", href: "" },
+  { id: 13, year: "2022", title: "Simi Nasr Maad", type: "Industrial Distributor Hub", linkType: "offline", href: "" },
+  { id: 14, year: "2021", title: "Bavar Task Manager", type: "Mobile Application", linkType: "offline", href: "" },
 ];
 
 const PAGE_SIZE = 10;

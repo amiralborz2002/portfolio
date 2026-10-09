@@ -23,7 +23,7 @@ export const caseStudies: CaseStudy[] = [
     slug: "design-system",
     title: "Enterprise Design System",
     category: "Design Infrastructure",
-    tags: ["Design Infrastructure", "2025"],
+    tags: ["Design Infrastructure", "System Architecture"],
     summary:
       "How a token-driven design system unified six product teams and cut UI delivery time in half.",
     tlDr: {
@@ -63,7 +63,7 @@ export const caseStudies: CaseStudy[] = [
     slug: "nubar-cloud",
     title: "NobarCloud",
     category: "IaaS Platform",
-    tags: ["IaaS Platform", "2025"],
+    tags: ["IaaS Platform", "B2B Ecosystem"],
     summary: "Turning a sprawling cloud control panel into a console engineers actually trust.",
     tlDr: {
       role: "Senior UX Designer",
@@ -101,7 +101,7 @@ export const caseStudies: CaseStudy[] = [
     slug: "digi-express",
     title: "Digi Express Annual Report",
     category: "Data Storytelling Landing",
-    tags: ["Data Storytelling Landing", "2025"],
+    tags: ["Data Storytelling", "Interactive Web"],
     summary: "An interactive annual report that turns a year of logistics data into a narrative.",
     tlDr: {
       role: "Product Designer",
@@ -137,7 +137,7 @@ export const caseStudies: CaseStudy[] = [
     slug: "fragrance-spa",
     title: "ODO Perfume",
     category: "Single Page Application",
-    tags: ["Single Page Application", "2026"],
+    tags: ["Single Page Application", "E-Commerce"],
     summary: "A wholesale ordering experience built for buyers who reorder hundreds of SKUs.",
     tlDr: {
       role: "UX Architect",
@@ -173,7 +173,7 @@ export const caseStudies: CaseStudy[] = [
     slug: "parv-online",
     title: "Parv Online",
     category: "E-Commerce Platform",
-    tags: ["E-Commerce Platform", "2024"],
+    tags: ["E-Commerce Platform", "Web Application"],
     summary: "A two-sided marketplace that makes discovering and booking escape rooms effortless.",
     tlDr: {
       role: "Product Designer",
